@@ -54,3 +54,5 @@ local.properties
 FodUpload.jar
 
 /target/
+
+dependency-reduced-pom.xml
