@@ -97,6 +97,29 @@
 						<target>1.7</target>
 					</configuration>
 				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>2.4.3</version>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>shade</goal>
+							</goals>
+							<configuration>
+								<minimizeJar>true</minimizeJar>
+								<artifactSet>
+									<excludes>
+										<exclude>org.apache.httpcomponents:httpclient-win</exclude>
+									</excludes>
+								</artifactSet>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>
