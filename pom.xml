@@ -2,10 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.fortify.fod</groupId>
-	<artifactId>fod-uploader</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>FodUpload</artifactId>
+	<version>5.3</version>
 	<packaging>jar</packaging>
-	
 	<dependencies>
 
 		<dependency>
@@ -29,11 +28,6 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient-win -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient-win</artifactId>
-			<version>4.5.1</version>
-		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient-cache -->
 		<dependency>
@@ -87,7 +81,6 @@
 	</dependencies>
 
 	<build>
-		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -96,6 +89,12 @@
 					<configuration>
 						<source>1.7</source>
 						<target>1.7</target>
+						<archive>
+				            <manifest>
+				              <addClasspath>true</addClasspath>
+				              <mainClass>com.fortify.fod.Main</mainClass>
+				            </manifest>
+         				 </archive>
 					</configuration>
 				</plugin>
 
@@ -105,23 +104,22 @@
 					<version>2.4.3</version>
 					<executions>
 						<execution>
+						    <phase>package</phase>
 							<goals>
 								<goal>shade</goal>
 							</goals>
 							<configuration>
 								<minimizeJar>true</minimizeJar>
-								<artifactSet>
-									<excludes>
-										<exclude>org.apache.httpcomponents:httpclient-win</exclude>
-									</excludes>
-								</artifactSet>
+								<transformers>
+				                   <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+				                  		<mainClass>com.fortify.fod.Main</mainClass>
+				               	   </transformer>
+				                </transformers>
 							</configuration>
 						</execution>
 					</executions>
 				</plugin>
-
 			</plugins>
-		</pluginManagement>
 	</build>
 </project>
 
