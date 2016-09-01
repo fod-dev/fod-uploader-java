@@ -11,7 +11,9 @@ Instead of using the package goal, use shade:shade
 mvn clean install shade:shade
 ```
 
-If you are behind the HPE firewall, you will need to configure maven's proxy settings in the `<user-directory>/.m2/settings.xml` file.
+If you are behind the HPE firewall, you will need to configure maven's proxy settings in:
+
+`<user-directory>/.m2/settings.xml`
 
 ```xml
 <settings>
