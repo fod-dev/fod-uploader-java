@@ -1,7 +1,7 @@
 # fod-uploader
 Java Utility for uploading packages to FoD
 
-## Compiling
+## Setup
 
 The FoD-Uploader relies on Maven's Shade Plugin to compile all of its dependencies into a single jar.
 
@@ -13,7 +13,7 @@ mvn clean install shade:shade
 
 If you are behind the HPE firewall, you will need to configure maven's proxy settings in:
 
-`<user-directory>/.m2/settings.xml`
+*\<user-directory>/.m2/settings.xml*
 
 ```xml
 <settings>
