@@ -1,7 +1,7 @@
 # fod-uploader
 Java Utility for uploading packages to FoD
 
-## Compiling
+## Setup
 
 The FoD-Uploader relies on Maven's Shade Plugin to compile all of its dependencies into a single jar.
 
