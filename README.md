@@ -39,6 +39,7 @@ If you are behind the HPE firewall, you will need to configure maven's proxy set
       <password></password>
       <nonProxyHosts>localhost,127.0.0.1</nonProxyHosts>
     </proxy>
+  </proxies>
   ...
 </settings>
 ```
