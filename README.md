@@ -3,43 +3,23 @@ Java Utility for uploading packages to FoD
 
 ## Setup
 
-The FoD-Uploader relies on Maven's Shade Plugin to compile all of its dependencies into a single jar.
+The FoD-Uploader is configured to build a fat jar with the Gradle Shadow plugin as the default gradle task.
 
-Instead of using the package goal, use shade:shade
+To compile, simply use the gradlew or gradlew.bat depending on your operating system.
 
 ```
-mvn clean install shade:shade
+.\gradlew.bat
 ```
 
-If you are behind the HPE firewall, you will need to configure maven's proxy settings in:
+If you are behind the HPE firewall, you will need to configure gradles's proxy settings in:
 
-*\<user-directory>/.m2/settings.xml*
+*/<user-directory>/.gradle/gradle.properties*
 
-```xml
-<settings>
-  ...
-  <proxies>
-    <proxy>
-      <id>http-proxy</id>
-      <active>true</active>
-      <protocol>http</protocol>
-      <host>web-proxy.atl.hp.com</host>
-      <port>8080</port>
-      <username></username>
-      <password></password>
-      <nonProxyHosts>localhost,127.0.0.1</nonProxyHosts>
-    </proxy>
-    <proxy>
-      <id>https-proxy</id>
-      <active>true</active>
-      <protocol>https</protocol>
-      <host>web-proxy.atl.hp.com</host>
-      <port>8080</port>
-      <username></username>
-      <password></password>
-      <nonProxyHosts>localhost,127.0.0.1</nonProxyHosts>
-    </proxy>
-  </proxies>
-  ...
-</settings>
+```
+systemProp.http.proxyHost=web-proxy.atl.hp.com
+systemProp.http.proxyPort=8080
+
+systemProp.https.proxyHost=web-proxy.atl.hp.com
+systemProp.https.proxyPort=8080
+
 ```
