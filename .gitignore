@@ -1,58 +1,76 @@
-.metadata
-bin/
-tmp/
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.settings/
-.loadpath
-.recommenders
+# Gradle
+# ------
+.gradle
+/build
+/buildSrc/build
+/subprojects/*/build
+/subprojects/docs/src/samples/*/*/build
+/subprojects/internal-android-performance-testing/build-android-libs
+# Ignore Gradle GUI config
+gradle-app.setting
 
-# Eclipse Core
-.project
+# IDEA
+# ----
+.idea
+.shelf
+/*.iml
+/*.ipr
+/*.iws
+/buildSrc/*.iml
+/buildSrc/*.ipr
+/buildSrc/*.iws
+/buildSrc/out
+/out
+/subprojects/*/*.iml
+/subprojects/*/out
 
-# External tool builders
-.externalToolBuilders/
+# Eclipse
+# -------
+*.classpath
+*.project
+*.settings
+/bin
+/subprojects/*/bin
+atlassian-ide-plugin.xml
 
-# Locally stored "Eclipse launch configurations"
-*.launch
+# NetBeans
+# --------
+.nb-gradle
+.nb-gradle-properties
 
-# PyDev specific (Python IDE for Eclipse)
-*.pydevproject
+# Vim
+# ---
+*.sw[op]
 
-# CDT-specific (C/C++ Development Tooling)
-.cproject
+# Emacs
+# -----
+*~
 
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
+# Textmate
+# --------
+.textmate
 
-# Java annotation processor (APT)
-.factorypath
+# Sublime Text
+# ------------
+*.sublime-*
 
-# PDT-specific (PHP Development Tools)
-.buildpath
+# jEnv
+# ----
+.java-version
 
-# sbteclipse plugin
-.target
+# OS X
+# ----
+.DS_Store
 
-# Tern plugin
-.tern-project
+# HPROF
+# -----
+*.hprof
 
-# TeXlipse plugin
-.texlipse
+# Work dirs
+# ---------
+/incoming-distributions
+/intTestHomeDir
 
-# STS (Spring Tool Suite)
-.springBeans
-
-# Code Recommenders
-.recommenders/
-
-# Additional Ignores
-
-FodUpload.jar
-
-/target/
-
-dependency-reduced-pom.xml
+# Logs
+# ----
+/*.log

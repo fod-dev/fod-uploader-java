@@ -1,0 +1,47 @@
+group = 'com.fortify.fod'
+version = '5.3'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+     mavenCentral()
+}
+dependencies {
+    compile group: 'commons-codec', name: 'commons-codec', version:'1.9'
+    compile group: 'commons-logging', name: 'commons-logging', version:'1.2'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.5.1'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient-cache', version:'4.5.1'
+    compile group: 'org.apache.httpcomponents', name: 'httpcore', version:'4.4.3'
+    compile group: 'org.apache.httpcomponents', name: 'httpmime', version:'4.5.1'
+    compile group: 'net.java.dev.jna', name: 'jna', version:'4.1.0'
+    compile group: 'net.java.dev.jna', name: 'jna-platform', version:'4.1.0'
+    compile group: 'com.google.code.gson', name: 'gson', version:'2.1'
+    compile group: 'org.apache.httpcomponents', name: 'fluent-hc', version:'4.5.1'
+}
+
+shadowJar {
+    classifier = null
+    configurations = [project.configurations.compile]
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.fortify.fod.Main'
+    }
+}
+
+defaultTasks 'shadowJar'
