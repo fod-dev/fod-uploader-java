@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -60,8 +59,9 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
-		
+        FortifyParser fortifyCommands = new FortifyParser();
+        fortifyCommands.parse(args);
+
 		final int seglen = 1024*1024;        // chunk size
 		final long maxFileSize = 5000*1024*1024L;
 		boolean uploadSucceeded = false;
