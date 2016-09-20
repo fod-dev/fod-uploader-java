@@ -44,4 +44,8 @@ jar {
     }
 }
 
+task logError {
+    logging.captureStandardOutput LogLevel.ERROR
+}
+
 defaultTasks 'shadowJar'

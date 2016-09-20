@@ -11,6 +11,12 @@ To compile, simply use the gradlew or gradlew.bat depending on your operating sy
 .\gradlew.bat
 ```
 
+For a better breakdown of the build proccess, compile gradle with the following:
+
+```
+.\gradlew.bat -I init.gradle build
+```
+
 If you are behind the HPE firewall, you will need to configure gradles's proxy settings in:
 
 */\<user-directory>/.gradle/gradle.properties*

@@ -1,0 +1,19 @@
+useLogger(new CustomEventLogger())
+
+class CustomEventLogger extends BuildAdapter implements TaskExecutionListener {
+
+    public void beforeExecute(Task task) {
+        println "begin [$task.name]"
+    }
+
+    public void afterExecute(Task task, TaskState state) {
+        println "end [$task.name]"
+    }
+    
+    public void buildFinished(BuildResult result) {
+        if (result.failure != null)
+            println 'build failed'
+        else
+            println 'build completed'
+    }
+}
