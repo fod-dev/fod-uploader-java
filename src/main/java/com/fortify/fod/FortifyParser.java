@@ -36,7 +36,7 @@ public class FortifyParser {
                 .build();
 
         // Creates the username argument ( -url, --bsiUrl <url> required=true build server url )
-        Option bsiUrl = Option.builder("url")
+        Option bsiUrl = Option.builder("b")
                 .hasArg(true)
                 .required(true)
                 .longOpt("bsiUrl")
@@ -45,7 +45,7 @@ public class FortifyParser {
                 .build();
 
         // Creates the username argument ( -loc, --zipLocation <file> required=true location of scan )
-        Option zipLocation = Option.builder("loc")
+        Option zipLocation = Option.builder("z")
                 .hasArg(true)
                 .required(true)
                 .longOpt("zipLocation")
