@@ -17,8 +17,7 @@ public class BsiUrl {
     private String languageLevel;
     private String endpoint;
 
-    //TODO: proxy (proxy, proxyUsername, proxyPassword, ntWorkStation, ntDomain), pollingInterval,
-    //TODO: scanPreferenceId, auditPreferenceId, runSonatypeScan
+    //TODO: proxy (proxy, proxyUsername, proxyPassword, ntWorkStation, ntDomain)
 
     /**
      * Creates a bsi url object.

@@ -7,11 +7,31 @@ import java.util.regex.Pattern;
 
 public class FortifyParser {
     public static final String USERNAME = "username";
+    public static final String USERNAME_SHORT = "u";
+
     public static final String PASSWORD = "password";
-    public static final String ZIP_LOCATION = "ziplocation";
+    public static final String PASSWORD_SHORT = "u";
+
+    public static final String ZIP_LOCATION = "zipLocation";
+    public static final String ZIP_LOCATION_SHORT = "l";
+
     public static final String BSI_URL = "bsiUrl";
+    public static final String BSI_URL_SHORT = "U";
+
     public static final String HELP = "help";
     public static final String VERSION = "version";
+
+    public static final String POLLING_INTERVAL = "pollingInterval";
+    public static final String POLLING_INTERVAL_SHORT = "i";
+
+    public static final String RUN_SONATYPE_SCAN = "runSonatypeScan";
+    public static final String RUN_SONATYPE_SCAN_SHORT = "s";
+
+    public static final String AUDIT_PREFERENCE_ID = "auditPreferenceId";
+    public static final String AUDIT_PREFERENCE_ID_SHORT = "a";
+
+    public static final String SCAN_PREFERENCE_ID = "scanPreferenceId";
+    public static final String SCAN_PREFERENCE_ID_SHORT = "m";
 
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
@@ -21,12 +41,52 @@ public class FortifyParser {
      * Argument paring wrapper for the Fod Uploader.
      */
     public FortifyParser() {
-        // creates 2 arguments which aren't required
+        // creates 2 arguments which aren't required. #documentation
         Option help = new       Option(HELP, "print this message");
         Option version = new    Option(VERSION, "print the version information and exit");
 
+        // Creates the polling interval argument ( -i --pollingInterval <<minutes> required=false interval between
+        // checking scan status
+        Option pollingInterval = Option.builder(POLLING_INTERVAL_SHORT)
+                .hasArg(true)
+                .required(false)
+                .longOpt(POLLING_INTERVAL)
+                .argName("minutes")
+                .desc("interval between checking scan status")
+                .build();
+
+        // Creates the run sonatype scan argument ( -s --runSonatypeScan <true | false> required=false whether to run a
+        // Sonatype Scan
+        Option runSonatypeScan = Option.builder(RUN_SONATYPE_SCAN_SHORT)
+                .hasArg(true)
+                .required(false)
+                .longOpt(RUN_SONATYPE_SCAN)
+                .argName("true|false")
+                .desc("whether to run a Sonatype Scan")
+                .build();
+
+        // Creates the audit preference id argument ( -a, --auditPreferenceId <1 | 2> required=false false positive audit
+        // type (Manual or Automated) )
+        Option auditPreferenceId = Option.builder(AUDIT_PREFERENCE_ID_SHORT)
+                .hasArg(true)
+                .required(false)
+                .longOpt(AUDIT_PREFERENCE_ID)
+                .argName("1|2")
+                .desc("false positive audit type (Manual or Automated)")
+                .build();
+
+        // Creates the scan preference id argument ( -m, --scanPreferenceId <1 | 2> required=false scan mode (Standard or
+        // Express) )
+        Option scanPreferenceId = Option.builder(SCAN_PREFERENCE_ID_SHORT)
+                .hasArg(true)
+                .required(true)
+                .longOpt(SCAN_PREFERENCE_ID)
+                .argName("1|2")
+                .desc("scan mode (Standard or Express)")
+                .build();
+
         // Creates the username argument ( -u, --username <user> required=true username/api key )
-        Option username = Option.builder("u")
+        Option username = Option.builder(USERNAME_SHORT)
                 .hasArg(true)
                 .required(true)
                 .longOpt(USERNAME)
@@ -34,8 +94,8 @@ public class FortifyParser {
                 .desc("username/api key")
                 .build();
 
-        // Creates the username argument ( -p, --password <pass> required=true password/api secret )
-        Option password = Option.builder("p")
+        // Creates the password argument ( -p, --password <pass> required=true password/api secret )
+        Option password = Option.builder(PASSWORD_SHORT)
                 .hasArg(true)
                 .required(true)
                 .longOpt(PASSWORD)
@@ -43,8 +103,8 @@ public class FortifyParser {
                 .desc("password/api secret")
                 .build();
 
-        // Creates the username argument ( -url, --bsiUrl <url> required=true build server url )
-        Option bsiUrl = Option.builder("b")
+        // Creates the bsi url argument ( -U, --bsiUrl <url> required=true build server url )
+        Option bsiUrl = Option.builder(BSI_URL_SHORT)
                 .hasArg(true)
                 .required(true)
                 .longOpt(BSI_URL)
@@ -52,8 +112,8 @@ public class FortifyParser {
                 .desc("build server url")
                 .build();
 
-        // Creates the username argument ( -loc, --zipLocation <file> required=true location of scan )
-        Option zipLocation = Option.builder("z")
+        // Creates the zip location argument ( -z, --zipLocation <file> required=true location of scan )
+        Option zipLocation = Option.builder(ZIP_LOCATION_SHORT)
                 .hasArg(true)
                 .required(true)
                 .longOpt(ZIP_LOCATION)
@@ -68,6 +128,10 @@ public class FortifyParser {
         options.addOption(password);
         options.addOption(bsiUrl);
         options.addOption(zipLocation);
+        options.addOption(pollingInterval);
+        options.addOption(runSonatypeScan);
+        options.addOption(auditPreferenceId);
+        options.addOption(scanPreferenceId);
     }
 
     /**
@@ -84,7 +148,8 @@ public class FortifyParser {
                 BsiUrl url = new BsiUrl(cmd.getOptionValue(BSI_URL));
             }
 
-            if (cmd.hasOption(USERNAME) && cmd.hasOption(PASSWORD) && cmd.hasOption(ZIP_LOCATION) && cmd.hasOption(BSI_URL)) {
+            if (cmd.hasOption(USERNAME) && cmd.hasOption(PASSWORD) && cmd.hasOption(ZIP_LOCATION)
+                    && cmd.hasOption(BSI_URL)) {
 
             }
         // Throws if username, password, zip location and bsi url aren't all present.
@@ -101,6 +166,8 @@ public class FortifyParser {
                 System.err.println(e.getMessage());
                 System.err.println("try \"-" + HELP + "\" for info");
             }
+
+            System.exit(1);
         } catch(Exception e) {
             System.err.println(e.getMessage());
             System.exit(1);
@@ -131,7 +198,11 @@ public class FortifyParser {
 
             int result = required2.compareTo(required1);
             if (result == 0) {
-                result = o1.getOpt().compareToIgnoreCase(o2.getOpt());
+                // will try to sort by short Operator but if it doesn't exist then it'll use long operator
+                String comp1 = o1.getOpt() == null ? o1.getLongOpt() : o1.getOpt();
+                String comp2 = o2.getOpt() == null ? o2.getLongOpt() : o2.getOpt();
+
+                result = comp1.compareToIgnoreCase(comp2);
             }
             return result;
         }
