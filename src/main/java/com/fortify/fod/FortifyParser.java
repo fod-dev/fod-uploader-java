@@ -134,16 +134,18 @@ public class FortifyParser {
         } catch (ParseException e) {
             // If the user types just -help or just -version, then it will handle that command.
             // Regex is used here since cmd isn't accessible.
-            Pattern p = Pattern.compile("(-{0,2})" + HELP + "|" + VERSION);
-            if (p.matcher(args[0]).matches()) {
-                help();
-            } else if (p.matcher(args[0]).matches()) {
-                System.out.println("upload version FodUploader 5.3.0");
-            } else {
-                // I can no longer hope to imagine the command you intended.
-                System.err.println(e.getMessage());
-                System.err.println("try \"-" + HELP + "\" for info");
+            if(args.length > 0) {
+                if (Pattern.matches("(-{1,2})" + HELP, args[0])) {
+                    help();
+                    System.exit(1);
+                } else if (Pattern.matches("(-{1,2})" + VERSION, args[0])) {
+                    System.out.println("upload version FodUploader 5.3.0");
+                    System.exit(1);
+                }
             }
+            // I can no longer hope to imagine the command you intended.
+            System.err.println(e.getMessage());
+            System.err.println("try \"-" + HELP + "\" for info");
 
             System.exit(1);
         } catch(Exception e) {
