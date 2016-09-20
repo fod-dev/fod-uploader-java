@@ -1,8 +1,10 @@
 package com.fortify.fod;
 
 import org.apache.commons.cli.*;
+import org.apache.http.NameValuePair;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class FortifyParser {
@@ -47,79 +49,55 @@ public class FortifyParser {
 
         // Creates the polling interval argument ( -i --pollingInterval <<minutes> required=false interval between
         // checking scan status
-        Option pollingInterval = Option.builder(POLLING_INTERVAL_SHORT)
-                .hasArg(true)
-                .required(false)
-                .longOpt(POLLING_INTERVAL)
-                .argName("minutes")
+        Option pollingInterval = Option.builder(POLLING_INTERVAL_SHORT).longOpt(POLLING_INTERVAL)
+                .hasArg(true).argName("minutes")
                 .desc("interval between checking scan status")
-                .build();
+                .required(false).build();
 
         // Creates the run sonatype scan argument ( -s --runSonatypeScan <true | false> required=false whether to run a
         // Sonatype Scan
-        Option runSonatypeScan = Option.builder(RUN_SONATYPE_SCAN_SHORT)
-                .hasArg(true)
-                .required(false)
-                .longOpt(RUN_SONATYPE_SCAN)
-                .argName("true|false")
+        Option runSonatypeScan = Option.builder(RUN_SONATYPE_SCAN_SHORT).longOpt(RUN_SONATYPE_SCAN)
+                .hasArg(true).argName("true|false")
                 .desc("whether to run a Sonatype Scan")
-                .build();
+                .required(false).build();
 
         // Creates the audit preference id argument ( -a, --auditPreferenceId <1 | 2> required=false false positive audit
         // type (Manual or Automated) )
-        Option auditPreferenceId = Option.builder(AUDIT_PREFERENCE_ID_SHORT)
-                .hasArg(true)
-                .required(false)
-                .longOpt(AUDIT_PREFERENCE_ID)
-                .argName("1|2")
+        Option auditPreferenceId = Option.builder(AUDIT_PREFERENCE_ID_SHORT).longOpt(AUDIT_PREFERENCE_ID)
+                .hasArg(true).argName("1|2")
                 .desc("false positive audit type (Manual or Automated)")
-                .build();
+                .required(false).build();
 
         // Creates the scan preference id argument ( -m, --scanPreferenceId <1 | 2> required=false scan mode (Standard or
         // Express) )
-        Option scanPreferenceId = Option.builder(SCAN_PREFERENCE_ID_SHORT)
-                .hasArg(true)
-                .required(true)
-                .longOpt(SCAN_PREFERENCE_ID)
-                .argName("1|2")
+        Option scanPreferenceId = Option.builder(SCAN_PREFERENCE_ID_SHORT).longOpt(SCAN_PREFERENCE_ID)
+                .hasArg(true).argName("1|2")
                 .desc("scan mode (Standard or Express)")
-                .build();
+                .required(true).build();
 
         // Creates the username argument ( -u, --username <user> required=true username/api key )
-        Option username = Option.builder(USERNAME_SHORT)
-                .hasArg(true)
-                .required(true)
-                .longOpt(USERNAME)
-                .argName("user")
+        Option username = Option.builder(USERNAME_SHORT).longOpt(USERNAME)
+                .hasArg(true).argName("user")
                 .desc("username/api key")
-                .build();
+                .required(true).build();
 
         // Creates the password argument ( -p, --password <pass> required=true password/api secret )
-        Option password = Option.builder(PASSWORD_SHORT)
-                .hasArg(true)
-                .required(true)
-                .longOpt(PASSWORD)
-                .argName("pass")
+        Option password = Option.builder(PASSWORD_SHORT).longOpt(PASSWORD)
+                .hasArg(true).argName("pass")
                 .desc("password/api secret")
-                .build();
+                .required(true).build();
 
         // Creates the bsi url argument ( -U, --bsiUrl <url> required=true build server url )
-        Option bsiUrl = Option.builder(BSI_URL_SHORT)
-                .hasArg(true)
-                .required(true)
-                .longOpt(BSI_URL)
-                .argName("url")
+        Option bsiUrl = Option.builder(BSI_URL_SHORT).longOpt(BSI_URL)
+                .hasArg(true).argName("url")
                 .desc("build server url")
-                .build();
+                .required(true).build();
 
         // Creates the zip location argument ( -z, --zipLocation <file> required=true location of scan )
-        Option zipLocation = Option.builder(ZIP_LOCATION_SHORT)
-                .hasArg(true)
-                .required(true)
-                .longOpt(ZIP_LOCATION)
-                .argName("file")
+        Option zipLocation = Option.builder(ZIP_LOCATION_SHORT).longOpt(ZIP_LOCATION)
+                .hasArg(true).argName("file")
                 .desc("location of scan")
-                .build();
+                .required(true).build();
 
         // Add the options to the options list
         options.addOption(help);
