@@ -71,212 +71,199 @@ public class Main {
 		String errorMessage = "";
 		boolean authenticationSucceeded = false;
 
+        URI proxyUri = null;
+        String proxyUsername = "";
+        String proxyPassword = "";
+        String ntDomain = "";
+        String ntWorkstation = "";
+        long pollingInterval = 0;
+        try
+        {
+            httpclient = new DefaultHttpClient();
+            Map<String,String> argMap = parseArgs(args);
 
-		if(args.length < 4)	
-		{
-			System.out.println("Username/key:Api Key, password/secret, endpoint url and payload location required");			
-		}
-		else 
-		{
-			
-			URI proxyUri = null;	
-			String proxyUsername = "";
-			String proxyPassword = "";
-			String ntDomain = "";
-			String ntWorkstation = "";
-			long pollingInterval = 0;
-			try 
-			{	 
-				httpclient = new DefaultHttpClient();
-				Map<String,String> argMap = parseArgs(args);
-				
-				if(argMap.containsKey("tenantId") &&  
-				   argMap.containsKey("username") &&
-				   argMap.containsKey("password") &&
-				   argMap.containsKey("releaseId") &&
-				   argMap.containsKey("technologyType") &&
-				   argMap.containsKey("endpoint") &&
-				   argMap.containsKey("assessmentTypeId") &&
-				   argMap.containsKey("zipLocation"))
-				{
-				
-					url = argMap.get("endpoint");
-					String zipLocation = argMap.get("zipLocation");
-					username = argMap.get("username");
-					password = argMap.get("password");
-					String techType = argMap.get("technologyType");
-					String assessmentTypeId = argMap.get("assessmentTypeId");
-					String tenantId = argMap.get("tenantId");
-					tenantCode = argMap.get("tenantCode");
-					releaseId = argMap.get("releaseId");
-					String languageLevel = "";
-					if(argMap.containsKey("pollingInterval"))
-					{
-						pollingInterval = Long.parseLong(argMap.get("pollingInterval"));
-					}
-					if(argMap.containsKey("languageLevel"))
-					{
-						languageLevel = argMap.get("languageLevel");
-					}
-					
-					if(argMap.containsKey("proxy"))
-				    {
-					    proxyUri = new URI(argMap.get("proxy"));
-					    HttpHost proxy = new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme());
-						httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
-					}
-					
-					if(argMap.containsKey("proxyUsername")  && argMap.containsKey("proxyPassword"))
-				    {
-						proxyUsername = argMap.get("proxyUsername");
-						proxyPassword = argMap.get("proxyPassword");
-						
-						if(argMap.containsKey("ntDomain") && argMap.containsKey("ntWorkstation"))
-						{
-							ntWorkstation = argMap.get("ntWorkstation");
-							ntDomain = argMap.get("ntDomain");
-							httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new NTCredentials(proxyUsername , proxyPassword, ntWorkstation, ntDomain));
-						}
-						else
-						{
-							httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(proxyUsername , proxyPassword));
-						}
-				    }
-					//first thing check file size
-					File zipFileInfo = new File(zipLocation);
-					if(zipFileInfo.length() > maxFileSize)
-					{
-						System.out.println("Terminating upload. File Exceeds maximum length : " + maxFileSize);
-						return;
-					}
-					
-					token = authorize(url, tenantCode, username, password, httpclient);
-					if(token != null && !token.isEmpty())	
-					{
-						authenticationSucceeded = true;
-						FileInputStream fs = new FileInputStream(zipLocation);
-						byte[] readByteArray = new byte[seglen];
-						byte[] sendByteArray = null;
-						int fragmentNumber = 0;
-						int byteCount = 0;
-						long offset = 0;
-						while((byteCount = fs.read(readByteArray)) != -1)
-						{
-						  if(byteCount < seglen)
-						  {
-							  fragmentNumber = -1;
-							  lastFragment = true;
-							  sendByteArray = Arrays.copyOf(readByteArray, byteCount);
-						  }
-						  else 
-						  {
-							  sendByteArray = readByteArray;
-						  }
-						  String fragUrl = "";
-						  if(languageLevel != null)
-						  {
-							  fragUrl = url + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId=" + assessmentTypeId + "&technologyStack=" + techType + "&languageLevel=" + languageLevel +  "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
-						  }
-						  else
-					      {
-							  fragUrl = url + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId=" + assessmentTypeId + "&technologyStack=" + techType +  "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
-					      } 
-						  if(argMap.containsKey("scanPreferenceId"))
-						  {
-							  fragUrl += "&scanPreferenceId=" + argMap.get("scanPreferenceId");
-						  }
-						  if(argMap.containsKey("auditPreferenceId"))
-						  {
-							  fragUrl += "&auditPreferenceId=" + argMap.get("auditPreferenceId");
-						  }
-						  if(argMap.containsKey("runSonatypeScan"))
-						  {
-							  fragUrl += "&doSonatypeScan=" + argMap.get("runSonatypeScan");
-						  }
-						  String postErrorMessage = "";
-						  SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpclient, token, postErrorMessage);
-						  HttpResponse response = postResponse.getResponse();
-						  if(response == null)
-						  {
-							  errorMessage = postResponse.getErrorMessage();
-							  sendPostFailed = true;
-							  break;
-						  }
-						  else
-						  {
-							
-							StatusLine sl = response.getStatusLine();
-							Integer statusCode = Integer.valueOf(sl.getStatusCode()); 
-							if( !statusCode.toString().startsWith("2") )
-							{
-								errorMessage = sl.toString();
-								break;
-							}
-							else
-							{
-								if(fragmentNumber != 0 && fragmentNumber % 5 == 0)
-								{
-									System.out.println("Upload Status - Bytes sent:" + offset);
-								}
-								if(lastFragment == true)
-								{
-									 HttpEntity entity = response.getEntity();
-									 String finalResponse = EntityUtils.toString(entity).trim();
-									 if(finalResponse.toUpperCase().equals("ACK") )
-									 {
-										 uploadSucceeded = true;
-									 } 
-									 else
-									 {
-										 errorMessage = finalResponse;
-									 }
-								}
-							}
-							EntityUtils.consume(response.getEntity());
-						  }
-						  offset += byteCount;
-						}
-						bytesSent = offset;
-						fs.close();
-						
-					}
-					else
-					{
-						errorMessage = "Failed to authenticate";
-					}
-				}
-				else
-				{
-					System.out.println("tenantId, username, password, and zip location are required to proceed");
-				}	
-		    }
-			catch (URISyntaxException e)
-			{
-				e.printStackTrace();
-			}
-			catch (Exception e) 
-			{
-				e.printStackTrace();
-			}
-			
-			//check success status exit appropriately
-			if(uploadSucceeded == true)
-			{
-				System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent );
-				int completionsStatus = pollServerForScanStatus(pollingInterval);
-				retireToken();
-				System.exit(completionsStatus);
-			}
-			else
-			{
-				System.out.println("Package upload failed. Message: " + errorMessage);
-				if(authenticationSucceeded)
-				{
-					retireToken();
-				}
-				System.exit(1);
-			}
-		}
+            if(argMap.containsKey("tenantId") &&
+               argMap.containsKey("username") &&
+               argMap.containsKey("password") &&
+               argMap.containsKey("releaseId") &&
+               argMap.containsKey("technologyType") &&
+               argMap.containsKey("endpoint") &&
+               argMap.containsKey("assessmentTypeId") &&
+               argMap.containsKey("zipLocation"))
+            {
+
+                url = argMap.get("endpoint");
+                String zipLocation = argMap.get("zipLocation");
+                username = argMap.get("username");
+                password = argMap.get("password");
+                String techType = argMap.get("technologyType");
+                String assessmentTypeId = argMap.get("assessmentTypeId");
+                String tenantId = argMap.get("tenantId");
+                tenantCode = argMap.get("tenantCode");
+                releaseId = argMap.get("releaseId");
+                String languageLevel = "";
+                if(argMap.containsKey("pollingInterval"))
+                {
+                    pollingInterval = Long.parseLong(argMap.get("pollingInterval"));
+                }
+                if(argMap.containsKey("languageLevel"))
+                {
+                    languageLevel = argMap.get("languageLevel");
+                }
+
+                if(argMap.containsKey("proxy"))
+                {
+                    proxyUri = new URI(argMap.get("proxy"));
+                    HttpHost proxy = new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme());
+                    httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+                }
+
+                if(argMap.containsKey("proxyUsername")  && argMap.containsKey("proxyPassword"))
+                {
+                    proxyUsername = argMap.get("proxyUsername");
+                    proxyPassword = argMap.get("proxyPassword");
+
+                    if(argMap.containsKey("ntDomain") && argMap.containsKey("ntWorkstation"))
+                    {
+                        ntWorkstation = argMap.get("ntWorkstation");
+                        ntDomain = argMap.get("ntDomain");
+                        httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new NTCredentials(proxyUsername , proxyPassword, ntWorkstation, ntDomain));
+                    }
+                    else
+                    {
+                        httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(proxyUsername , proxyPassword));
+                    }
+                }
+                //first thing check file size
+                File zipFileInfo = new File(zipLocation);
+                if(zipFileInfo.length() > maxFileSize)
+                {
+                    System.out.println("Terminating upload. File Exceeds maximum length : " + maxFileSize);
+                    return;
+                }
+
+                token = authorize(url, tenantCode, username, password, httpclient);
+                if(token != null && !token.isEmpty())
+                {
+                    authenticationSucceeded = true;
+                    FileInputStream fs = new FileInputStream(zipLocation);
+                    byte[] readByteArray = new byte[seglen];
+                    byte[] sendByteArray = null;
+                    int fragmentNumber = 0;
+                    int byteCount = 0;
+                    long offset = 0;
+                    while((byteCount = fs.read(readByteArray)) != -1)
+                    {
+                      if(byteCount < seglen)
+                      {
+                          fragmentNumber = -1;
+                          lastFragment = true;
+                          sendByteArray = Arrays.copyOf(readByteArray, byteCount);
+                      }
+                      else
+                      {
+                          sendByteArray = readByteArray;
+                      }
+                      String fragUrl = "";
+                      if(languageLevel != null)
+                      {
+                          fragUrl = url + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId=" + assessmentTypeId + "&technologyStack=" + techType + "&languageLevel=" + languageLevel +  "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
+                      }
+                      else
+                      {
+                          fragUrl = url + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId=" + assessmentTypeId + "&technologyStack=" + techType +  "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
+                      }
+                      if(argMap.containsKey("scanPreferenceId"))
+                      {
+                          fragUrl += "&scanPreferenceId=" + argMap.get("scanPreferenceId");
+                      }
+                      if(argMap.containsKey("auditPreferenceId"))
+                      {
+                          fragUrl += "&auditPreferenceId=" + argMap.get("auditPreferenceId");
+                      }
+                      if(argMap.containsKey("runSonatypeScan"))
+                      {
+                          fragUrl += "&doSonatypeScan=" + argMap.get("runSonatypeScan");
+                      }
+                      String postErrorMessage = "";
+                      SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpclient, token, postErrorMessage);
+                      HttpResponse response = postResponse.getResponse();
+                      if(response == null)
+                      {
+                          errorMessage = postResponse.getErrorMessage();
+                          sendPostFailed = true;
+                          break;
+                      }
+                      else
+                      {
+
+                        StatusLine sl = response.getStatusLine();
+                        Integer statusCode = Integer.valueOf(sl.getStatusCode());
+                        if( !statusCode.toString().startsWith("2") )
+                        {
+                            errorMessage = sl.toString();
+                            break;
+                        }
+                        else
+                        {
+                            if(fragmentNumber != 0 && fragmentNumber % 5 == 0)
+                            {
+                                System.out.println("Upload Status - Bytes sent:" + offset);
+                            }
+                            if(lastFragment == true)
+                            {
+                                 HttpEntity entity = response.getEntity();
+                                 String finalResponse = EntityUtils.toString(entity).trim();
+                                 if(finalResponse.toUpperCase().equals("ACK") )
+                                 {
+                                     uploadSucceeded = true;
+                                 }
+                                 else
+                                 {
+                                     errorMessage = finalResponse;
+                                 }
+                            }
+                        }
+                        EntityUtils.consume(response.getEntity());
+                      }
+                      offset += byteCount;
+                    }
+                    bytesSent = offset;
+                    fs.close();
+
+                }
+                else
+                {
+                    errorMessage = "Failed to authenticate";
+                }
+            }
+        }
+        catch (URISyntaxException e)
+        {
+            e.printStackTrace();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        //check success status exit appropriately
+        if(uploadSucceeded == true)
+        {
+            System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent );
+            int completionsStatus = pollServerForScanStatus(pollingInterval);
+            retireToken();
+            System.exit(completionsStatus);
+        }
+        else
+        {
+            System.out.println("Package upload failed. Message: " + errorMessage);
+            if(authenticationSucceeded)
+            {
+                retireToken();
+            }
+            System.exit(1);
+        }
 	}
 
 	private static void retireToken() {
@@ -477,6 +464,7 @@ public class Main {
 		return result;
 	}
 
+	@Deprecated
 	private static Map<String, String> parseArgs(String[] args) {
 		
 		Map<String,String> result = new HashMap<String,String>();
@@ -517,6 +505,7 @@ public class Main {
 		return result;
 	}
 
+	@Deprecated
 	private static void processOptionalArgs(String[] args, Map<String, String> result) 
 	{
 		ArrayList<String> unnamedArgs = removeNamedOptionalArgs(args,result);
@@ -537,6 +526,7 @@ public class Main {
 		
 	}
 
+    @Deprecated
 	private static ArrayList removeNamedOptionalArgs(String[] args, Map<String,String> argMap ) 
 	{
 		ArrayList<String> result = new ArrayList<String>();

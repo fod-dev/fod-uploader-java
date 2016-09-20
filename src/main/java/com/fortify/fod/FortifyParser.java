@@ -17,9 +17,9 @@ public class FortifyParser {
     private CommandLineParser parser = new DefaultParser();
     private CommandLine cmd = null;
 
-    /*
-    Argument paring wrapper for the Fod Uploader.
-    */
+    /**
+     * Argument paring wrapper for the Fod Uploader.
+     */
     public FortifyParser() {
         // creates 2 arguments which aren't required
         Option help = new       Option(HELP, "print this message");
@@ -70,23 +70,34 @@ public class FortifyParser {
         options.addOption(zipLocation);
     }
 
-    /*
-    args: list of arguments to parse
-    Gets the various arguments and handles them accordingly.
-    */
+    /**
+     * Gets the various arguments and handles them accordingly.
+     * @param args arguments to parse
+     * @throws ParseException
+     * @throws Exception
+     */
     public void parse(String[] args) {
         try {
             cmd = parser.parse(options, args);
-            if (cmd.hasOption(HELP)) {
-                help();
+
+            if(cmd.hasOption(BSI_URL)) {
+                BsiUrl url = new BsiUrl(cmd.getOptionValue(BSI_URL));
             }
+
+            if (cmd.hasOption(USERNAME) && cmd.hasOption(PASSWORD) && cmd.hasOption(ZIP_LOCATION) && cmd.hasOption(BSI_URL)) {
+
+            }
+        // Throws if username, password, zip location and bsi url aren't all present.
         } catch (ParseException e) {
+            // If the user types just -help or just -version, then it will handle that command.
+            // Regex is used here since cmd isn't accessible.
             Pattern p = Pattern.compile("(-{0,2})" + HELP + "|" + VERSION);
             if (p.matcher(args[0]).matches()) {
                 help();
             } else if (p.matcher(args[0]).matches()) {
                 System.out.println("upload version FodUploader 5.3.0");
             } else {
+                // I can no longer hope to imagine the command you intended.
                 System.err.println(e.getMessage());
                 System.err.println("try \"-" + HELP + "\" for info");
             }
@@ -96,7 +107,9 @@ public class FortifyParser {
         }
     }
 
-
+    /**
+     * Displays help dialog.
+     */
     private void help() {
         HelpFormatter formatter = new HelpFormatter();
         formatter.setOptionComparator(HelpComparator);
@@ -104,12 +117,12 @@ public class FortifyParser {
         formatter.printHelp( "FodUpload-5.3.jar", options, true );
     }
 
-    /*
-    Compares options so that they are ordered:
-    1.) by required, then by
-    2.) short operator.
-    Used for sorting the results of the Help command.
-    */
+    /**
+     * Compares options so that they are ordered:
+     * 1.) by required, then by
+     * 2.) short operator.
+     * Used for sorting the results of the Help command.
+     */
     private static Comparator<Option> HelpComparator = new Comparator<Option>() {
         @Override
         public int compare(Option o1, Option o2) {
