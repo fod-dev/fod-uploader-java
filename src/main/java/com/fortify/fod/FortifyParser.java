@@ -3,8 +3,16 @@ package com.fortify.fod;
 import org.apache.commons.cli.*;
 
 import java.util.Comparator;
+import java.util.regex.Pattern;
 
 public class FortifyParser {
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+    public static final String ZIP_LOCATION = "ziplocation";
+    public static final String BSI_URL = "bsiUrl";
+    public static final String HELP = "help";
+    public static final String VERSION = "version";
+
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
     private CommandLine cmd = null;
@@ -14,14 +22,14 @@ public class FortifyParser {
     */
     public FortifyParser() {
         // creates 2 arguments which aren't required
-        Option help = new       Option("help", "print this message");
-        Option version = new    Option("version", "print the version information and exit");
+        Option help = new       Option(HELP, "print this message");
+        Option version = new    Option(VERSION, "print the version information and exit");
 
         // Creates the username argument ( -u, --username <user> required=true username/api key )
         Option username = Option.builder("u")
                 .hasArg(true)
                 .required(true)
-                .longOpt("username")
+                .longOpt(USERNAME)
                 .argName("user")
                 .desc("username/api key")
                 .build();
@@ -30,7 +38,7 @@ public class FortifyParser {
         Option password = Option.builder("p")
                 .hasArg(true)
                 .required(true)
-                .longOpt("password")
+                .longOpt(PASSWORD)
                 .argName("pass")
                 .desc("password/api secret")
                 .build();
@@ -39,7 +47,7 @@ public class FortifyParser {
         Option bsiUrl = Option.builder("b")
                 .hasArg(true)
                 .required(true)
-                .longOpt("bsiUrl")
+                .longOpt(BSI_URL)
                 .argName("url")
                 .desc("build server url")
                 .build();
@@ -48,7 +56,7 @@ public class FortifyParser {
         Option zipLocation = Option.builder("z")
                 .hasArg(true)
                 .required(true)
-                .longOpt("zipLocation")
+                .longOpt(ZIP_LOCATION)
                 .argName("file")
                 .desc("location of scan")
                 .build();
@@ -69,15 +77,21 @@ public class FortifyParser {
     public void parse(String[] args) {
         try {
             cmd = parser.parse(options, args);
-            if (cmd.hasOption("help")) {
+            if (cmd.hasOption(HELP)) {
                 help();
             }
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            System.out.println();
-            help();
+            Pattern p = Pattern.compile("(-{0,2})" + HELP + "|" + VERSION);
+            if (p.matcher(args[0]).matches()) {
+                help();
+            } else if (p.matcher(args[0]).matches()) {
+                System.out.println("upload version FodUploader 5.3.0");
+            } else {
+                System.err.println(e.getMessage());
+                System.err.println("try \"-" + HELP + "\" for info");
+            }
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             System.exit(1);
         }
     }

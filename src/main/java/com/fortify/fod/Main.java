@@ -70,23 +70,7 @@ public class Main {
 		long bytesSent = 0;
 		String errorMessage = "";
 		boolean authenticationSucceeded = false;
-		
-		if (args.length == 0) {
-			System.out.println("Try: FodUploader.jar -help");
-		}
 
-		if (args.length == 1)
-		{
-			if (args[0].equals("-version")) {
-				System.out.println("FodUploader 4.3.0");
-			} else if (args[0].equals("-help")) {
-				System.out.println("Username");
-				System.out.println("Password");
-				System.out.println("BSI URL");
-				System.out.println("Zip Location");
-			}
-			return;
-		}
 
 		if(args.length < 4)	
 		{
