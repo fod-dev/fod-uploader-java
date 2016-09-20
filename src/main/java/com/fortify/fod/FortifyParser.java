@@ -14,8 +14,44 @@ public class FortifyParser {
         Option help = new       Option("help", "print this message");
         Option version = new    Option("version", "print the version information and exit");
 
+        Option username = Option.builder("u")
+                .hasArg(true)
+                .required(true)
+                .longOpt("username")
+                .argName("user")
+                .desc("username/api key")
+                .build();
+
+        Option password = Option.builder("p")
+                .hasArg(true)
+                .required(true)
+                .longOpt("password")
+                .argName("pass")
+                .desc("password/api secret")
+                .build();
+
+        Option bsiUrl = Option.builder("url")
+                .hasArg(true)
+                .required(true)
+                .longOpt("bsiUrl")
+                .argName("url")
+                .desc("build server url")
+                .build();
+
+        Option zipLocation = Option.builder("loc")
+                .hasArg(true)
+                .required(true)
+                .longOpt("zipLocation")
+                .argName("file")
+                .desc("location of scan")
+                .build();
+
         options.addOption(help);
         options.addOption(version);
+        options.addOption(username);
+        options.addOption(password);
+        options.addOption(bsiUrl);
+        options.addOption(zipLocation);
     }
 
     public void parse(String[] args) {
