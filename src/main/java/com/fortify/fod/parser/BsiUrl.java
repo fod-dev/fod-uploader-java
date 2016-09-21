@@ -8,16 +8,14 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 public class BsiUrl {
-    private String tenantId;
+    private int tenantId;
     private String tenantCode;
-    private String projectVersionId;
+    private int projectVersionId;
     private String payloadType;
-    private String assessmentTypeId;
+    private int assessmentTypeId;
     private String technologyStack;
     private String languageLevel;
     private String endpoint;
-
-    //TODO: proxy (proxy, proxyUsername, proxyPassword, ntWorkStation, ntDomain)
 
     /**
      * Creates a bsi url object.
@@ -47,13 +45,13 @@ public class BsiUrl {
         for(NameValuePair param : params) {
             switch(param.getName()) {
                 case "tid":
-                    tenantId = param.getValue();
+                    tenantId = Integer.parseInt(param.getValue());
                     break;
                 case "tc":
                     tenantCode = param.getValue();
                     break;
                 case "pv":
-                    projectVersionId = param.getValue();
+                    projectVersionId = Integer.parseInt(param.getValue());
                     break;
                 case "ts":
                     technologyStack = param.getValue();
@@ -62,7 +60,7 @@ public class BsiUrl {
                     languageLevel = param.getValue();
                     break;
                 case "astid":
-                    assessmentTypeId = param.getValue();
+                    assessmentTypeId = Integer.parseInt(param.getValue());
                     break;
                 case "payloadType":
                     payloadType = param.getValue();
@@ -71,35 +69,59 @@ public class BsiUrl {
         }
     }
 
-    public String getTenantId() {
+    public int getTenantId() {
         return tenantId;
+    }
+    public boolean hasTenantId() {
+        return tenantId != 0;
     }
 
     public String getTenantCode() {
         return tenantCode;
     }
+    public boolean hasTenantCode() {
+        return !(tenantCode.isEmpty() || tenantCode == null);
+    }
 
-    public String getProjectVersionId() {
+    public int getProjectVersionId() {
         return projectVersionId;
+    }
+    public boolean hasProjectVersionId() {
+        return projectVersionId != 0;
     }
 
     public String getPayloadType() {
         return payloadType;
     }
+    public boolean hasPayloadType() {
+        return !(payloadType.isEmpty() || payloadType == null);
+    }
 
-    public String getAssessmentTypeId() {
+    public int getAssessmentTypeId() {
         return assessmentTypeId;
+    }
+    public boolean hasAssessmentTypeId() {
+        return assessmentTypeId != 0;
     }
 
     public String getTechnologyStack() {
         return technologyStack;
     }
+    public boolean hasTechnologyStack() {
+        return !(technologyStack.isEmpty() || technologyStack == null);
+    }
 
     public String getLanguageLevel() {
         return languageLevel;
     }
+    public boolean hasLanguageLevel() {
+        return !(languageLevel.isEmpty() || languageLevel == null);
+    }
 
     public String getEndpoint() {
         return endpoint;
+    }
+    public boolean hasEndpoint() {
+        return !(endpoint.isEmpty() || endpoint == null);
     }
 }

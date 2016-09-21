@@ -43,20 +43,35 @@ public class Proxy {
     public URI getProxyUri() {
         return proxyUri;
     }
+    public boolean hasProxyUri() {
+        return proxyUri != null;
+    }
 
     public String getUsername() {
         return username;
+    }
+    public boolean hasUsername() {
+        return !(username.isEmpty() || username == null);
     }
 
     public String getPassword() {
         return password;
     }
+    public boolean hasPassword() {
+        return !(password.isEmpty() || password == null);
+    }
 
     public String getNtDomain() {
         return ntDomain;
     }
+    public boolean hasNTDomain() {
+        return !(ntDomain.isEmpty() || ntDomain == null);
+    }
 
     public String getNtWorkstation() {
         return ntWorkstation;
+    }
+    public boolean hasNtWorkstation() {
+        return !(ntWorkstation.isEmpty() || ntWorkstation == null);
     }
 }
