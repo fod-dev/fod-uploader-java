@@ -1,6 +1,7 @@
 package com.fortify.fod.parser;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
 
 import java.io.PrintWriter;
 import java.util.Comparator;
@@ -8,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class FortifyParser {
     public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
+    public static final String API = "api";
     public static final String ZIP_LOCATION = "zipLocation";
     public static final String BSI_URL = "bsiUrl";
     public static final String HELP = "help";
@@ -31,53 +32,41 @@ public class FortifyParser {
         Option help = new       Option(HELP, "print this message");
         Option version = new    Option(VERSION, "print the version information and exit");
 
-        // Creates the polling interval argument ( -i --pollingInterval <<minutes> required=false interval between
+        // Creates the polling interval argument ( -pollingInterval <<minutes> required=false interval between
         // checking scan status
         Option pollingInterval = Option.builder(POLLING_INTERVAL)
                 .hasArg(true).argName("minutes")
                 .desc("interval between checking scan status")
                 .required(false).build();
 
-        // Creates the run sonatype scan argument ( -s --runSonatypeScan <true | false> required=false whether to run a
+        // Creates the run sonatype scan argument ( -runSonatypeScan <true | false> required=false whether to run a
         // Sonatype Scan
         Option runSonatypeScan = Option.builder(RUN_SONATYPE_SCAN)
                 .hasArg(true).argName("true|false")
                 .desc("whether to run a Sonatype Scan")
                 .required(false).build();
 
-        // Creates the audit preference id argument ( -a, --auditPreferenceId <1 | 2> required=false false positive audit
+        // Creates the audit preference id argument ( -auditPreferenceId <1 | 2> required=false false positive audit
         // type (Manual or Automated) )
         Option auditPreferenceId = Option.builder(AUDIT_PREFERENCE_ID)
                 .hasArg(true).argName("1|2")
                 .desc("false positive audit type (Manual or Automated)")
                 .required(false).build();
 
-        // Creates the scan preference id argument ( -m, --scanPreferenceId <1 | 2> required=false scan mode (Standard or
+        // Creates the scan preference id argument ( -scanPreferenceId <1 | 2> required=false scan mode (Standard or
         // Express) )
         Option scanPreferenceId = Option.builder(SCAN_PREFERENCE_ID)
                 .hasArg(true).argName("1|2")
                 .desc("scan mode (Standard or Express)")
                 .required(false).build();
 
-        // Creates the username argument ( -u, --username <user> required=true username/api key )
-        Option username = Option.builder(USERNAME)
-                .hasArg(true).argName("user")
-                .desc("username/api key")
-                .required(true).build();
-
-        // Creates the password argument ( -p, --password <pass> required=true password/api secret )
-        Option password = Option.builder(PASSWORD)
-                .hasArg(true).argName("pass")
-                .desc("password/api secret")
-                .required(true).build();
-
-        // Creates the bsi url argument ( -U, --bsiUrl <url> required=true build server url )
+        // Creates the bsi url argument ( -bsiUrl <url> required=true build server url )
         Option bsiUrl = Option.builder(BSI_URL)
                 .hasArg(true).argName("url")
                 .desc("build server url")
                 .required(true).build();
 
-        // Creates the zip location argument ( -z, --zipLocation <file> required=true location of scan )
+        // Creates the zip location argument ( -zipLocation <file> required=true location of scan )
         Option zipLocation = Option.builder(ZIP_LOCATION)
                 .hasArg(true).argName("file")
                 .desc("location of scan")
@@ -86,8 +75,6 @@ public class FortifyParser {
         // Add the options to the options list
         options.addOption(help);
         options.addOption(version);
-        options.addOption(username);
-        options.addOption(password);
         options.addOption(bsiUrl);
         options.addOption(zipLocation);
         options.addOption(pollingInterval);
@@ -103,6 +90,24 @@ public class FortifyParser {
                 .desc("credentials for accessing the proxy")
                 .required(false).build();
         options.addOption(proxy);
+
+        // I've put the log-in credentials into a special group to denote that either can be used.
+        // Similar build as Proxy, but I won't be using a custom class for these.
+        Option username = Option.builder(USERNAME)
+                .hasArg().numberOfArgs(2).argName("username> <password")
+                .desc("login credentials")
+                .build();
+        Option api = Option.builder(API)
+                .hasArg().numberOfArgs(2).argName("key> <secret")
+                .desc("api credentials")
+                .build();
+
+        OptionGroup credentials = new OptionGroup();
+        credentials.setRequired(true);
+        credentials.addOption(username);
+        credentials.addOption(api);
+
+        options.addOptionGroup(credentials);
     }
 
     /**
@@ -119,7 +124,7 @@ public class FortifyParser {
                 Proxy proxy = new Proxy(cmd.getOptionValues(PROXY));
             }
 
-            if (cmd.hasOption(USERNAME) && cmd.hasOption(PASSWORD) && cmd.hasOption(ZIP_LOCATION)
+            if ((cmd.hasOption(USERNAME) || cmd.hasOption(API)) && cmd.hasOption(ZIP_LOCATION)
                     && cmd.hasOption(BSI_URL)) {
                 BsiUrl url = new BsiUrl(cmd.getOptionValue(BSI_URL));
             }
@@ -151,7 +156,8 @@ public class FortifyParser {
      * Displays help dialog.
      */
     private void help() {
-        final String header = "FodUpload is a command-line tool for uploading a static scan.";
+        final String header = "FodUpload is a command-line tool for uploading a static scan. \n\nConnect to the api with " +
+                "either \"-username\" or \"-api\".";
         final int width = 120;
         final int padding = 5;
         HelpFormatter formatter = new HelpFormatter();
@@ -161,7 +167,6 @@ public class FortifyParser {
         formatter.setOptionComparator(HelpComparator);
 
         formatter.printWrapped(out, width, header);
-        formatter.printWrapped(out, width, ""); // New line
         formatter.printUsage(out, width, "FodUpload-5.3.jar", options);
         formatter.printWrapped(out, width, ""); // New line
         formatter.printOptions(out, width, options, formatter.getLeftPadding(), formatter.getDescPadding());
@@ -190,4 +195,9 @@ public class FortifyParser {
             return result;
         }
     };
+
+    private static void validate(final CommandLine cmd) {
+        //final boolean usernamePassword = cmd.hasOption(USERNAME) && cmd.hasOption(PASSWORD);
+
+    }
 }
