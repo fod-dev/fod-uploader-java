@@ -115,17 +115,13 @@ public class FortifyParser {
         try {
             cmd = parser.parse(options, args);
 
-            if (cmd.hasOption(BSI_URL)) {
-                BsiUrl url = new BsiUrl(cmd.getOptionValue(BSI_URL));
-            }
-
             if (cmd.hasOption(PROXY)) {
                 Proxy proxy = new Proxy(cmd.getOptionValues(PROXY));
             }
 
             if (cmd.hasOption(USERNAME) && cmd.hasOption(PASSWORD) && cmd.hasOption(ZIP_LOCATION)
                     && cmd.hasOption(BSI_URL)) {
-
+                BsiUrl url = new BsiUrl(cmd.getOptionValue(BSI_URL));
             }
         // Throws if username, password, zip location and bsi url aren't all present.
         } catch (ParseException e) {
