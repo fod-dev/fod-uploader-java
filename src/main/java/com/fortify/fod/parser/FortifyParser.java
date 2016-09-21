@@ -57,7 +57,7 @@ public class FortifyParser {
         Option scanPreferenceId = Option.builder(SCAN_PREFERENCE_ID)
                 .hasArg(true).argName("1|2")
                 .desc("scan mode (Standard or Express)")
-                .required(true).build();
+                .required(false).build();
 
         // Creates the username argument ( -u, --username <user> required=true username/api key )
         Option username = Option.builder(USERNAME)
