@@ -155,6 +155,20 @@ public class FortifyParser {
      * Displays help dialog.
      */
     private void help() {
+        final String header = "FodUpload is a command-line tool for uploading a static scan.";
+        final int width = 120;
+        final int padding = 5;
+        HelpFormatter formatter = new HelpFormatter();
+        PrintWriter out = new PrintWriter(System.out, true);
+
+        formatter.setDescPadding(padding);
+        formatter.setOptionComparator(HelpComparator);
+
+        formatter.printWrapped(out, width, header);
+        formatter.printWrapped(out, width, ""); // New line
+        formatter.printUsage(out, width, "FodUpload-5.3.jar", options);
+        formatter.printWrapped(out, width, ""); // New line
+        formatter.printOptions(out, width, options, formatter.getLeftPadding(), formatter.getDescPadding());
     }
 
     /**
