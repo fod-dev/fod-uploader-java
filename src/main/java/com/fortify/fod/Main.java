@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fortify.fod.parser.FortifyCommandLine;
 import com.fortify.fod.parser.FortifyParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -61,7 +62,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
         FortifyParser fortifyCommands = new FortifyParser();
-        fortifyCommands.parse(args);
+        FortifyCommandLine cl = fortifyCommands.parse(args);
 
 		final int seglen = 1024*1024;        // chunk size
 		final long maxFileSize = 5000*1024*1024L;

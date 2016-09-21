@@ -116,10 +116,12 @@ public class FortifyParser {
      * @throws ParseException
      * @throws Exception
      */
-    public void parse(String[] args) {
+    public FortifyCommandLine parse(String[] args) {
         try {
             cmd = parser.parse(options, args);
 
+            // Put args into an object for easy handling.
+            return new FortifyCommandLine(cmd);
 
         // Throws if username, password, zip location and bsi url aren't all present.
         } catch (ParseException e) {
@@ -128,20 +130,20 @@ public class FortifyParser {
             if(args.length > 0) {
                 if (Pattern.matches("(-{1,2})" + HELP, args[0])) {
                     help();
-                    System.exit(1);
+                    return null;
                 } else if (Pattern.matches("(-{1,2})" + VERSION, args[0])) {
                     System.out.println("upload version FodUploader 5.3.0");
-                    System.exit(1);
+                    return null;
                 }
             }
             // I can no longer hope to imagine the command you intended.
             System.err.println(e.getMessage());
             System.err.println("try \"-" + HELP + "\" for info");
 
-            System.exit(1);
+            return null;
         } catch(Exception e) {
             System.err.println(e.getMessage());
-            System.exit(1);
+            return null;
         }
     }
 
