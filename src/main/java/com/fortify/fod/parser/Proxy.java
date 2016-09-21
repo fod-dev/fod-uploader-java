@@ -51,7 +51,7 @@ public class Proxy {
         return username;
     }
     public boolean hasUsername() {
-        return !(username.isEmpty() || username == null);
+        return !(username.isEmpty());
     }
 
     public String getPassword() {
@@ -61,17 +61,17 @@ public class Proxy {
         return !(password.isEmpty() || password == null);
     }
 
-    public String getNtDomain() {
+    public String getNTDomain() {
         return ntDomain;
     }
     public boolean hasNTDomain() {
         return !(ntDomain.isEmpty() || ntDomain == null);
     }
 
-    public String getNtWorkstation() {
+    public String getNTWorkstation() {
         return ntWorkstation;
     }
-    public boolean hasNtWorkstation() {
+    public boolean hasNTWorkstation() {
         return !(ntWorkstation.isEmpty() || ntWorkstation == null);
     }
 }

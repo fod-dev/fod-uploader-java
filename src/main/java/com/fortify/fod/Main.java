@@ -8,8 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
 import com.fortify.fod.parser.FortifyParser;
+import com.fortify.fod.parser.Proxy;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -73,69 +73,52 @@ public class Main {
 		String errorMessage = "";
 		boolean authenticationSucceeded = false;
 
-        URI proxyUri = null;
-        String proxyUsername = "";
-        String proxyPassword = "";
-        String ntDomain = "";
-        String ntWorkstation = "";
-        long pollingInterval = 0;
         try
         {
             httpclient = new DefaultHttpClient();
-            Map<String,String> argMap = parseArgs(args);
+            /*Map<String,String> argMap = parseArgs(args);*/
 
-            if(argMap.containsKey("tenantId") &&
-               argMap.containsKey("username") &&
-               argMap.containsKey("password") &&
-               argMap.containsKey("releaseId") &&
-               argMap.containsKey("technologyType") &&
-               argMap.containsKey("endpoint") &&
-               argMap.containsKey("assessmentTypeId") &&
-               argMap.containsKey("zipLocation"))
+            if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials()) && cl.hasBsiUrl())
             {
+                BsiUrl bsiUrl = cl.getBsiUrl();
 
-                url = argMap.get("endpoint");
-                String zipLocation = argMap.get("zipLocation");
-                username = argMap.get("username");
-                password = argMap.get("password");
-                String techType = argMap.get("technologyType");
-                String assessmentTypeId = argMap.get("assessmentTypeId");
-                String tenantId = argMap.get("tenantId");
-                tenantCode = argMap.get("tenantCode");
-                releaseId = argMap.get("releaseId");
-                String languageLevel = "";
-                if(argMap.containsKey("pollingInterval"))
-                {
-                    pollingInterval = Long.parseLong(argMap.get("pollingInterval"));
-                }
-                if(argMap.containsKey("languageLevel"))
-                {
-                    languageLevel = argMap.get("languageLevel");
+                String zipLocation = cl.getZipLocation();
+
+                Map.Entry<String, String> tempCredentials;
+                // Has username/password
+                if (cl.hasLoginCredentials()) {
+                    tempCredentials = cl.getLoginCredentials().entrySet().iterator().next();
+                // Has key/secret
+                } else {
+                    tempCredentials = cl.getApiCredentials().entrySet().iterator().next();
                 }
 
-                if(argMap.containsKey("proxy"))
+                username = tempCredentials.getKey();
+                password = tempCredentials.getValue();
+
+                if(cl.hasProxy())
                 {
-                    proxyUri = new URI(argMap.get("proxy"));
-                    HttpHost proxy = new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme());
+                    Proxy clProxy = cl.getProxy();
+                    HttpHost proxy = new HttpHost(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort(),
+                            clProxy.getProxyUri().getScheme());
                     httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
-                }
 
-                if(argMap.containsKey("proxyUsername")  && argMap.containsKey("proxyPassword"))
-                {
-                    proxyUsername = argMap.get("proxyUsername");
-                    proxyPassword = argMap.get("proxyPassword");
-
-                    if(argMap.containsKey("ntDomain") && argMap.containsKey("ntWorkstation"))
+                    if(clProxy.hasUsername() && clProxy.hasPassword())
                     {
-                        ntWorkstation = argMap.get("ntWorkstation");
-                        ntDomain = argMap.get("ntDomain");
-                        httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new NTCredentials(proxyUsername , proxyPassword, ntWorkstation, ntDomain));
-                    }
-                    else
-                    {
-                        httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(proxyUsername , proxyPassword));
+                        if(clProxy.hasNTDomain() && clProxy.hasNTWorkstation())
+                        {
+                            httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY,
+                                    new NTCredentials(clProxy.getUsername() , clProxy.getPassword(),
+                                            clProxy.getNTWorkstation(), clProxy.getNTDomain()));
+                        }
+                        else
+                        {
+                            httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY,
+                                    new UsernamePasswordCredentials(clProxy.getUsername() , clProxy.getPassword()));
+                        }
                     }
                 }
+
                 //first thing check file size
                 File zipFileInfo = new File(zipLocation);
                 if(zipFileInfo.length() > maxFileSize)
@@ -144,7 +127,7 @@ public class Main {
                     return;
                 }
 
-                token = authorize(url, tenantCode, username, password, httpclient);
+                token = authorize(bsiUrl.getEndpoint(), tenantCode, username, password, httpclient);
                 if(token != null && !token.isEmpty())
                 {
                     authenticationSucceeded = true;
@@ -166,26 +149,31 @@ public class Main {
                       {
                           sendByteArray = readByteArray;
                       }
-                      String fragUrl = "";
-                      if(languageLevel != null)
+                      String fragUrl;
+                      if(bsiUrl.hasLanguageLevel())
                       {
-                          fragUrl = url + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId=" + assessmentTypeId + "&technologyStack=" + techType + "&languageLevel=" + languageLevel +  "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
+                          fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId="
+                                  + bsiUrl.getAssessmentTypeId() + "&technologyStack=" + bsiUrl.getTechnologyStack()
+                                  + "&languageLevel=" + bsiUrl.getLanguageLevel() + "&fragNo=" + fragmentNumber++
+                                  + "&len=" + byteCount + "&offset=" + offset;
                       }
                       else
                       {
-                          fragUrl = url + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId=" + assessmentTypeId + "&technologyStack=" + techType +  "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
+                          fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId="
+                                  + bsiUrl.getAssessmentTypeId() + "&technologyStack=" + bsiUrl.getTechnologyStack()
+                                  + "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
                       }
-                      if(argMap.containsKey("scanPreferenceId"))
+                      if(cl.hasScanPreferenceId())
                       {
-                          fragUrl += "&scanPreferenceId=" + argMap.get("scanPreferenceId");
+                          fragUrl += "&scanPreferenceId=" + cl.getScanPreferenceId();
                       }
-                      if(argMap.containsKey("auditPreferenceId"))
+                      if(cl.hasAuditPreferencesId())
                       {
-                          fragUrl += "&auditPreferenceId=" + argMap.get("auditPreferenceId");
+                          fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
                       }
-                      if(argMap.containsKey("runSonatypeScan"))
+                      if(cl.hasRunSonatypeScan())
                       {
-                          fragUrl += "&doSonatypeScan=" + argMap.get("runSonatypeScan");
+                          fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
                       }
                       String postErrorMessage = "";
                       SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpclient, token, postErrorMessage);
@@ -239,12 +227,7 @@ public class Main {
                     errorMessage = "Failed to authenticate";
                 }
             }
-        }
-        catch (URISyntaxException e)
-        {
-            e.printStackTrace();
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -253,7 +236,7 @@ public class Main {
         if(uploadSucceeded == true)
         {
             System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent );
-            int completionsStatus = pollServerForScanStatus(pollingInterval);
+            int completionsStatus = pollServerForScanStatus(cl.getPollingInterval());
             retireToken();
             System.exit(completionsStatus);
         }

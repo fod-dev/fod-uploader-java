@@ -2,7 +2,6 @@ package com.fortify.fod.parser;
 
 import org.apache.commons.cli.CommandLine;
 
-import java.time.format.FormatStyle;
 import java.util.Map;
 
 public class FortifyCommandLine {
@@ -11,6 +10,7 @@ public class FortifyCommandLine {
     private Map<String, String> apiCredentials;
     private Map<String, String> loginCredentials;
     private int auditPreferenceId;
+    private int scanPreferenceId;
     private int pollingInterval;
     private Proxy proxy;
     private boolean runSonatypeScan;
@@ -22,6 +22,7 @@ public class FortifyCommandLine {
         auditPreferenceId = Integer.parseInt(cmd.getOptionValue(FortifyParser.AUDIT_PREFERENCE_ID));
         pollingInterval = Integer.parseInt(cmd.getOptionValue(FortifyParser.POLLING_INTERVAL));
         runSonatypeScan = Boolean.parseBoolean(cmd.getOptionValue(FortifyParser.RUN_SONATYPE_SCAN));
+        scanPreferenceId = Integer.parseInt(cmd.getOptionValue(FortifyParser.SCAN_PREFERENCE_ID));
 
         String[] loginValues = cmd.getOptionValues(FortifyParser.USERNAME);
         loginCredentials.put(loginValues[0] == null ? null : loginValues[0],
@@ -83,5 +84,12 @@ public class FortifyCommandLine {
     }
     public boolean hasZipLocation() {
         return !(zipLocation.isEmpty() || zipLocation == null);
+    }
+
+    public int getScanPreferenceId() {
+        return scanPreferenceId;
+    }
+    public boolean hasScanPreferenceId() {
+        return scanPreferenceId != 0;
     }
 }
