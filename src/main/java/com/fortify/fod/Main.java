@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fortify.fod.parser.FortifyParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -266,6 +267,7 @@ public class Main {
         }
 	}
 
+	@Deprecated
 	private static void retireToken() {
 		String statusUrl = url + "/oauth/retireToken";
 		HttpGet get = new HttpGet(statusUrl);
@@ -572,6 +574,7 @@ public class Main {
 		return result;
 	}
 
+	@Deprecated
 	private static String authorize(String baseUrl, String tenantCode, String username, String password, HttpClient client)
 	{
 		String accessToken = "";
