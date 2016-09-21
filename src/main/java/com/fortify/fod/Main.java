@@ -81,6 +81,7 @@ public class Main {
             if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials()) && cl.hasBsiUrl())
             {
                 BsiUrl bsiUrl = cl.getBsiUrl();
+                tenantCode = bsiUrl.getTenantCode();
 
                 String zipLocation = cl.getZipLocation();
 
@@ -96,7 +97,7 @@ public class Main {
                 username = tempCredentials.getKey();
                 password = tempCredentials.getValue();
 
-                if(cl.hasProxy())
+                if(cl.hasProxy() && cl.getProxy().hasProxyUri())
                 {
                     Proxy clProxy = cl.getProxy();
                     HttpHost proxy = new HttpHost(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort(),

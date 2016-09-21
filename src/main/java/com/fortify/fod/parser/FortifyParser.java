@@ -8,21 +8,20 @@ import java.util.Comparator;
 import java.util.regex.Pattern;
 
 public class FortifyParser {
-    public static final String USERNAME = "username";
-    public static final String API = "api";
-    public static final String ZIP_LOCATION = "zipLocation";
-    public static final String BSI_URL = "bsiUrl";
-    public static final String HELP = "help";
-    public static final String VERSION = "version";
-    public static final String POLLING_INTERVAL = "pollingInterval";
-    public static final String RUN_SONATYPE_SCAN = "runSonatypeScan";
-    public static final String AUDIT_PREFERENCE_ID = "auditPreferenceId";
-    public static final String SCAN_PREFERENCE_ID = "scanPreferenceId";
-    public static final String PROXY = "proxy";
+    static final String USERNAME = "username";
+    static final String API = "api";
+    static final String ZIP_LOCATION = "zipLocation";
+    static final String BSI_URL = "bsiUrl";
+    private static final String HELP = "help";
+    private static final String VERSION = "version";
+    static final String POLLING_INTERVAL = "pollingInterval";
+    static final String RUN_SONATYPE_SCAN = "runSonatypeScan";
+    static final String AUDIT_PREFERENCE_ID = "auditPreferenceId";
+    static final String SCAN_PREFERENCE_ID = "scanPreferenceId";
+    static final String PROXY = "proxy";
 
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
-    private CommandLine cmd = null;
 
     /**
      * Argument paring wrapper for the Fod Uploader.
@@ -113,12 +112,10 @@ public class FortifyParser {
     /**
      * Gets the various arguments and handles them accordingly.
      * @param args arguments to parse
-     * @throws ParseException
-     * @throws Exception
      */
     public FortifyCommandLine parse(String[] args) {
         try {
-            cmd = parser.parse(options, args);
+            CommandLine cmd = parser.parse(options, args);
 
             // Put args into an object for easy handling.
             return new FortifyCommandLine(cmd);
@@ -173,26 +170,18 @@ public class FortifyParser {
      * 2.) short operator.
      * Used for sorting the results of the Help command.
      */
-    private static Comparator<Option> HelpComparator = new Comparator<Option>() {
-        @Override
-        public int compare(Option o1, Option o2) {
-            String required1 = o1.isRequired() ? "1" : "0";
-            String required2 = o2.isRequired() ? "1" : "0";
+    private static Comparator<Option> HelpComparator = (o1, o2) -> {
+        String required1 = o1.isRequired() ? "1" : "0";
+        String required2 = o2.isRequired() ? "1" : "0";
 
-            int result = required2.compareTo(required1);
-            if (result == 0) {
-                // will try to sort by short Operator but if it doesn't exist then it'll use long operator
-                String comp1 = o1.getOpt() == null ? o1.getLongOpt() : o1.getOpt();
-                String comp2 = o2.getOpt() == null ? o2.getLongOpt() : o2.getOpt();
+        int result = required2.compareTo(required1);
+        if (result == 0) {
+            // will try to sort by short Operator but if it doesn't exist then it'll use long operator
+            String comp1 = o1.getOpt() == null ? o1.getLongOpt() : o1.getOpt();
+            String comp2 = o2.getOpt() == null ? o2.getLongOpt() : o2.getOpt();
 
-                result = comp1.compareToIgnoreCase(comp2);
-            }
-            return result;
+            result = comp1.compareToIgnoreCase(comp2);
         }
+        return result;
     };
-
-    private static void validate(final CommandLine cmd) {
-        //final boolean usernamePassword = cmd.hasOption(USERNAME) && cmd.hasOption(PASSWORD);
-
-    }
 }

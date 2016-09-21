@@ -7,15 +7,15 @@ import java.util.Map;
 public class FortifyCommandLine {
     private BsiUrl bsiUrl;
     private String zipLocation;
-    private Map<String, String> apiCredentials;
-    private Map<String, String> loginCredentials;
+    private Map<String, String> apiCredentials = null;
+    private Map<String, String> loginCredentials = null;
     private int auditPreferenceId;
     private int scanPreferenceId;
     private int pollingInterval;
     private Proxy proxy;
     private boolean runSonatypeScan;
 
-    public FortifyCommandLine(CommandLine cmd) {
+    FortifyCommandLine(CommandLine cmd) {
         bsiUrl = new BsiUrl(cmd.getOptionValue(FortifyParser.BSI_URL));
         proxy = new Proxy(cmd.getOptionValues(FortifyParser.PROXY));
         zipLocation = cmd.getOptionValue(FortifyParser.ZIP_LOCATION);
@@ -57,9 +57,6 @@ public class FortifyCommandLine {
     public int getPollingInterval() {
         return pollingInterval;
     }
-    public boolean hasPollingInterval() {
-        return pollingInterval != 0;
-    }
 
     public Proxy getProxy() {
         return proxy;
@@ -83,7 +80,7 @@ public class FortifyCommandLine {
         return zipLocation;
     }
     public boolean hasZipLocation() {
-        return !(zipLocation.isEmpty() || zipLocation == null);
+        return !(zipLocation.isEmpty());
     }
 
     public int getScanPreferenceId() {

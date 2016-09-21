@@ -19,10 +19,9 @@ public class BsiUrl {
 
     /**
      * Creates a bsi url object.
-     * @param bsiUrl
-     * @throws URISyntaxException
+     * @param bsiUrl build server url
      */
-    public BsiUrl(String bsiUrl) {
+    BsiUrl(String bsiUrl) {
         try {
             URI uri = new URI(bsiUrl);
 
@@ -80,7 +79,7 @@ public class BsiUrl {
         return tenantCode;
     }
     public boolean hasTenantCode() {
-        return !(tenantCode.isEmpty() || tenantCode == null);
+        return !tenantCode.isEmpty();
     }
 
     public int getProjectVersionId() {
@@ -94,7 +93,7 @@ public class BsiUrl {
         return payloadType;
     }
     public boolean hasPayloadType() {
-        return !(payloadType.isEmpty() || payloadType == null);
+        return !payloadType.isEmpty();
     }
 
     public int getAssessmentTypeId() {
@@ -108,20 +107,20 @@ public class BsiUrl {
         return technologyStack;
     }
     public boolean hasTechnologyStack() {
-        return !(technologyStack.isEmpty() || technologyStack == null);
+        return !technologyStack.isEmpty();
     }
 
     public String getLanguageLevel() {
         return languageLevel;
     }
     public boolean hasLanguageLevel() {
-        return !(languageLevel.isEmpty() || languageLevel == null);
+        return !languageLevel.isEmpty();
     }
 
     public String getEndpoint() {
         return endpoint;
     }
     public boolean hasEndpoint() {
-        return !(endpoint.isEmpty() || endpoint == null);
+        return !endpoint.isEmpty();
     }
 }

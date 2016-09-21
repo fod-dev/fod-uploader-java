@@ -4,13 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class Proxy {
-    // These locations mirror the positions from the "-help" command and I demand that they be in this order!
-    private final int URI_LOCATION = 0;
-    private final int USERNAME_LOCATION = 1;
-    private final int PASSWORD_LOCATION = 2;
-    private final int NTDOMAIN_LOCATION = 3;
-    private final int NTWORKSTATION_LOCATION = 4;
-
     private URI proxyUri;
     private String username;
     private String password;
@@ -20,21 +13,22 @@ public class Proxy {
     /**
      * Creates a Proxy object from -proxy option
      * @param args array of up to 5 arguments for configuring proxy.
-     * @throws URISyntaxException
-     * @throws ArrayIndexOutOfBoundsException
      */
-    public Proxy(String[] args) {
+    Proxy(String[] args) {
         try {
-            proxyUri =      args.length > URI_LOCATION              ? new URI(args[URI_LOCATION])   : null;
+            final int URI_LOCATION = 0;
+            final int USERNAME_LOCATION = 1;
+            final int PASSWORD_LOCATION = 2;
+            final int NTDOMAIN_LOCATION = 3;
+            final int NTWORKSTATION_LOCATION = 4;
+
+            proxyUri =      args.length > URI_LOCATION ? new URI(args[URI_LOCATION])   : null;
             username =      args.length > USERNAME_LOCATION         ? args[USERNAME_LOCATION]       : null;
             password =      args.length > PASSWORD_LOCATION         ? args[PASSWORD_LOCATION]       : null;
-            ntDomain =      args.length > NTDOMAIN_LOCATION         ? args[NTDOMAIN_LOCATION]       : null;
+            ntDomain =      args.length > NTDOMAIN_LOCATION ? args[NTDOMAIN_LOCATION]       : null;
             ntWorkstation = args.length > NTWORKSTATION_LOCATION    ? args[NTWORKSTATION_LOCATION]  : null;
 
-        } catch(URISyntaxException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
-        } catch(ArrayIndexOutOfBoundsException e) {
+        } catch(URISyntaxException | ArrayIndexOutOfBoundsException e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }
@@ -51,27 +45,27 @@ public class Proxy {
         return username;
     }
     public boolean hasUsername() {
-        return !(username.isEmpty());
+        return !username.isEmpty();
     }
 
     public String getPassword() {
         return password;
     }
     public boolean hasPassword() {
-        return !(password.isEmpty() || password == null);
+        return !password.isEmpty();
     }
 
     public String getNTDomain() {
         return ntDomain;
     }
     public boolean hasNTDomain() {
-        return !(ntDomain.isEmpty() || ntDomain == null);
+        return !ntDomain.isEmpty();
     }
 
     public String getNTWorkstation() {
         return ntWorkstation;
     }
     public boolean hasNTWorkstation() {
-        return !(ntWorkstation.isEmpty() || ntWorkstation == null);
+        return !ntWorkstation.isEmpty();
     }
 }
