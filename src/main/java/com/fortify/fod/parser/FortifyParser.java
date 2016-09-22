@@ -90,6 +90,7 @@ public class FortifyParser {
                 .hasArgs().numberOfArgs(5).argName("proxyUrl> <username> <password> <ntDomain> <ntWorkstation")
                 .desc("credentials for accessing the proxy")
                 .required(false).build();
+        proxy.setOptionalArg(true);
         options.addOption(proxy);
 
         // I've put the log-in credentials into a special group to denote that either can be used.
