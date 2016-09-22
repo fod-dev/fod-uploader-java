@@ -19,9 +19,11 @@ public class FortifyParser {
     static final String AUDIT_PREFERENCE_ID = "auditPreferenceId";
     static final String SCAN_PREFERENCE_ID = "scanPreferenceId";
     static final String PROXY = "proxy";
+    static final String LEGACY = "legacy";
 
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
+    private boolean legacy = false;
 
     /**
      * Argument paring wrapper for the Fod Uploader.
@@ -132,6 +134,11 @@ public class FortifyParser {
                     System.out.println("upload version FodUploader 5.3.0");
                     return null;
                 }
+                if (Pattern.matches("(-{1,2})" + LEGACY, args[0])) {
+                    System.out.println("Using legacy argument parsing....");
+                    legacy = true;
+                    return null;
+                }
             }
             // I can no longer hope to imagine the command you intended.
             System.err.println(e.getMessage());
@@ -184,4 +191,8 @@ public class FortifyParser {
         }
         return result;
     };
+
+    public boolean useLegacy() {
+        return legacy;
+    }
 }

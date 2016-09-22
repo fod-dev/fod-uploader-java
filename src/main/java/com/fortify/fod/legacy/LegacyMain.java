@@ -56,8 +56,6 @@ public class LegacyMain {
      * @param args all arguments except "-l" which is cut out before getting here
      */
     public static void main(String[] args) {
-
-
         final int segmentLength = 1024*1024;        // chunk size
         final long maxFileSize = 5000*1024*1024L;
         boolean uploadSucceeded = false;
