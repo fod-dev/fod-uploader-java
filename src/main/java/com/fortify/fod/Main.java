@@ -59,7 +59,7 @@ public class Main {
 	private static String tenantCode = "";
 	
 	/**
-	 * @param args
+	 * @param args Required:  zip location, bsi url, username/password or api key/secret
 	 */
 	public static void main(String[] args) {
         FortifyParser fortifyCommands = new FortifyParser();
@@ -72,10 +72,9 @@ public class Main {
             LegacyMain.main(newArgs);
         // Use new stuff
         } else {
-            final int seglen = 1024 * 1024;        // chunk size
+            final int segmentLength = 1024 * 1024;        // chunk size
             final long maxFileSize = 5000 * 1024 * 1024L;
             boolean uploadSucceeded = false;
-            boolean sendPostFailed = false;
             boolean lastFragment = false;
             long bytesSent = 0;
             String errorMessage = "";
@@ -133,13 +132,13 @@ public class Main {
                     if (token != null && !token.isEmpty()) {
                         authenticationSucceeded = true;
                         FileInputStream fs = new FileInputStream(zipLocation);
-                        byte[] readByteArray = new byte[seglen];
-                        byte[] sendByteArray = null;
+                        byte[] readByteArray = new byte[segmentLength];
+                        byte[] sendByteArray;
                         int fragmentNumber = 0;
                         int byteCount = 0;
                         long offset = 0;
                         while ((byteCount = fs.read(readByteArray)) != -1) {
-                            if (byteCount < seglen) {
+                            if (byteCount < segmentLength) {
                                 fragmentNumber = -1;
                                 lastFragment = true;
                                 sendByteArray = Arrays.copyOf(readByteArray, byteCount);
@@ -171,12 +170,11 @@ public class Main {
                             HttpResponse response = postResponse.getResponse();
                             if (response == null) {
                                 errorMessage = postResponse.getErrorMessage();
-                                sendPostFailed = true;
                                 break;
                             } else {
 
                                 StatusLine sl = response.getStatusLine();
-                                Integer statusCode = Integer.valueOf(sl.getStatusCode());
+                                Integer statusCode = sl.getStatusCode();
                                 if (!statusCode.toString().startsWith("2")) {
                                     errorMessage = sl.toString();
                                     break;
@@ -184,7 +182,7 @@ public class Main {
                                     if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
                                         System.out.println("Upload Status - Bytes sent:" + offset);
                                     }
-                                    if (lastFragment == true) {
+                                    if (lastFragment) {
                                         HttpEntity entity = response.getEntity();
                                         String finalResponse = EntityUtils.toString(entity).trim();
                                         if (finalResponse.toUpperCase().equals("ACK")) {
@@ -210,7 +208,7 @@ public class Main {
             }
 
             //check success status exit appropriately
-            if (uploadSucceeded == true) {
+            if (uploadSucceeded) {
                 System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent);
                 int completionsStatus = pollServerForScanStatus(cl.getPollingInterval());
                 retireToken();
