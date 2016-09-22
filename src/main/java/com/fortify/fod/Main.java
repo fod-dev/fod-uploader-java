@@ -82,16 +82,13 @@ public class Main {
             boolean authenticationSucceeded = false;
 
             try {
-                Api fodApi = new Api();
-                fodApi.authenticateHttpOk("petebeegletenant1", "usernameTest", "passwordTest");
-
                 httpclient = new DefaultHttpClient();
 
                 if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials()) && cl.hasBsiUrl()) {
                     BsiUrl bsiUrl = cl.getBsiUrl();
-                    tenantCode = bsiUrl.getTenantCode();
-
                     String zipLocation = cl.getZipLocation();
+
+                    tenantCode = bsiUrl.getTenantCode();
 
                     Map<String, String> tempCredentials;
                     // Has username/password
@@ -106,6 +103,7 @@ public class Main {
                         password = tempCredentials.get("secret");
                     }
 
+                    Api fodApi = new Api(bsiUrl.getEndpoint());
 
                     if (cl.hasProxy() && cl.getProxy().hasProxyUri()) {
                         Proxy clProxy = cl.getProxy();
@@ -132,8 +130,8 @@ public class Main {
                         return;
                     }
 
-                    token = authorize(bsiUrl.getEndpoint(), tenantCode, username, password, httpclient);
-                    System.out.println("Token: " + token);
+                    token = fodApi.authenticate(tenantCode, username, password, cl.hasLoginCredentials());
+
                     if (token != null && !token.isEmpty()) {
                         authenticationSucceeded = true;
                         FileInputStream fs = new FileInputStream(zipLocation);
@@ -215,7 +213,8 @@ public class Main {
             //check success status exit appropriately
             if (uploadSucceeded) {
                 System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent);
-                int completionsStatus = pollServerForScanStatus(cl.getPollingInterval());
+                //TODO: WIP api integration
+                int completionsStatus = pollServerForScanStatus(cl.getPollingInterval(), new Api(cl.getBsiUrl().getEndpoint()));
                 retireToken();
                 System.exit(completionsStatus);
             } else {
@@ -265,7 +264,7 @@ public class Main {
 	//need to parse urls like this:
 	//http://www.fod.local/bsi2.aspx?tid=1&tc=tt0@qweqwe.com&pv=187&payloadType=ANALYSIS_PAYLOAD&astid=1&ts=JAVA/J2EE&ll=1.7
 	
-	private static int pollServerForScanStatus(long pollingInterval) {
+	private static int pollServerForScanStatus(long pollingInterval, Api fodApi) {
 		boolean finished = false;
         int completionStatus = 1; // default is failure
 		if(pollingInterval == 0)
@@ -276,7 +275,7 @@ public class Main {
 			while(!finished)
 			{
 				Thread.sleep(pollingInterval*60*1000);
-				int status = getScanStatus();
+				int status = getScanStatus(fodApi);
 				if(consecutiveGetStatusFailureCount < 3)
 				{
 					String statusString = "";
@@ -372,7 +371,7 @@ public class Main {
 		
 	}
 
-	private static int getScanStatus() {
+	private static int getScanStatus(Api fodApi) {
 		int result = -1;
 		try {
 			String statusUrl = url + "/api/v2/releases?q=releaseId:" + releaseId + "&fields=status";
@@ -398,7 +397,8 @@ public class Main {
 				else if(responseCode == 401)   // got logged out during polling so log back in
 				{
 					System.out.println("Token expired re-authorizing");
-					token = authorize(url, tenantCode, username, password, httpclient);
+                    //TODO: this is lame will clean up
+                    token = fodApi.authenticate(tenantCode, username, password, fodApi.useClientId());
 					if(token == null || token.isEmpty() )
 					{
 						System.out.println("Failed to reauthorize");
@@ -426,178 +426,7 @@ public class Main {
 		}
 		return result;
 	}
-
-	@Deprecated
-	private static Map<String, String> parseArgs(String[] args) {
-		
-		Map<String,String> result = new HashMap<String,String>();
-		result.put("username", args[0]);
-		result.put("password", args[1]);
-		String urlString = args[2];
-		result.put("zipLocation",args[3]);
-		processOptionalArgs(args,result);
-		URL url;
-		try {
-			url = new URL(urlString);
-			result.put("endpoint",url.getProtocol() + "://" + url.getAuthority());
-			String query = url.getQuery();
-			String[] queryNVPairs = query.split("&");
-			Map<String,String> queryMap = new HashMap<String, String>();
-			for(String pair : queryNVPairs)
-				{
-				String[] nvPair = pair.split("=");
-				if(nvPair.length == 2)
-					{
-					queryMap.put(nvPair[0], nvPair[1]);
-					}
-				else
-				{
-					queryMap.put(nvPair[0], "");
-				}
-			}
-			result.put("releaseId", queryMap.get("pv"));
-			result.put("technologyType", queryMap.get("ts"));
-			result.put("assessmentTypeId", queryMap.get("astid"));
-			result.put("tenantId", queryMap.get("tid"));
-			result.put("tenantCode", queryMap.get("tc"));
-			result.put("languageLevel", queryMap.get("ll"));
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		
-		return result;
-	}
-
-	@Deprecated
-	private static void processOptionalArgs(String[] args, Map<String, String> result) 
-	{
-		ArrayList<String> unnamedArgs = removeNamedOptionalArgs(args,result);
-		if(unnamedArgs.size() >= 5)
-		{
-			result.put("proxy",unnamedArgs.get(4));
-			if(unnamedArgs.size() >= 7)
-			{
-				result.put("proxyUsername",unnamedArgs.get(5));
-				result.put("proxyPassword",unnamedArgs.get(6));
-				if(unnamedArgs.size() == 9)
-				{
-					result.put("ntWorkStation",unnamedArgs.get(7));
-					result.put("ntDomain",unnamedArgs.get(8));
-				}
-			}
-		}
-		
-	}
-
-    @Deprecated
-	private static ArrayList removeNamedOptionalArgs(String[] args, Map<String,String> argMap ) 
-	{
-		ArrayList<String> result = new ArrayList<String>();
-		for(String arg : args)
-		{
-			if(arg.startsWith("-pollingInterval"))
-			{
-				String[] split = arg.split(":");
-				if(split.length == 2)
-				{
-					argMap.put("pollingInterval", split[1]);
-				}
-			}
-			else if(arg.startsWith("-scanPreferenceId"))
-			{
-				String[] split = arg.split(":");
-				if(split.length == 2)
-				{
-					argMap.put("scanPreferenceId", split[1]);
-				}
-			}
-			else if(arg.startsWith("-auditPreferenceId"))
-			{
-				String[] split = arg.split(":");
-				if(split.length == 2)
-				{
-					argMap.put("auditPreferenceId", split[1]);
-				}
-			}
-			else if(arg.startsWith("-runSonatypeScan"))
-			{
-				String[] split = arg.split(":");
-				if(split.length == 2)
-				{
-					argMap.put("runSonatypeScan", split[1]);
-				}
-			}
-			else  // unnamed argument
-			{
-				result.add(arg);
-			}
-		}
-		return result;
-	}
-
-	@Deprecated
-	private static String authorize(String baseUrl, String tenantCode, String username, String password, HttpClient client)
-	{
-		String accessToken = "";
-		try {
-			String endpoint = baseUrl + "/oauth/token";
-			HttpPost httppost = new HttpPost(endpoint);
-			List<NameValuePair> formparams = new ArrayList<NameValuePair>();
-			if(username.toLowerCase().startsWith("key"))
-			{
-                 formparams.add(new BasicNameValuePair("scope", "https://hpfod.com/tenant"));
- 				 formparams.add(new BasicNameValuePair("grant_type", "client_credentials"));
- 				 formparams.add(new BasicNameValuePair("client_id", username.substring(4)));
- 				 formparams.add(new BasicNameValuePair("client_secret", password));	
-			}
-			else
-			{
-				formparams.add(new BasicNameValuePair("scope", "https://hpfod.com/tenant"));
-				formparams.add(new BasicNameValuePair("grant_type", "password"));
-				formparams.add(new BasicNameValuePair("username",  tenantCode + "\\" + username));
-				formparams.add(new BasicNameValuePair("password", password));	
-			}
-			
-			
-			
-			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
-			httppost.setEntity(entity);
-			HttpResponse response = client.execute(httppost);
-			StatusLine sl = response.getStatusLine();
-			Integer statusCode = Integer.valueOf(sl.getStatusCode()); 
-			if(statusCode.toString().startsWith("2") )
-			{
-				HttpEntity respopnseEntity = response.getEntity();
-				InputStream is = respopnseEntity.getContent();
-				 BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-			        String line;
-			        StringBuffer content = new StringBuffer();
-			        while ((line = rd.readLine()) != null) {
-			        	content.append(line);
-			        	content.append('\r');
-			        }
-			        rd.close();
-			        String x=content.toString();
-			        JsonParser parser=new JsonParser();
-			        JsonElement jsonElement = parser.parse(x);
-			        JsonObject jsonObject = jsonElement.getAsJsonObject();
-			        JsonPrimitive tokenPrimitive=jsonObject.getAsJsonPrimitive("access_token");
-			        if( tokenPrimitive!=null )
-			        {
-			            accessToken=tokenPrimitive.getAsString();
-			        }
-			}
-				
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return accessToken;
-	}
-	
+    
 	private static SendPostResponse sendPost(String url, byte[] bytesToSend, HttpClient client, String token, String errorMessage)
 	{
 		SendPostResponse result = new SendPostResponse();
