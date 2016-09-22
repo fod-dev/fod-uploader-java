@@ -22,6 +22,7 @@ public class FortifyCommandLine {
         if (cmd == null)
             return;
 
+
         if (cmd.hasOption(FortifyParser.BSI_URL))
             bsiUrl = new BsiUrl(cmd.getOptionValue(FortifyParser.BSI_URL));
         if (cmd.hasOption(FortifyParser.PROXY))
@@ -95,7 +96,7 @@ public class FortifyCommandLine {
         return zipLocation;
     }
     public boolean hasZipLocation() {
-        return zipLocation.isEmpty();
+        return !zipLocation.isEmpty();
     }
 
     public int getScanPreferenceId() {
