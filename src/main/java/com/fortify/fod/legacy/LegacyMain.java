@@ -6,14 +6,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,12 +20,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -60,15 +53,14 @@ public class LegacyMain {
     private static String tenantCode = "";
 
     /**
-     * @param args
+     * @param args all arguments except "-l" which is cut out before getting here
      */
     public static void main(String[] args) {
 
 
-        final int seglen = 1024*1024;        // chunk size
+        final int segmentLength = 1024*1024;        // chunk size
         final long maxFileSize = 5000*1024*1024L;
         boolean uploadSucceeded = false;
-        boolean sendPostFailed = false;
         boolean lastFragment = false;
         long bytesSent = 0;
         String errorMessage = "";
@@ -88,12 +80,12 @@ public class LegacyMain {
         else
         {
 
-            URI proxyUri = null;
-            String proxyUsername = "";
-            String proxyPassword = "";
-            String ntDomain = "";
-            String ntWorkstation = "";
-            long pollingInterval = 0;
+            URI proxyUri;
+            String proxyUsername;
+            String proxyPassword;
+            String ntDomain;
+            String ntWorkstation;
+            long pollingInterval = 0L;
             try
             {
                 httpclient = new DefaultHttpClient();
@@ -115,7 +107,6 @@ public class LegacyMain {
                     password = argMap.get("password");
                     String techType = argMap.get("technologyType");
                     String assessmentTypeId = argMap.get("assessmentTypeId");
-                    String tenantId = argMap.get("tenantId");
                     tenantCode = argMap.get("tenantCode");
                     releaseId = argMap.get("releaseId");
                     String languageLevel = "";
@@ -164,14 +155,14 @@ public class LegacyMain {
                     {
                         authenticationSucceeded = true;
                         FileInputStream fs = new FileInputStream(zipLocation);
-                        byte[] readByteArray = new byte[seglen];
-                        byte[] sendByteArray = null;
+                        byte[] readByteArray = new byte[segmentLength];
+                        byte[] sendByteArray;
                         int fragmentNumber = 0;
-                        int byteCount = 0;
+                        int byteCount;
                         long offset = 0;
                         while((byteCount = fs.read(readByteArray)) != -1)
                         {
-                            if(byteCount < seglen)
+                            if(byteCount < segmentLength)
                             {
                                 fragmentNumber = -1;
                                 lastFragment = true;
@@ -181,7 +172,7 @@ public class LegacyMain {
                             {
                                 sendByteArray = readByteArray;
                             }
-                            String fragUrl = "";
+                            String fragUrl;
                             if(languageLevel != null)
                             {
                                 fragUrl = url + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId=" + assessmentTypeId + "&technologyStack=" + techType + "&languageLevel=" + languageLevel +  "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
@@ -202,20 +193,19 @@ public class LegacyMain {
                             {
                                 fragUrl += "&doSonatypeScan=" + argMap.get("runSonatypeScan");
                             }
-                            String postErrorMessage = "";
-                            SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpclient, token, postErrorMessage);
+
+                            SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpclient, token);
                             HttpResponse response = postResponse.getResponse();
                             if(response == null)
                             {
                                 errorMessage = postResponse.getErrorMessage();
-                                sendPostFailed = true;
                                 break;
                             }
                             else
                             {
 
                                 StatusLine sl = response.getStatusLine();
-                                Integer statusCode = Integer.valueOf(sl.getStatusCode());
+                                Integer statusCode = sl.getStatusCode();
                                 if( !statusCode.toString().startsWith("2") )
                                 {
                                     errorMessage = sl.toString();
@@ -227,7 +217,7 @@ public class LegacyMain {
                                     {
                                         System.out.println("Upload Status - Bytes sent:" + offset);
                                     }
-                                    if(lastFragment == true)
+                                    if(lastFragment)
                                     {
                                         HttpEntity entity = response.getEntity();
                                         String finalResponse = EntityUtils.toString(entity).trim();
@@ -258,18 +248,13 @@ public class LegacyMain {
                 {
                     System.out.println("tenantId, username, password, and zip location are required to proceed");
                 }
-            }
-            catch (URISyntaxException e)
-            {
-                e.printStackTrace();
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 e.printStackTrace();
             }
 
             //check success status exit appropriately
-            if(uploadSucceeded == true)
+            if(uploadSucceeded)
             {
                 System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent );
                 int completionsStatus = pollServerForScanStatus(pollingInterval);
@@ -384,9 +369,9 @@ public class LegacyMain {
             ReleaseQueryResponse requestQueryResponse = gson.fromJson(responseString, ReleaseQueryResponse.class);
             boolean isPassed = requestQueryResponse.getData()[0].isPassed();
             System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );
-            if(isPassed == false)
+            if(!isPassed)
             {
-                String passFailReason = "";
+                String passFailReason;
                 switch(requestQueryResponse.getData()[0].getPassedFailReasonId())
                 {
                     case 1:
@@ -413,7 +398,6 @@ public class LegacyMain {
 
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -480,36 +464,36 @@ public class LegacyMain {
         try {
             String endpoint = baseUrl + "/oauth/token";
             HttpPost httppost = new HttpPost(endpoint);
-            List<NameValuePair> formparams = new ArrayList<NameValuePair>();
+            List<NameValuePair> formParams = new ArrayList<>();
             if(username.toLowerCase().startsWith("key"))
             {
-                formparams.add(new BasicNameValuePair("scope", "https://hpfod.com/tenant"));
-                formparams.add(new BasicNameValuePair("grant_type", "client_credentials"));
-                formparams.add(new BasicNameValuePair("client_id", username.substring(4)));
-                formparams.add(new BasicNameValuePair("client_secret", password));
+                formParams.add(new BasicNameValuePair("scope", "https://hpfod.com/tenant"));
+                formParams.add(new BasicNameValuePair("grant_type", "client_credentials"));
+                formParams.add(new BasicNameValuePair("client_id", username.substring(4)));
+                formParams.add(new BasicNameValuePair("client_secret", password));
             }
             else
             {
-                formparams.add(new BasicNameValuePair("scope", "https://hpfod.com/tenant"));
-                formparams.add(new BasicNameValuePair("grant_type", "password"));
-                formparams.add(new BasicNameValuePair("username",  tenantCode + "\\" + username));
-                formparams.add(new BasicNameValuePair("password", password));
+                formParams.add(new BasicNameValuePair("scope", "https://hpfod.com/tenant"));
+                formParams.add(new BasicNameValuePair("grant_type", "password"));
+                formParams.add(new BasicNameValuePair("username",  tenantCode + "\\" + username));
+                formParams.add(new BasicNameValuePair("password", password));
             }
 
 
 
-            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
+            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formParams, "UTF-8");
             httppost.setEntity(entity);
             HttpResponse response = client.execute(httppost);
             StatusLine sl = response.getStatusLine();
-            Integer statusCode = Integer.valueOf(sl.getStatusCode());
+            Integer statusCode = sl.getStatusCode();
             if(statusCode.toString().startsWith("2") )
             {
-                HttpEntity respopnseEntity = response.getEntity();
-                InputStream is = respopnseEntity.getContent();
+                HttpEntity responseEntity = response.getEntity();
+                InputStream is = responseEntity.getContent();
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is));
                 String line;
-                StringBuffer content = new StringBuffer();
+                StringBuilder content = new StringBuilder();
                 while ((line = rd.readLine()) != null) {
                     content.append(line);
                     content.append('\r');
@@ -525,18 +509,13 @@ public class LegacyMain {
                     accessToken=tokenPrimitive.getAsString();
                 }
             }
-
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return accessToken;
     }
 
-    private static SendPostResponse sendPost(String url, byte[] bytesToSend, HttpClient client, String token, String errorMessage)
+    private static SendPostResponse sendPost(String url, byte[] bytesToSend, HttpClient client, String token)
     {
         SendPostResponse result = new SendPostResponse();
         try {
@@ -547,16 +526,8 @@ public class LegacyMain {
             HttpResponse response = client.execute(httppost);
             result.setResponse(response);
             result.setErrorMessage("");
-        } catch (ParseException e) {
-            errorMessage = e.getMessage();
-            result.setResponse(null);
-            result.setErrorMessage(errorMessage);
-        } catch (IOException e) {
-            errorMessage = e.getMessage();
-            result.setResponse(null);
-            result.setErrorMessage(errorMessage);
-        }	catch (Exception e) {
-            errorMessage = e.getMessage();
+        } catch (Exception e) {
+            String errorMessage = e.getMessage();
             result.setResponse(null);
             result.setErrorMessage(errorMessage);
         }
