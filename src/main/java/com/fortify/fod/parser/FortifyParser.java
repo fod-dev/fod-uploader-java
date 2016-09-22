@@ -129,25 +129,25 @@ public class FortifyParser {
             if(args.length > 0) {
                 if (Pattern.matches("(-{1,2})" + HELP, args[0])) {
                     help();
-                    return null;
+                    return new FortifyCommandLine(null);
                 } else if (Pattern.matches("(-{1,2})" + VERSION, args[0])) {
                     System.out.println("upload version FodUploader 5.3.0");
-                    return null;
+                    return new FortifyCommandLine(null);
                 }
                 if (Pattern.matches("(-{1,2})" + LEGACY, args[0])) {
                     System.out.println("Using legacy argument parsing....");
                     legacy = true;
-                    return null;
+                    return new FortifyCommandLine(null);
                 }
             }
             // I can no longer hope to imagine the command you intended.
             System.err.println(e.getMessage());
             System.err.println("try \"-" + HELP + "\" for info");
 
-            return null;
+            return new FortifyCommandLine(null);
         } catch(Exception e) {
             System.err.println(e.getMessage());
-            return null;
+            return new FortifyCommandLine(null);
         }
     }
 

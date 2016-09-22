@@ -90,17 +90,19 @@ public class Main {
 
                     String zipLocation = cl.getZipLocation();
 
-                    Map.Entry<String, String> tempCredentials;
+                    Map<String, String> tempCredentials;
                     // Has username/password
                     if (cl.hasLoginCredentials()) {
-                        tempCredentials = cl.getLoginCredentials().entrySet().iterator().next();
-                        // Has key/secret
+                        tempCredentials = cl.getLoginCredentials();
+                        username = tempCredentials.get("username");
+                        password = tempCredentials.get("password");
+                    // Has key/secret
                     } else {
-                        tempCredentials = cl.getApiCredentials().entrySet().iterator().next();
+                        tempCredentials = cl.getApiCredentials();
+                        username = tempCredentials.get("key");
+                        password = tempCredentials.get("secret");
                     }
 
-                    username = tempCredentials.getKey();
-                    password = tempCredentials.getValue();
 
                     if (cl.hasProxy() && cl.getProxy().hasProxyUri()) {
                         Proxy clProxy = cl.getProxy();
