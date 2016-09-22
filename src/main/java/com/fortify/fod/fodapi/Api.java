@@ -1,9 +1,17 @@
 package com.fortify.fod.fodapi;
 
+import com.fortify.fod.MessageResponse;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import okhttp3.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
 
 
 public class Api {
@@ -62,6 +70,30 @@ public class Api {
             e.printStackTrace();
         }
         return accessToken;
+    }
+
+    public void retireToken() {
+        try {
+            Request request = new Request.Builder()
+                    .url(baseUrl + "/oauth/retireToken")
+                    .get()
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            if (response.isSuccessful()) {
+                // Read the results and close the response
+                String content = IOUtils.toString(response.body().byteStream(), "utf-8");
+                response.body().close();
+
+                Gson gson = new Gson();
+                MessageResponse messageResponse = gson.fromJson(content, MessageResponse.class);
+
+                if(messageResponse != null)  // did not get back the expected response
+                    System.out.println("Retiring Token : " + messageResponse.getMessage());
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean useClientId() {
