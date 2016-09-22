@@ -115,6 +115,7 @@ public class LegacyMain {
                         languageLevel = argMap.get("languageLevel");
                     }
 
+                    // Set default proxy
                     if(argMap.containsKey("proxy"))
                     {
                         proxyUri = new URI(argMap.get("proxy"));
@@ -147,7 +148,6 @@ public class LegacyMain {
                     }
 
                     token = authorize(url, tenantCode, username, password, httpclient);
-                    System.out.println(token);
                     if(token != null && !token.isEmpty())
                     {
                         authenticationSucceeded = true;
@@ -476,8 +476,6 @@ public class LegacyMain {
                 formParams.add(new BasicNameValuePair("username",  tenantCode + "\\" + username));
                 formParams.add(new BasicNameValuePair("password", password));
             }
-
-
 
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formParams, "UTF-8");
             httppost.setEntity(entity);

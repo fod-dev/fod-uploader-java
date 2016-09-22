@@ -70,43 +70,27 @@ public class Main {
                 httpclient = new DefaultHttpClient();
                 if(cl.hasBsiUrl()) {
                     BsiUrl bsiUrl = cl.getBsiUrl();
-                    Api fodApi = new Api(bsiUrl.getEndpoint());
+                    Api fodApi = new Api(bsiUrl.getEndpoint(), cl.getProxy());
+
                     if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials())) {
 
                         String zipLocation = cl.getZipLocation();
 
                         tenantCode = bsiUrl.getTenantCode();
-
                         Map<String, String> tempCredentials;
                         // Has username/password
                         if (cl.hasLoginCredentials()) {
                             tempCredentials = cl.getLoginCredentials();
                             username = tempCredentials.get("username");
                             password = tempCredentials.get("password");
-                            // Has key/secret
+                        // Has key/secret
                         } else {
                             tempCredentials = cl.getApiCredentials();
                             username = tempCredentials.get("key");
                             password = tempCredentials.get("secret");
                         }
 
-                        if (cl.hasProxy() && cl.getProxy().hasProxyUri()) {
-                            Proxy clProxy = cl.getProxy();
-                            HttpHost proxy = new HttpHost(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort(),
-                                    clProxy.getProxyUri().getScheme());
-                            httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
-
-                            if (clProxy.hasUsername() && clProxy.hasPassword()) {
-                                if (clProxy.hasNTDomain() && clProxy.hasNTWorkstation()) {
-                                    httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY,
-                                            new NTCredentials(clProxy.getUsername(), clProxy.getPassword(),
-                                                    clProxy.getNTWorkstation(), clProxy.getNTDomain()));
-                                } else {
-                                    httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY,
-                                            new UsernamePasswordCredentials(clProxy.getUsername(), clProxy.getPassword()));
-                                }
-                            }
-                        }
+                        token = fodApi.authenticate(tenantCode, username, password, cl.hasLoginCredentials());
 
                         //first thing check file size
                         File zipFileInfo = new File(zipLocation);
@@ -114,8 +98,6 @@ public class Main {
                             System.out.println("Terminating upload. File Exceeds maximum length : " + maxFileSize);
                             return;
                         }
-
-                        token = fodApi.authenticate(tenantCode, username, password, cl.hasLoginCredentials());
 
                         if (token != null && !token.isEmpty()) {
                             authenticationSucceeded = true;
@@ -282,7 +264,6 @@ public class Main {
 		}
 		return completionStatus;
 	}
-		
 
 	private static void printPassFail() {
 		try 

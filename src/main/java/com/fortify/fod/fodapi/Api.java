@@ -1,27 +1,28 @@
 package com.fortify.fod.fodapi;
 
 import com.fortify.fod.MessageResponse;
+import com.fortify.fod.parser.Proxy;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import okhttp3.*;
+import okhttp3.Credentials;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.*;
+import org.apache.http.conn.params.ConnRoutePNames;
 
-import java.io.IOException;
+import java.net.InetSocketAddress;
 
 
 public class Api {
     private String baseUrl;
-    private final OkHttpClient client;
+    private OkHttpClient client;
     private boolean useClientId = false;
 
-    public Api(String url) {
+    public Api(String url, Proxy clProxy) {
         baseUrl = url;
-        this.client = new OkHttpClient();
+        client = Proxy(clProxy);
     }
 
     public String authenticate(String tenantCode, String username, String password, boolean hasLoginCredentials) {
@@ -31,13 +32,13 @@ public class Api {
             FormBody.Builder formBodyBuilder = new FormBody.Builder().add("scope", "https://hpfod.com/tenant");
             // Has username/password stuff
             if (hasLoginCredentials) {
-                formBodyBuilder.add("grant_type", "client_credentials")
+                formBodyBuilder.add("grant_type", "password")
                         .add("username", tenantCode + "\\" + username)
                         .add("password", password);
             // Has api key/secret
             } else {
                 useClientId = true;
-                formBodyBuilder.add("grant_type", "password")
+                formBodyBuilder.add("grant_type", "client_credentials")
                         .add("client_id", username)
                         .add("client_secret", password);
             }
@@ -49,11 +50,12 @@ public class Api {
                     .post(formBody)
                     .build();
 
+
             // Get the response
             Response response = client.newCall(request).execute();
 
+            System.out.println("success? "+response.isSuccessful());
             if(response.isSuccessful()) {
-
                 // Read the results and close the response
                 String content = IOUtils.toString(response.body().byteStream(), "utf-8");
                 response.body().close();
@@ -93,6 +95,41 @@ public class Api {
             }
         } catch(Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private OkHttpClient Proxy(Proxy clProxy) {
+        if(clProxy != null) {
+            OkHttpClient.Builder builder = new OkHttpClient().newBuilder()
+                .proxy(new java.net.Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort())));
+
+            if (clProxy.hasUsername() && clProxy.hasPassword()) {
+                // Include NTDomain and NTWorkstation in auth
+                Authenticator proxyAuthenticator;
+                if (clProxy.hasNTDomain() && clProxy.hasNTWorkstation()) {
+                    proxyAuthenticator = (Route route, Response response) -> {
+                        String credentials = new NTCredentials(clProxy.getUsername(), clProxy.getPassword(),
+                                clProxy.getNTWorkstation(), clProxy.getNTDomain()).toString();
+
+                        return response.request().newBuilder()
+                                .header("Proxy-Authorization", credentials)
+                                .build();
+                    };
+                // Just use username and password
+                } else {
+                    proxyAuthenticator = (Route route, Response response) -> {
+                        String credentials = Credentials.basic(clProxy.getUsername(), clProxy.getPassword());
+                        return response.request().newBuilder()
+                                .header("Proxy-Authorization", credentials)
+                                .build();
+                    };
+
+                }
+                builder.proxyAuthenticator(proxyAuthenticator);
+            }
+            return builder.build();
+        } else {
+            return new OkHttpClient();
         }
     }
 
