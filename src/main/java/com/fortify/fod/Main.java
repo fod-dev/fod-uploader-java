@@ -1,18 +1,11 @@
 package com.fortify.fod;
 
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
+
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fortify.fod.fodapi.Api;
@@ -24,28 +17,20 @@ import com.fortify.fod.parser.Proxy;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 public class Main {
 
@@ -83,173 +68,149 @@ public class Main {
 
             try {
                 httpclient = new DefaultHttpClient();
-
-                if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials()) && cl.hasBsiUrl()) {
+                if(cl.hasBsiUrl()) {
                     BsiUrl bsiUrl = cl.getBsiUrl();
-                    String zipLocation = cl.getZipLocation();
-
-                    tenantCode = bsiUrl.getTenantCode();
-
-                    Map<String, String> tempCredentials;
-                    // Has username/password
-                    if (cl.hasLoginCredentials()) {
-                        tempCredentials = cl.getLoginCredentials();
-                        username = tempCredentials.get("username");
-                        password = tempCredentials.get("password");
-                    // Has key/secret
-                    } else {
-                        tempCredentials = cl.getApiCredentials();
-                        username = tempCredentials.get("key");
-                        password = tempCredentials.get("secret");
-                    }
-
                     Api fodApi = new Api(bsiUrl.getEndpoint());
+                    if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials())) {
 
-                    if (cl.hasProxy() && cl.getProxy().hasProxyUri()) {
-                        Proxy clProxy = cl.getProxy();
-                        HttpHost proxy = new HttpHost(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort(),
-                                clProxy.getProxyUri().getScheme());
-                        httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+                        String zipLocation = cl.getZipLocation();
 
-                        if (clProxy.hasUsername() && clProxy.hasPassword()) {
-                            if (clProxy.hasNTDomain() && clProxy.hasNTWorkstation()) {
-                                httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY,
-                                        new NTCredentials(clProxy.getUsername(), clProxy.getPassword(),
-                                                clProxy.getNTWorkstation(), clProxy.getNTDomain()));
-                            } else {
-                                httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY,
-                                        new UsernamePasswordCredentials(clProxy.getUsername(), clProxy.getPassword()));
+                        tenantCode = bsiUrl.getTenantCode();
+
+                        Map<String, String> tempCredentials;
+                        // Has username/password
+                        if (cl.hasLoginCredentials()) {
+                            tempCredentials = cl.getLoginCredentials();
+                            username = tempCredentials.get("username");
+                            password = tempCredentials.get("password");
+                            // Has key/secret
+                        } else {
+                            tempCredentials = cl.getApiCredentials();
+                            username = tempCredentials.get("key");
+                            password = tempCredentials.get("secret");
+                        }
+
+                        if (cl.hasProxy() && cl.getProxy().hasProxyUri()) {
+                            Proxy clProxy = cl.getProxy();
+                            HttpHost proxy = new HttpHost(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort(),
+                                    clProxy.getProxyUri().getScheme());
+                            httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+
+                            if (clProxy.hasUsername() && clProxy.hasPassword()) {
+                                if (clProxy.hasNTDomain() && clProxy.hasNTWorkstation()) {
+                                    httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY,
+                                            new NTCredentials(clProxy.getUsername(), clProxy.getPassword(),
+                                                    clProxy.getNTWorkstation(), clProxy.getNTDomain()));
+                                } else {
+                                    httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY,
+                                            new UsernamePasswordCredentials(clProxy.getUsername(), clProxy.getPassword()));
+                                }
                             }
                         }
-                    }
 
-                    //first thing check file size
-                    File zipFileInfo = new File(zipLocation);
-                    if (zipFileInfo.length() > maxFileSize) {
-                        System.out.println("Terminating upload. File Exceeds maximum length : " + maxFileSize);
-                        return;
-                    }
+                        //first thing check file size
+                        File zipFileInfo = new File(zipLocation);
+                        if (zipFileInfo.length() > maxFileSize) {
+                            System.out.println("Terminating upload. File Exceeds maximum length : " + maxFileSize);
+                            return;
+                        }
 
-                    token = fodApi.authenticate(tenantCode, username, password, cl.hasLoginCredentials());
+                        token = fodApi.authenticate(tenantCode, username, password, cl.hasLoginCredentials());
 
-                    if (token != null && !token.isEmpty()) {
-                        authenticationSucceeded = true;
-                        FileInputStream fs = new FileInputStream(zipLocation);
-                        byte[] readByteArray = new byte[segmentLength];
-                        byte[] sendByteArray;
-                        int fragmentNumber = 0;
-                        int byteCount = 0;
-                        long offset = 0;
-                        while ((byteCount = fs.read(readByteArray)) != -1) {
-                            if (byteCount < segmentLength) {
-                                fragmentNumber = -1;
-                                lastFragment = true;
-                                sendByteArray = Arrays.copyOf(readByteArray, byteCount);
-                            } else {
-                                sendByteArray = readByteArray;
-                            }
-                            String fragUrl;
-                            if (bsiUrl.hasLanguageLevel()) {
-                                fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId="
-                                        + bsiUrl.getAssessmentTypeId() + "&technologyStack=" + bsiUrl.getTechnologyStack()
-                                        + "&languageLevel=" + bsiUrl.getLanguageLevel() + "&fragNo=" + fragmentNumber++
-                                        + "&len=" + byteCount + "&offset=" + offset;
-                            } else {
-                                fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId="
-                                        + bsiUrl.getAssessmentTypeId() + "&technologyStack=" + bsiUrl.getTechnologyStack()
-                                        + "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
-                            }
-                            if (cl.hasScanPreferenceId()) {
-                                fragUrl += "&scanPreferenceId=" + cl.getScanPreferenceId();
-                            }
-                            if (cl.hasAuditPreferencesId()) {
-                                fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
-                            }
-                            if (cl.hasRunSonatypeScan()) {
-                                fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
-                            }
-                            String postErrorMessage = "";
-                            SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpclient, token, postErrorMessage);
-                            HttpResponse response = postResponse.getResponse();
-                            if (response == null) {
-                                errorMessage = postResponse.getErrorMessage();
-                                break;
-                            } else {
-
-                                StatusLine sl = response.getStatusLine();
-                                Integer statusCode = sl.getStatusCode();
-                                if (!statusCode.toString().startsWith("2")) {
-                                    errorMessage = sl.toString();
+                        if (token != null && !token.isEmpty()) {
+                            authenticationSucceeded = true;
+                            FileInputStream fs = new FileInputStream(zipLocation);
+                            byte[] readByteArray = new byte[segmentLength];
+                            byte[] sendByteArray;
+                            int fragmentNumber = 0;
+                            int byteCount = 0;
+                            long offset = 0;
+                            while ((byteCount = fs.read(readByteArray)) != -1) {
+                                if (byteCount < segmentLength) {
+                                    fragmentNumber = -1;
+                                    lastFragment = true;
+                                    sendByteArray = Arrays.copyOf(readByteArray, byteCount);
+                                } else {
+                                    sendByteArray = readByteArray;
+                                }
+                                String fragUrl;
+                                if (bsiUrl.hasLanguageLevel()) {
+                                    fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId="
+                                            + bsiUrl.getAssessmentTypeId() + "&technologyStack=" + bsiUrl.getTechnologyStack()
+                                            + "&languageLevel=" + bsiUrl.getLanguageLevel() + "&fragNo=" + fragmentNumber++
+                                            + "&len=" + byteCount + "&offset=" + offset;
+                                } else {
+                                    fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId="
+                                            + bsiUrl.getAssessmentTypeId() + "&technologyStack=" + bsiUrl.getTechnologyStack()
+                                            + "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
+                                }
+                                if (cl.hasScanPreferenceId()) {
+                                    fragUrl += "&scanPreferenceId=" + cl.getScanPreferenceId();
+                                }
+                                if (cl.hasAuditPreferencesId()) {
+                                    fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
+                                }
+                                if (cl.hasRunSonatypeScan()) {
+                                    fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
+                                }
+                                String postErrorMessage = "";
+                                SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpclient, token, postErrorMessage);
+                                HttpResponse response = postResponse.getResponse();
+                                if (response == null) {
+                                    errorMessage = postResponse.getErrorMessage();
                                     break;
                                 } else {
-                                    if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
-                                        System.out.println("Upload Status - Bytes sent:" + offset);
-                                    }
-                                    if (lastFragment) {
-                                        HttpEntity entity = response.getEntity();
-                                        String finalResponse = EntityUtils.toString(entity).trim();
-                                        if (finalResponse.toUpperCase().equals("ACK")) {
-                                            uploadSucceeded = true;
-                                        } else {
-                                            errorMessage = finalResponse;
+
+                                    StatusLine sl = response.getStatusLine();
+                                    Integer statusCode = sl.getStatusCode();
+                                    if (!statusCode.toString().startsWith("2")) {
+                                        errorMessage = sl.toString();
+                                        break;
+                                    } else {
+                                        if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
+                                            System.out.println("Upload Status - Bytes sent:" + offset);
+                                        }
+                                        if (lastFragment) {
+                                            HttpEntity entity = response.getEntity();
+                                            String finalResponse = EntityUtils.toString(entity).trim();
+                                            if (finalResponse.toUpperCase().equals("ACK")) {
+                                                uploadSucceeded = true;
+                                            } else {
+                                                errorMessage = finalResponse;
+                                            }
                                         }
                                     }
+                                    EntityUtils.consume(response.getEntity());
                                 }
-                                EntityUtils.consume(response.getEntity());
+                                offset += byteCount;
                             }
-                            offset += byteCount;
-                        }
-                        bytesSent = offset;
-                        fs.close();
+                            bytesSent = offset;
+                            fs.close();
 
+                        } else {
+                            errorMessage = "Failed to authenticate";
+                        }
+                    }
+
+                    //check success status exit appropriately
+                    if (uploadSucceeded) {
+                        System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent);
+                        //TODO: WIP api integration
+                        int completionsStatus = pollServerForScanStatus(cl.getPollingInterval(), fodApi);
+                        fodApi.retireToken();
+                        System.exit(completionsStatus);
                     } else {
-                        errorMessage = "Failed to authenticate";
+                        System.out.println("Package upload failed. Message: " + errorMessage);
+                        if (authenticationSucceeded) {
+                            fodApi.retireToken();
+                        }
+                        System.exit(1);
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            //check success status exit appropriately
-            if (uploadSucceeded) {
-                System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent);
-                //TODO: WIP api integration
-                int completionsStatus = pollServerForScanStatus(cl.getPollingInterval(), new Api(cl.getBsiUrl().getEndpoint()));
-                retireToken();
-                System.exit(completionsStatus);
-            } else {
-                System.out.println("Package upload failed. Message: " + errorMessage);
-                if (authenticationSucceeded) {
-                    retireToken();
-                }
-                System.exit(1);
-            }
         }
-	}
-
-	@Deprecated
-	private static void retireToken() {
-		String statusUrl = url + "/oauth/retireToken";
-		HttpGet get = new HttpGet(statusUrl);
-		get.addHeader("Authorization","Bearer " + token);
-		HttpResponse response;
-		try {
-			response = httpclient.execute(get);
-			HttpEntity entity = response.getEntity();
-			String responseString = EntityUtils.toString(entity);
-			Gson gson = new Gson();
-			MessageResponse messageResponse = gson.fromJson(responseString, MessageResponse.class);
-			if(messageResponse != null)  // did not get back the expected response
-			{
-				System.out.println("Retiring Token : " + messageResponse.getMessage());
-			}
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-		}
-		
-		
 	}
 
 	// arg 0: username
@@ -426,7 +387,7 @@ public class Main {
 		}
 		return result;
 	}
-    
+
 	private static SendPostResponse sendPost(String url, byte[] bytesToSend, HttpClient client, String token, String errorMessage)
 	{
 		SendPostResponse result = new SendPostResponse();

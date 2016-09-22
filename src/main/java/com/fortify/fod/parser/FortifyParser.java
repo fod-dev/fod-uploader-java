@@ -146,7 +146,7 @@ public class FortifyParser {
 
             return new FortifyCommandLine(null);
         } catch(Exception e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return new FortifyCommandLine(null);
         }
     }

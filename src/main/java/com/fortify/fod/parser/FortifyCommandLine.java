@@ -2,14 +2,14 @@ package com.fortify.fod.parser;
 
 import org.apache.commons.cli.CommandLine;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class FortifyCommandLine {
     private BsiUrl bsiUrl = null;
     private String zipLocation = "";
-    private Map<String, String> apiCredentials = Collections.emptyMap();
-    private Map<String, String> loginCredentials = Collections.emptyMap();
+    private Map<String, String> apiCredentials = new HashMap<>();;
+    private Map<String, String> loginCredentials = new HashMap<>();;
     private int auditPreferenceId = 0;
     private int scanPreferenceId = 0;
     private int pollingInterval = 0;
@@ -22,20 +22,27 @@ public class FortifyCommandLine {
         if (cmd == null)
             return;
 
-        bsiUrl = new BsiUrl(cmd.getOptionValue(FortifyParser.BSI_URL));
-        proxy = new Proxy(cmd.getOptionValues(FortifyParser.PROXY));
-        zipLocation = cmd.getOptionValue(FortifyParser.ZIP_LOCATION);
-        auditPreferenceId = Integer.parseInt(cmd.getOptionValue(FortifyParser.AUDIT_PREFERENCE_ID));
-        pollingInterval = Integer.parseInt(cmd.getOptionValue(FortifyParser.POLLING_INTERVAL));
-        runSonatypeScan = Boolean.parseBoolean(cmd.getOptionValue(FortifyParser.RUN_SONATYPE_SCAN));
-        scanPreferenceId = Integer.parseInt(cmd.getOptionValue(FortifyParser.SCAN_PREFERENCE_ID));
+        if (cmd.hasOption(FortifyParser.BSI_URL))
+            bsiUrl = new BsiUrl(cmd.getOptionValue(FortifyParser.BSI_URL));
+        if (cmd.hasOption(FortifyParser.PROXY))
+            proxy = new Proxy(cmd.getOptionValues(FortifyParser.PROXY));
+        if (cmd.hasOption(FortifyParser.ZIP_LOCATION))
+            zipLocation = cmd.getOptionValue(FortifyParser.ZIP_LOCATION);
+        if (cmd.hasOption(FortifyParser.AUDIT_PREFERENCE_ID))
+            auditPreferenceId = Integer.parseInt(cmd.getOptionValue(FortifyParser.AUDIT_PREFERENCE_ID));
+        if (cmd.hasOption(FortifyParser.POLLING_INTERVAL))
+            pollingInterval = Integer.parseInt(cmd.getOptionValue(FortifyParser.POLLING_INTERVAL));
+        if (cmd.hasOption(FortifyParser.RUN_SONATYPE_SCAN))
+            runSonatypeScan = Boolean.parseBoolean(cmd.getOptionValue(FortifyParser.RUN_SONATYPE_SCAN));
+        if (cmd.hasOption(FortifyParser.SCAN_PREFERENCE_ID))
+            scanPreferenceId = Integer.parseInt(cmd.getOptionValue(FortifyParser.SCAN_PREFERENCE_ID));
         String[] loginValues = cmd.getOptionValues(FortifyParser.USERNAME);
-        if (loginValues[0] != null && loginValues[1] != null) {
+        if (loginValues != null && loginValues[0] != null && loginValues[1] != null) {
             loginCredentials.put("username", loginValues[0]);
             loginCredentials.put("password", loginValues[1]);
         }
         loginValues = cmd.getOptionValues(FortifyParser.API);
-        if (loginValues[0] != null && loginValues[1] != null) {
+        if (loginValues != null && loginValues[0] != null && loginValues[1] != null) {
             apiCredentials.put("key", loginValues[0]);
             apiCredentials.put("secret", loginValues[1]);
         }
