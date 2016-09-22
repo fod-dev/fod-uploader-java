@@ -22,7 +22,6 @@ public class FortifyCommandLine {
         if (cmd == null)
             return;
 
-
         if (cmd.hasOption(FortifyParser.BSI_URL))
             bsiUrl = new BsiUrl(cmd.getOptionValue(FortifyParser.BSI_URL));
         if (cmd.hasOption(FortifyParser.PROXY))
@@ -60,7 +59,7 @@ public class FortifyCommandLine {
         return loginCredentials;
     }
     public boolean hasLoginCredentials() {
-        return !loginCredentials.containsKey("username");
+        return loginCredentials.containsKey("username");
     }
 
     public int getAuditPreferenceId() {
@@ -89,7 +88,7 @@ public class FortifyCommandLine {
         return apiCredentials;
     }
     public boolean hasApiCredentials() {
-        return !apiCredentials.containsKey("key");
+        return apiCredentials.containsKey("key");
     }
 
     public String getZipLocation() {
