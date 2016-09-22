@@ -21,7 +21,6 @@ import java.util.Map;
  * need to parse urls like this:
  * http://www.fod.local/bsi2.aspx?tid=1&tc=tt0@qweqwe.com&pv=187&payloadType=ANALYSIS_PAYLOAD&astid=1&ts=JAVA/J2EE&ll=1.7
  */
-@Deprecated
 class LegacyParser {
     private Map<String, String> argsMap;
 
@@ -134,7 +133,6 @@ class LegacyParser {
         return result;
     }
 
-    @Deprecated
     Map<String, String> getArgsMap() {
         return argsMap;
     }

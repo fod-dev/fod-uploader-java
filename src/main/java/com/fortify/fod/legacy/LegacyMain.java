@@ -41,8 +41,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 public class LegacyMain {
-
-
     private static String token = "";
     private static String url = "";
     private static String releaseId = "";
@@ -149,6 +147,7 @@ public class LegacyMain {
                     }
 
                     token = authorize(url, tenantCode, username, password, httpclient);
+                    System.out.println(token);
                     if(token != null && !token.isEmpty())
                     {
                         authenticationSucceeded = true;

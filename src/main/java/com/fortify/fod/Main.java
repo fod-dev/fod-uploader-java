@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fortify.fod.fodapi.Api;
 import com.fortify.fod.legacy.LegacyMain;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
@@ -81,6 +82,9 @@ public class Main {
             boolean authenticationSucceeded = false;
 
             try {
+                Api fodApi = new Api();
+                fodApi.authenticateHttpOk("petebeegletenant1", "usernameTest", "passwordTest");
+
                 httpclient = new DefaultHttpClient();
 
                 if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials()) && cl.hasBsiUrl()) {
@@ -129,6 +133,7 @@ public class Main {
                     }
 
                     token = authorize(bsiUrl.getEndpoint(), tenantCode, username, password, httpclient);
+                    System.out.println("Token: " + token);
                     if (token != null && !token.isEmpty()) {
                         authenticationSucceeded = true;
                         FileInputStream fs = new FileInputStream(zipLocation);
