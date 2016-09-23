@@ -1,34 +1,18 @@
 package com.fortify.fod;
 
 import java.io.File;
-import java.io.IOException;
 
 import java.util.Arrays;
 import java.util.Map;
 
 import com.fortify.fod.fodapi.FodApi;
-import com.fortify.fod.fodapi.models.ReleaseInfo;
-import com.fortify.fod.fodapi.models.ReleaseModel;
 import com.fortify.fod.legacy.LegacyMain;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
 import com.fortify.fod.parser.FortifyParser;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-
-import com.google.gson.Gson;
 
 public class Main {
-
-	
-	private static String token = "";
-	private static String url = "";
-	private static String releaseId = "";
-	private static int consecutiveGetStatusFailureCount = 0;
-	private static DefaultHttpClient httpclient;
 	private static String username = "";
 	private static String password = "";
 	private static String tenantCode = "";
@@ -50,11 +34,8 @@ public class Main {
             final long maxFileSize = 5000 * 1024 * 1024L;
             boolean uploadSucceeded = false;
             long bytesSent = 0;
-            String errorMessage = "";
-            boolean authenticationSucceeded = false;
 
             try {
-                httpclient = new DefaultHttpClient();
                 if(cl.hasBsiUrl()) {
                     BsiUrl bsiUrl = cl.getBsiUrl();
                     FodApi fodApi = new FodApi(bsiUrl.getEndpoint(), cl.getProxy());
@@ -103,7 +84,6 @@ public class Main {
                         fodApi.retireToken();
                         System.exit(1);
                     } else {
-                        System.out.println("Package upload failed. Message: " + errorMessage);
                         fodApi.retireToken();
                         System.exit(1);
                     }

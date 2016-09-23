@@ -92,7 +92,7 @@ public class StaticScanController extends ControllerBase {
                         successfulUpload = true;
                     // There was an error along the lines of 'another scan in progress' or something
                     } else {
-                        System.out.println(finalResponse);
+                        System.out.println("Package upload failed: " + finalResponse);
                     }
                 }
                 offset += byteCount;
