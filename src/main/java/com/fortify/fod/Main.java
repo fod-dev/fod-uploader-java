@@ -10,14 +10,10 @@ import com.fortify.fod.legacy.LegacyMain;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
 import com.fortify.fod.parser.FortifyParser;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 public class Main {
-	private static String username = "";
-	private static String password = "";
-	private static String tenantCode = "";
-	
-	/**
+
+    /**
 	 * @param args Required:  zip location, bsi url, username/password or api key/secret
 	 */
 	public static void main(String[] args) {
@@ -44,9 +40,11 @@ public class Main {
 
                         String zipLocation = cl.getZipLocation();
 
-                        tenantCode = bsiUrl.getTenantCode();
+                        String tenantCode = bsiUrl.getTenantCode();
                         Map<String, String> tempCredentials;
                         // Has username/password
+                        String username = "";
+                        String password = "";
                         if (cl.hasLoginCredentials()) {
                             tempCredentials = cl.getLoginCredentials();
                             username = tempCredentials.get("username");
