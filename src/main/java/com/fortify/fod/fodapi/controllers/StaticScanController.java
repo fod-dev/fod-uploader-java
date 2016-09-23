@@ -24,7 +24,8 @@ public class StaticScanController {
      * @param bsiUrl releaseId, assessmentTypeId, technologyStack, languageLevel
      * @param cl scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
      */
-    public void StartStaticScan(final BsiUrl bsiUrl, final FortifyCommandLine cl) {
+    public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommandLine cl) {
+        boolean successfulUpload = false;
         boolean lastFragment = false;
         try {
             FileInputStream fs = new FileInputStream(cl.getZipLocation());
@@ -43,6 +44,8 @@ public class StaticScanController {
                 } else {
                     sendByteArray = readByteArray;
                 }
+
+                // Build url
                 String fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + bsiUrl.getProjectVersionId() + "/scan/?"
                         + "&fragNo=" + fragmentNumber + "&offset=" + offset;
                 if (bsiUrl.hasAssessmentTypeId())
@@ -70,8 +73,10 @@ public class StaticScanController {
 
                 System.out.println(response);
 
-                if (!response.isSuccessful())
+                // The endpoint call was unsuccessful. Maybe unauthorized who knows.
+                if (!response.isSuccessful()) {
                     throw new IOException("Unexpected code: " + response);
+                }
 
                 if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
                     System.out.println("Upload Status - Bytes sent:" + offset);
@@ -81,8 +86,10 @@ public class StaticScanController {
                     String finalResponse = IOUtils.toString(response.body().byteStream(), "utf-8");
                     response.body().close();
 
+                    // Scan successfully uploaded
                     if (finalResponse.toUpperCase().equals("ACK")) {
-                        System.out.println("Finished upload!");
+                        successfulUpload = true;
+                    // There was an error along the lines of 'another scan in progress' or something
                     } else {
                         System.out.println(finalResponse);
                     }
@@ -93,5 +100,6 @@ public class StaticScanController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return successfulUpload;
     }
 }

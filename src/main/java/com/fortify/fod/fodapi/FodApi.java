@@ -17,6 +17,9 @@ import java.util.concurrent.TimeUnit;
 
 
 public class FodApi {
+    public final String GRANT_TYPE_PASSWORD = "password";
+    public final String GRANT_TYPE_CLIENT_CREDENTIALS = "client_credentials";
+
     private String baseUrl;
     private OkHttpClient client;
     private boolean useClientId = false;
@@ -35,19 +38,19 @@ public class FodApi {
         staticScanController = new StaticScanController(this);
     }
 
-    public String authenticate(String tenantCode, String username, String password, boolean hasLoginCredentials) {
+    public void authenticate(String tenantCode, String username, String password, String grantType) {
         try {
             // Build the form body
             FormBody.Builder formBodyBuilder = new FormBody.Builder().add("scope", "https://hpfod.com/tenant");
             // Has username/password stuff
-            if (hasLoginCredentials) {
-                formBodyBuilder.add("grant_type", "password")
+            if (grantType == GRANT_TYPE_PASSWORD) {
+                formBodyBuilder.add("grant_type", GRANT_TYPE_PASSWORD)
                         .add("username", tenantCode + "\\" + username)
                         .add("password", password);
             // Has api key/secret
             } else {
                 useClientId = true;
-                formBodyBuilder.add("grant_type", "client_credentials")
+                formBodyBuilder.add("grant_type", GRANT_TYPE_CLIENT_CREDENTIALS)
                         .add("client_id", username)
                         .add("client_secret", password);
             }
@@ -66,7 +69,6 @@ public class FodApi {
             if (!response.isSuccessful())
                 throw new IOException("Unexpected code " + response);
 
-            System.out.println("Token created");
             // Read the results and close the response
             String content = IOUtils.toString(response.body().byteStream(), "utf-8");
             response.body().close();
@@ -79,7 +81,6 @@ public class FodApi {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return token;
     }
 
     public void retireToken() {

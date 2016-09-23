@@ -47,7 +47,6 @@ public class Main {
         } else {
             final long maxFileSize = 5000 * 1024 * 1024L;
             boolean uploadSucceeded = false;
-            boolean lastFragment = false;
             long bytesSent = 0;
             String errorMessage = "";
             boolean authenticationSucceeded = false;
@@ -76,7 +75,9 @@ public class Main {
                             password = tempCredentials.get("secret");
                         }
 
-                        token = fodApi.authenticate(tenantCode, username, password, cl.hasLoginCredentials());
+                        String grantType = cl.hasLoginCredentials() ? fodApi.GRANT_TYPE_PASSWORD
+                                : fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
+                        fodApi.authenticate(tenantCode, username, password, grantType);
 
                         //first thing check file size
                         File zipFileInfo = new File(zipLocation);
@@ -85,11 +86,7 @@ public class Main {
                             return;
                         }
 
-                        if (token != null && !token.isEmpty()) {
-                            fodApi.getStaticScanController().StartStaticScan(bsiUrl, cl);
-                        } else {
-                            errorMessage = "Failed to authenticate";
-                        }
+                        uploadSucceeded = fodApi.getStaticScanController().StartStaticScan(bsiUrl, cl);
                     }
 
                     // TODO: Refactor since this is no longer hit
@@ -102,9 +99,7 @@ public class Main {
                         System.exit(completionsStatus);
                     } else {
                         System.out.println("Package upload failed. Message: " + errorMessage);
-                        if (authenticationSucceeded) {
-                            fodApi.retireToken();
-                        }
+                        fodApi.retireToken();
                         System.exit(1);
                     }
                 }
