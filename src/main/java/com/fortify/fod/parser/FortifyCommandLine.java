@@ -8,8 +8,8 @@ import java.util.Map;
 public class FortifyCommandLine {
     private BsiUrl bsiUrl = null;
     private String zipLocation = "";
-    private Map<String, String> apiCredentials = new HashMap<>();;
-    private Map<String, String> loginCredentials = new HashMap<>();;
+    private Map<String, String> apiCredentials = new HashMap<>();
+    private Map<String, String> loginCredentials = new HashMap<>();
     private int auditPreferenceId = 0;
     private int scanPreferenceId = 0;
     private int pollingInterval = 0;

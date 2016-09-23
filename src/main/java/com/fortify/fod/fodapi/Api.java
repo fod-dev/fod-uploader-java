@@ -1,6 +1,8 @@
 package com.fortify.fod.fodapi;
 
 import com.fortify.fod.MessageResponse;
+import com.fortify.fod.parser.BsiUrl;
+import com.fortify.fod.parser.FortifyCommandLine;
 import com.fortify.fod.parser.Proxy;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -8,17 +10,22 @@ import com.google.gson.JsonParser;
 import okhttp3.*;
 import okhttp3.Credentials;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpHost;
 import org.apache.http.auth.*;
-import org.apache.http.conn.params.ConnRoutePNames;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 
 public class Api {
     private String baseUrl;
     private OkHttpClient client;
     private boolean useClientId = false;
+    private String token;
+
+    private final int segmentLength = 1024 * 1024;        // chunk size
 
     public Api(String url, Proxy clProxy) {
         baseUrl = url;
@@ -54,30 +61,32 @@ public class Api {
             // Get the response
             Response response = client.newCall(request).execute();
 
-            System.out.println("success? "+response.isSuccessful());
-            if(response.isSuccessful()) {
-                // Read the results and close the response
-                String content = IOUtils.toString(response.body().byteStream(), "utf-8");
-                response.body().close();
+            if (!response.isSuccessful())
+                throw new IOException("Unexpected code " + response);
 
-                // Parse the Response
-                JsonParser parser = new JsonParser();
-                JsonObject obj = parser.parse(content).getAsJsonObject();
-                accessToken = obj.get("access_token").getAsString();
+            System.out.println("Token created");
+            // Read the results and close the response
+            String content = IOUtils.toString(response.body().byteStream(), "utf-8");
+            response.body().close();
 
-                System.out.println(accessToken);
-            }
+            // Parse the Response
+            JsonParser parser = new JsonParser();
+            JsonObject obj = parser.parse(content).getAsJsonObject();
+            token = obj.get("access_token").getAsString();
+
+            System.out.println(token);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return accessToken;
+        return token;
     }
 
     public void retireToken() {
         try {
             Request request = new Request.Builder()
                     .url(baseUrl + "/oauth/retireToken")
+                    .addHeader("Authorization","Bearer " + token)
                     .get()
                     .build();
             Response response = client.newCall(request).execute();
@@ -94,6 +103,68 @@ public class Api {
                     System.out.println("Retiring Token : " + messageResponse.getMessage());
             }
         } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * TODO: entitlementId, entitlementFrequencyType, isRemediationScan, excludeThirdPartyLibs
+     * Starts a scan based on the V3 API
+     * @param bsiUrl releaseId, assessmentTypeId, technologyStack, languageLevel
+     * @param cl scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
+     * @return url string
+     */
+    public void StartStaticScan(BsiUrl bsiUrl, FortifyCommandLine cl) {
+        boolean lastFragment = false;
+        boolean authenticationSucceeded = true;
+        try {
+            FileInputStream fs = new FileInputStream(cl.getZipLocation());
+
+            byte[] readByteArray = new byte[segmentLength];
+            byte[] sendByteArray;
+            int fragmentNumber = 0;
+            int byteCount = 0;
+            long offset = 0;
+            while ((byteCount = fs.read(readByteArray)) != -1) {
+                if (byteCount < segmentLength) {
+                    fragmentNumber = -1;
+                    lastFragment = true;
+                    sendByteArray = Arrays.copyOf(readByteArray, byteCount);
+                } else {
+                    sendByteArray = readByteArray;
+                }
+                String fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + bsiUrl.getProjectVersionId() + "/scan/?"
+                        + "&fragNo=" + fragmentNumber + "&offset=" + offset;
+                if (bsiUrl.hasAssessmentTypeId())
+                    fragUrl += "&assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
+                if (bsiUrl.hasTechnologyStack())
+                    fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
+                if (bsiUrl.hasLanguageLevel())
+                    fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
+                if (cl.hasScanPreferenceId())
+                    fragUrl += "&scanPreferenceId=" + cl.getScanPreferenceId();
+                if (cl.hasAuditPreferencesId())
+                    fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
+                if (cl.hasRunSonatypeScan())
+                    fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
+
+                System.out.println(sendByteArray);
+                System.out.println(fragUrl);
+                MediaType byteArray = MediaType.parse("application/octet-stream");
+                Request request = new Request.Builder()
+                        .addHeader("Authorization","Bearer " + token)
+                        .addHeader("Content-Type", "application/octet-stream")
+                        .url(fragUrl)
+                        .post(RequestBody.create(byteArray, sendByteArray))
+                        .build();
+                // Get the response
+                Response response = client.newCall(request).execute();
+
+                System.out.println(response);
+                System.out.println("success? " + response.isSuccessful());
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

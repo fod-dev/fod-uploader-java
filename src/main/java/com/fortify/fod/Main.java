@@ -13,19 +13,13 @@ import com.fortify.fod.legacy.LegacyMain;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
 import com.fortify.fod.parser.FortifyParser;
-import com.fortify.fod.parser.Proxy;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.NTCredentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -100,7 +94,8 @@ public class Main {
                         }
 
                         if (token != null && !token.isEmpty()) {
-                            authenticationSucceeded = true;
+                            fodApi.StartStaticScan(bsiUrl, cl);
+/*                            authenticationSucceeded = true;
                             FileInputStream fs = new FileInputStream(zipLocation);
                             byte[] readByteArray = new byte[segmentLength];
                             byte[] sendByteArray;
@@ -165,9 +160,9 @@ public class Main {
                                     EntityUtils.consume(response.getEntity());
                                 }
                                 offset += byteCount;
-                            }
-                            bytesSent = offset;
-                            fs.close();
+                            }*/
+/*                            bytesSent = offset;
+                            fs.close();*/
 
                         } else {
                             errorMessage = "Failed to authenticate";
