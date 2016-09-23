@@ -72,6 +72,9 @@ public class FortifyCommandLine {
     public int getPollingInterval() {
         return pollingInterval;
     }
+    public boolean hasPollingInterval() {
+        return pollingInterval > 0;
+    }
 
     public Proxy getProxy() {
         return proxy;

@@ -134,7 +134,7 @@ public class Main {
 			while(!finished)
 			{
 				Thread.sleep(pollingInterval*60*1000);
-				int status = getScanStatus(fodApi);
+				int status = fodApi.getReleaseController().getRelease(bsiUrl.getProjectVersionId(), "status");
 				if(consecutiveGetStatusFailureCount < 3)
 				{
 					String statusString = "";

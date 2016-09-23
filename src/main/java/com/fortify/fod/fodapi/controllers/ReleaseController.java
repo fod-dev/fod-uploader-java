@@ -15,11 +15,15 @@ public class ReleaseController extends ControllerBase {
         super(api);
     }
 
-    public int getScanStatus(int releaseId) {
+    public int getRelease(int releaseId, String fields) {
         int returnValue = 0;
         try {
+            String url = api.getBaseUrl() + "/api/v2/releases?q=releaseId:" + releaseId;
+            if (fields.length() > 0) {
+                url += "&fields=" + fields;
+            }
             Request request = new Request.Builder()
-                    .url(api.getBaseUrl() + "/api/v2/releases?q=releaseId:" + releaseId + "&fields=status")
+                    .url(url)
                     .addHeader("Authorization", "Bearer " + api.getToken())
                     .get()
                     .build();
@@ -49,6 +53,9 @@ public class ReleaseController extends ControllerBase {
         return returnValue;
     }
 
+    public int getRelease(int releaseId) {
+        return getRelease(releaseId, "");
+    }
 /*    private static int getScanStatus(FodApi fodApi) {
         int result = -1;
         try {
