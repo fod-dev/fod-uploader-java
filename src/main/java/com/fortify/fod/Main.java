@@ -29,7 +29,6 @@ public class Main {
         } else {
             final long maxFileSize = 5000 * 1024 * 1024L;
             boolean uploadSucceeded = false;
-            long bytesSent = 0;
 
             try {
                 if(cl.hasBsiUrl()) {
@@ -71,8 +70,6 @@ public class Main {
 
                     //check success status exit appropriately
                     if (uploadSucceeded) {
-                        System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent);
-
                         // Why do we need to poll for this?
                         if (cl.hasPollingInterval()) {
                             PollStatus listener = new PollStatus(bsiUrl.getProjectVersionId(), cl.getPollingInterval());

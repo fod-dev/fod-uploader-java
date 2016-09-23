@@ -95,6 +95,8 @@ public class StaticScanController extends ControllerBase {
                 offset += byteCount;
             }
             fs.close();
+            if (successfulUpload)
+                System.out.println("Upload completed successfully. Total bytes sent: " + offset);
         } catch (Exception e) {
             e.printStackTrace();
         }
