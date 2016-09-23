@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.fortify.fod.fodapi.Api;
+import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.legacy.LegacyMain;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
@@ -45,7 +45,6 @@ public class Main {
             LegacyMain.main(newArgs);
         // Use new stuff
         } else {
-            final int segmentLength = 1024 * 1024;        // chunk size
             final long maxFileSize = 5000 * 1024 * 1024L;
             boolean uploadSucceeded = false;
             boolean lastFragment = false;
@@ -57,7 +56,7 @@ public class Main {
                 httpclient = new DefaultHttpClient();
                 if(cl.hasBsiUrl()) {
                     BsiUrl bsiUrl = cl.getBsiUrl();
-                    Api fodApi = new Api(bsiUrl.getEndpoint(), cl.getProxy());
+                    FodApi fodApi = new FodApi(bsiUrl.getEndpoint(), cl.getProxy());
 
                     if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials())) {
 
@@ -87,12 +86,13 @@ public class Main {
                         }
 
                         if (token != null && !token.isEmpty()) {
-                            fodApi.StartStaticScan(bsiUrl, cl);
+                            fodApi.getStaticScanController().StartStaticScan(bsiUrl, cl);
                         } else {
                             errorMessage = "Failed to authenticate";
                         }
                     }
 
+                    // TODO: Refactor since this is no longer hit
                     //check success status exit appropriately
                     if (uploadSucceeded) {
                         System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent);
@@ -126,7 +126,7 @@ public class Main {
 	//need to parse urls like this:
 	//http://www.fod.local/bsi2.aspx?tid=1&tc=tt0@qweqwe.com&pv=187&payloadType=ANALYSIS_PAYLOAD&astid=1&ts=JAVA/J2EE&ll=1.7
 	
-	private static int pollServerForScanStatus(long pollingInterval, Api fodApi) {
+	private static int pollServerForScanStatus(long pollingInterval, FodApi fodApi) {
 		boolean finished = false;
         int completionStatus = 1; // default is failure
 		if(pollingInterval == 0)
@@ -232,7 +232,7 @@ public class Main {
 		
 	}
 
-	private static int getScanStatus(Api fodApi) {
+	private static int getScanStatus(FodApi fodApi) {
 		int result = -1;
 		try {
 			String statusUrl = url + "/api/v2/releases?q=releaseId:" + releaseId + "&fields=status";

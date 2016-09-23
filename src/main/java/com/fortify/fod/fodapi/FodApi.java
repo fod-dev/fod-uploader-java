@@ -1,8 +1,7 @@
 package com.fortify.fod.fodapi;
 
 import com.fortify.fod.MessageResponse;
-import com.fortify.fod.parser.BsiUrl;
-import com.fortify.fod.parser.FortifyCommandLine;
+import com.fortify.fod.fodapi.controllers.StaticScanController;
 import com.fortify.fod.parser.Proxy;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -12,27 +11,28 @@ import okhttp3.Credentials;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.auth.*;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 
-public class Api {
+public class FodApi {
     private String baseUrl;
     private OkHttpClient client;
     private boolean useClientId = false;
     private String token;
 
-    private final int CHUNK_SIZE = 1024 * 1024;
     private final int CONNECTION_TIMEOUT = 10;
     private final int WRITE_TIMEOUT = 30;
     private final int READ_TIMEOUT = 30;
 
-    public Api(String url, Proxy clProxy) {
+    private StaticScanController staticScanController;
+
+    public FodApi(String url, Proxy clProxy) {
         baseUrl = url;
         client = Create(clProxy);
+
+        staticScanController = new StaticScanController(this);
     }
 
     public String authenticate(String tenantCode, String username, String password, boolean hasLoginCredentials) {
@@ -107,83 +107,6 @@ public class Api {
         }
     }
 
-    /**
-     * TODO: entitlementId, entitlementFrequencyType, isRemediationScan, excludeThirdPartyLibs
-     * Starts a scan based on the V3 API
-     * @param bsiUrl releaseId, assessmentTypeId, technologyStack, languageLevel
-     * @param cl scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
-     */
-    public void StartStaticScan(BsiUrl bsiUrl, FortifyCommandLine cl) {
-        boolean lastFragment = false;
-        try {
-            FileInputStream fs = new FileInputStream(cl.getZipLocation());
-
-            byte[] readByteArray = new byte[CHUNK_SIZE];
-            byte[] sendByteArray;
-            int fragmentNumber = 0;
-            int byteCount;
-            long offset = 0;
-            while ((byteCount = fs.read(readByteArray)) != -1) {
-                System.out.println(byteCount);
-                if (byteCount < CHUNK_SIZE) {
-                    fragmentNumber = -1;
-                    lastFragment = true;
-                    sendByteArray = Arrays.copyOf(readByteArray, byteCount);
-                } else {
-                    sendByteArray = readByteArray;
-                }
-                String fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + bsiUrl.getProjectVersionId() + "/scan/?"
-                        + "&fragNo=" + fragmentNumber + "&offset=" + offset;
-                if (bsiUrl.hasAssessmentTypeId())
-                    fragUrl += "&assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
-                if (bsiUrl.hasTechnologyStack())
-                    fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
-                if (bsiUrl.hasLanguageLevel())
-                    fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
-                if (cl.hasScanPreferenceId())
-                    fragUrl += "&scanPreferenceId=" + cl.getScanPreferenceId();
-                if (cl.hasAuditPreferencesId())
-                    fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
-                if (cl.hasRunSonatypeScan())
-                    fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
-
-                MediaType byteArray = MediaType.parse("application/octet-stream");
-                Request request = new Request.Builder()
-                        .addHeader("Authorization","Bearer " + token)
-                        .addHeader("Content-Type", "application/octet-stream")
-                        .url(fragUrl)
-                        .post(RequestBody.create(byteArray, sendByteArray))
-                        .build();
-                // Get the response
-                Response response = client.newCall(request).execute();
-
-                System.out.println(response);
-
-                if (!response.isSuccessful())
-                    throw new IOException("Unexpected code: " + response);
-
-                if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
-                    System.out.println("Upload Status - Bytes sent:" + offset);
-                }
-                if (lastFragment) {
-                    // Read the results and close the response
-                    String finalResponse = IOUtils.toString(response.body().byteStream(), "utf-8");
-                    response.body().close();
-
-                    if (finalResponse.toUpperCase().equals("ACK")) {
-                        System.out.println("Finished upload!");
-                    } else {
-                        System.out.println(finalResponse);
-                    }
-                }
-                offset += byteCount;
-            }
-            fs.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private OkHttpClient Create(Proxy clProxy) {
         OkHttpClient.Builder c = new OkHttpClient().newBuilder()
                 .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
@@ -227,5 +150,17 @@ public class Api {
 
     public boolean useClientId() {
         return useClientId;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public OkHttpClient getClient() {
+        return client;
+    }
+
+    public StaticScanController getStaticScanController() {
+        return staticScanController;
     }
 }
