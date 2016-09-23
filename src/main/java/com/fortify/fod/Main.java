@@ -1,8 +1,6 @@
 package com.fortify.fod;
 
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import java.util.Arrays;
@@ -15,12 +13,7 @@ import com.fortify.fod.parser.FortifyCommandLine;
 import com.fortify.fod.parser.FortifyParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
@@ -95,75 +88,6 @@ public class Main {
 
                         if (token != null && !token.isEmpty()) {
                             fodApi.StartStaticScan(bsiUrl, cl);
-/*                            authenticationSucceeded = true;
-                            FileInputStream fs = new FileInputStream(zipLocation);
-                            byte[] readByteArray = new byte[segmentLength];
-                            byte[] sendByteArray;
-                            int fragmentNumber = 0;
-                            int byteCount = 0;
-                            long offset = 0;
-                            while ((byteCount = fs.read(readByteArray)) != -1) {
-                                if (byteCount < segmentLength) {
-                                    fragmentNumber = -1;
-                                    lastFragment = true;
-                                    sendByteArray = Arrays.copyOf(readByteArray, byteCount);
-                                } else {
-                                    sendByteArray = readByteArray;
-                                }
-                                String fragUrl;
-                                if (bsiUrl.hasLanguageLevel()) {
-                                    fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId="
-                                            + bsiUrl.getAssessmentTypeId() + "&technologyStack=" + bsiUrl.getTechnologyStack()
-                                            + "&languageLevel=" + bsiUrl.getLanguageLevel() + "&fragNo=" + fragmentNumber++
-                                            + "&len=" + byteCount + "&offset=" + offset;
-                                } else {
-                                    fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + releaseId + "/scan/?assessmentTypeId="
-                                            + bsiUrl.getAssessmentTypeId() + "&technologyStack=" + bsiUrl.getTechnologyStack()
-                                            + "&fragNo=" + fragmentNumber++ + "&len=" + byteCount + "&offset=" + offset;
-                                }
-                                if (cl.hasScanPreferenceId()) {
-                                    fragUrl += "&scanPreferenceId=" + cl.getScanPreferenceId();
-                                }
-                                if (cl.hasAuditPreferencesId()) {
-                                    fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
-                                }
-                                if (cl.hasRunSonatypeScan()) {
-                                    fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
-                                }
-                                String postErrorMessage = "";
-                                SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpclient, token, postErrorMessage);
-                                HttpResponse response = postResponse.getResponse();
-                                if (response == null) {
-                                    errorMessage = postResponse.getErrorMessage();
-                                    break;
-                                } else {
-
-                                    StatusLine sl = response.getStatusLine();
-                                    Integer statusCode = sl.getStatusCode();
-                                    if (!statusCode.toString().startsWith("2")) {
-                                        errorMessage = sl.toString();
-                                        break;
-                                    } else {
-                                        if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
-                                            System.out.println("Upload Status - Bytes sent:" + offset);
-                                        }
-                                        if (lastFragment) {
-                                            HttpEntity entity = response.getEntity();
-                                            String finalResponse = EntityUtils.toString(entity).trim();
-                                            if (finalResponse.toUpperCase().equals("ACK")) {
-                                                uploadSucceeded = true;
-                                            } else {
-                                                errorMessage = finalResponse;
-                                            }
-                                        }
-                                    }
-                                    EntityUtils.consume(response.getEntity());
-                                }
-                                offset += byteCount;
-                            }*/
-/*                            bytesSent = offset;
-                            fs.close();*/
-
                         } else {
                             errorMessage = "Failed to authenticate";
                         }
@@ -363,33 +287,4 @@ public class Main {
 		}
 		return result;
 	}
-
-	private static SendPostResponse sendPost(String url, byte[] bytesToSend, HttpClient client, String token, String errorMessage)
-	{
-		SendPostResponse result = new SendPostResponse();
-		try {
-			HttpPost httppost = new HttpPost(url);
-			httppost.addHeader("Authorization","Bearer " + token);
-			ByteArrayEntity entity = new ByteArrayEntity(bytesToSend);		
-			httppost.setEntity(entity);
-			HttpResponse response = client.execute(httppost);
-			result.setResponse(response);
-			result.setErrorMessage("");
-		} catch (ParseException e) {
-			errorMessage = e.getMessage();
-			result.setResponse(null);
-			result.setErrorMessage(errorMessage);
-		} catch (IOException e) {
-			errorMessage = e.getMessage();
-			result.setResponse(null);
-			result.setErrorMessage(errorMessage);
-		}	catch (Exception e) {
-			errorMessage = e.getMessage();
-			result.setResponse(null);
-			result.setErrorMessage(errorMessage);
-		}
-		return result;
-	}
-	
-	
 }

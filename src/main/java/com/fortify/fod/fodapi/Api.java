@@ -36,7 +36,6 @@ public class Api {
     }
 
     public String authenticate(String tenantCode, String username, String password, boolean hasLoginCredentials) {
-        String accessToken = "";
         try {
             // Build the form body
             FormBody.Builder formBodyBuilder = new FormBody.Builder().add("scope", "https://hpfod.com/tenant");
@@ -77,8 +76,6 @@ public class Api {
             JsonObject obj = parser.parse(content).getAsJsonObject();
             token = obj.get("access_token").getAsString();
 
-            System.out.println(token);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -118,16 +115,16 @@ public class Api {
      */
     public void StartStaticScan(BsiUrl bsiUrl, FortifyCommandLine cl) {
         boolean lastFragment = false;
-        boolean authenticationSucceeded = true;
         try {
             FileInputStream fs = new FileInputStream(cl.getZipLocation());
 
             byte[] readByteArray = new byte[CHUNK_SIZE];
             byte[] sendByteArray;
             int fragmentNumber = 0;
-            int byteCount = 0;
+            int byteCount;
             long offset = 0;
             while ((byteCount = fs.read(readByteArray)) != -1) {
+                System.out.println(byteCount);
                 if (byteCount < CHUNK_SIZE) {
                     fragmentNumber = -1;
                     lastFragment = true;
@@ -150,8 +147,6 @@ public class Api {
                 if (cl.hasRunSonatypeScan())
                     fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
 
-                System.out.println(sendByteArray);
-                System.out.println(fragUrl);
                 MediaType byteArray = MediaType.parse("application/octet-stream");
                 Request request = new Request.Builder()
                         .addHeader("Authorization","Bearer " + token)
@@ -163,9 +158,27 @@ public class Api {
                 Response response = client.newCall(request).execute();
 
                 System.out.println(response);
-                System.out.println("success? " + response.isSuccessful());
-            }
 
+                if (!response.isSuccessful())
+                    throw new IOException("Unexpected code: " + response);
+
+                if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
+                    System.out.println("Upload Status - Bytes sent:" + offset);
+                }
+                if (lastFragment) {
+                    // Read the results and close the response
+                    String finalResponse = IOUtils.toString(response.body().byteStream(), "utf-8");
+                    response.body().close();
+
+                    if (finalResponse.toUpperCase().equals("ACK")) {
+                        System.out.println("Finished upload!");
+                    } else {
+                        System.out.println(finalResponse);
+                    }
+                }
+                offset += byteCount;
+            }
+            fs.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
