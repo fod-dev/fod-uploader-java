@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 
 public class Api {
@@ -29,7 +30,7 @@ public class Api {
 
     public Api(String url, Proxy clProxy) {
         baseUrl = url;
-        client = Proxy(clProxy);
+        client = Create(clProxy);
     }
 
     public String authenticate(String tenantCode, String username, String password, boolean hasLoginCredentials) {
@@ -169,39 +170,45 @@ public class Api {
         }
     }
 
-    private OkHttpClient Proxy(Proxy clProxy) {
-        if(clProxy != null) {
-            OkHttpClient.Builder builder = new OkHttpClient().newBuilder()
-                .proxy(new java.net.Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort())));
+    private OkHttpClient Create(Proxy clProxy) {
+        OkHttpClient.Builder c = new OkHttpClient().newBuilder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS);
 
-            if (clProxy.hasUsername() && clProxy.hasPassword()) {
-                // Include NTDomain and NTWorkstation in auth
-                Authenticator proxyAuthenticator;
-                if (clProxy.hasNTDomain() && clProxy.hasNTWorkstation()) {
-                    proxyAuthenticator = (Route route, Response response) -> {
-                        String credentials = new NTCredentials(clProxy.getUsername(), clProxy.getPassword(),
-                                clProxy.getNTWorkstation(), clProxy.getNTDomain()).toString();
+        // If there's no proxy just create a normal client
+        if(clProxy == null)
+            return c.build();
 
-                        return response.request().newBuilder()
-                                .header("Proxy-Authorization", credentials)
-                                .build();
-                    };
-                // Just use username and password
-                } else {
-                    proxyAuthenticator = (Route route, Response response) -> {
-                        String credentials = Credentials.basic(clProxy.getUsername(), clProxy.getPassword());
-                        return response.request().newBuilder()
-                                .header("Proxy-Authorization", credentials)
-                                .build();
-                    };
+        // Build out the proxy
+        OkHttpClient.Builder builder = c
+            .proxy(new java.net.Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort())));
 
-                }
-                builder.proxyAuthenticator(proxyAuthenticator);
+        if (clProxy.hasUsername() && clProxy.hasPassword()) {
+            // Include NTDomain and NTWorkstation in auth
+            Authenticator proxyAuthenticator;
+            if (clProxy.hasNTDomain() && clProxy.hasNTWorkstation()) {
+                proxyAuthenticator = (Route route, Response response) -> {
+                    String credentials = new NTCredentials(clProxy.getUsername(), clProxy.getPassword(),
+                            clProxy.getNTWorkstation(), clProxy.getNTDomain()).toString();
+
+                    return response.request().newBuilder()
+                            .header("Proxy-Authorization", credentials)
+                            .build();
+                };
+            // Just use username and password
+            } else {
+                proxyAuthenticator = (Route route, Response response) -> {
+                    String credentials = Credentials.basic(clProxy.getUsername(), clProxy.getPassword());
+                    return response.request().newBuilder()
+                            .header("Proxy-Authorization", credentials)
+                            .build();
+                };
+
             }
-            return builder.build();
-        } else {
-            return new OkHttpClient();
+            builder.proxyAuthenticator(proxyAuthenticator);
         }
+        return builder.build();
     }
 
     public boolean useClientId() {
