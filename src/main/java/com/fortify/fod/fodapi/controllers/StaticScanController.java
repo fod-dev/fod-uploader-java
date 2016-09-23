@@ -52,7 +52,6 @@ public class StaticScanController extends ControllerBase {
 
             // Loop through chunks
             while ((byteCount = fs.read(readByteArray)) != -1) {
-                System.out.println(byteCount);
                 if (byteCount < CHUNK_SIZE) {
                     fragmentNumber = -1;
                     lastFragment = true;
@@ -71,8 +70,6 @@ public class StaticScanController extends ControllerBase {
                         .build();
                 // Get the response
                 Response response = api.getClient().newCall(request).execute();
-
-                System.out.println(response);
 
                 // The endpoint call was unsuccessful. Maybe unauthorized who knows.
                 if (!response.isSuccessful()) {

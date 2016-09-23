@@ -43,8 +43,8 @@ public class Main {
                         String tenantCode = bsiUrl.getTenantCode();
                         Map<String, String> tempCredentials;
                         // Has username/password
-                        String username = "";
-                        String password = "";
+                        String username;
+                        String password;
                         if (cl.hasLoginCredentials()) {
                             tempCredentials = cl.getLoginCredentials();
                             username = tempCredentials.get("username");
