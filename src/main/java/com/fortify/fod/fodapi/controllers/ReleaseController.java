@@ -15,8 +15,7 @@ public class ReleaseController extends ControllerBase {
         super(api);
     }
 
-    public int getRelease(int releaseId, String fields) {
-        int returnValue = 0;
+    public ReleaseModel getRelease(int releaseId, String fields) {
         try {
             String url = api.getBaseUrl() + "/api/v2/releases?q=releaseId:" + releaseId;
             if (fields.length() > 0) {
@@ -46,14 +45,14 @@ public class ReleaseController extends ControllerBase {
             Gson gson = new Gson();
             ReleaseModel messageResponse = gson.fromJson(content, ReleaseModel.class);
 
-            returnValue = messageResponse.getData()[0].getStatus();
+            return messageResponse;
         } catch(Exception e) {
             e.printStackTrace();
         }
-        return returnValue;
+        return null;
     }
 
-    public int getRelease(int releaseId) {
+    public ReleaseModel getRelease(int releaseId) {
         return getRelease(releaseId, "");
     }
 /*    private static int getScanStatus(FodApi fodApi) {
