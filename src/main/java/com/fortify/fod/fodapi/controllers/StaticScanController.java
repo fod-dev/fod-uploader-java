@@ -34,6 +34,23 @@ public class StaticScanController extends ControllerBase {
             int fragmentNumber = 0;
             int byteCount;
             long offset = 0;
+
+            // Build 'static' portion of url
+            String fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + bsiUrl.getProjectVersionId() + "/scan/?";
+            if (bsiUrl.hasAssessmentTypeId())
+                fragUrl += "&assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
+            if (bsiUrl.hasTechnologyStack())
+                fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
+            if (bsiUrl.hasLanguageLevel())
+                fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
+            if (cl.hasScanPreferenceId())
+                fragUrl += "&scanPreferenceId=" + cl.getScanPreferenceId();
+            if (cl.hasAuditPreferencesId())
+                fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
+            if (cl.hasRunSonatypeScan())
+                fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
+
+            // Loop through chunks
             while ((byteCount = fs.read(readByteArray)) != -1) {
                 System.out.println(byteCount);
                 if (byteCount < CHUNK_SIZE) {
@@ -44,27 +61,12 @@ public class StaticScanController extends ControllerBase {
                     sendByteArray = readByteArray;
                 }
 
-                // Build url
-                String fragUrl = bsiUrl.getEndpoint() + "/api/v1/release/" + bsiUrl.getProjectVersionId() + "/scan/?"
-                        + "&fragNo=" + fragmentNumber + "&offset=" + offset;
-                if (bsiUrl.hasAssessmentTypeId())
-                    fragUrl += "&assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
-                if (bsiUrl.hasTechnologyStack())
-                    fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
-                if (bsiUrl.hasLanguageLevel())
-                    fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
-                if (cl.hasScanPreferenceId())
-                    fragUrl += "&scanPreferenceId=" + cl.getScanPreferenceId();
-                if (cl.hasAuditPreferencesId())
-                    fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
-                if (cl.hasRunSonatypeScan())
-                    fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
-
                 MediaType byteArray = MediaType.parse("application/octet-stream");
                 Request request = new Request.Builder()
                         .addHeader("Authorization","Bearer " + api.getToken())
                         .addHeader("Content-Type", "application/octet-stream")
-                        .url(fragUrl)
+                        // Add offsets
+                        .url(fragUrl + "&fragNo=" + fragmentNumber + "&offset=" + offset)
                         .post(RequestBody.create(byteArray, sendByteArray))
                         .build();
                 // Get the response
