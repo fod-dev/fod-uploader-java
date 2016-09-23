@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.fortify.fod.MessageResponse;
-import com.fortify.fod.ReleaseInfo;
-import com.fortify.fod.ReleaseQueryResponse;
+import com.fortify.fod.fodapi.models.ReleaseInfo;
+import com.fortify.fod.fodapi.models.ReleaseModel;
 import com.fortify.fod.SendPostResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -363,7 +363,7 @@ public class LegacyMain {
             HttpEntity entity = response.getEntity();
             String responseString = EntityUtils.toString(entity);
             Gson gson = new Gson();
-            ReleaseQueryResponse requestQueryResponse = gson.fromJson(responseString, ReleaseQueryResponse.class);
+            ReleaseModel requestQueryResponse = gson.fromJson(responseString, ReleaseModel.class);
             boolean isPassed = requestQueryResponse.getData()[0].isPassed();
             System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );
             if(!isPassed)
@@ -410,7 +410,7 @@ public class LegacyMain {
             HttpEntity entity = response.getEntity();
             String responseString = EntityUtils.toString(entity);
             Gson gson = new Gson();
-            ReleaseQueryResponse requestQueryResponse = gson.fromJson(responseString, ReleaseQueryResponse.class);
+            ReleaseModel requestQueryResponse = gson.fromJson(responseString, ReleaseModel.class);
             if(requestQueryResponse != null)  // did not get back the expected response
             {
                 int responseCode = requestQueryResponse.getResponseCode();

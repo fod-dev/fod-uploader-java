@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 import com.fortify.fod.fodapi.FodApi;
+import com.fortify.fod.fodapi.models.ReleaseInfo;
+import com.fortify.fod.fodapi.models.ReleaseModel;
 import com.fortify.fod.legacy.LegacyMain;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
@@ -75,8 +77,7 @@ public class Main {
                             password = tempCredentials.get("secret");
                         }
 
-                        String grantType = cl.hasLoginCredentials() ? fodApi.GRANT_TYPE_PASSWORD
-                                : fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
+                        String grantType = cl.hasLoginCredentials() ? fodApi.GRANT_TYPE_PASSWORD : fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
                         fodApi.authenticate(tenantCode, username, password, grantType);
 
                         //first thing check file size
@@ -93,10 +94,11 @@ public class Main {
                     //check success status exit appropriately
                     if (uploadSucceeded) {
                         System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent);
-                        //TODO: WIP api integration
-                        int completionsStatus = pollServerForScanStatus(cl.getPollingInterval(), fodApi);
+                        //TODO: wtf does this do
+                        //int completionsStatus = pollServerForScanStatus(cl.getPollingInterval(), fodApi);
+                        fodApi.getReleaseController().getScanStatus(bsiUrl.getProjectVersionId());
                         fodApi.retireToken();
-                        System.exit(completionsStatus);
+                        System.exit(1);
                     } else {
                         System.out.println("Package upload failed. Message: " + errorMessage);
                         fodApi.retireToken();
@@ -189,7 +191,7 @@ public class Main {
 			HttpEntity entity = response.getEntity();
 			String responseString = EntityUtils.toString(entity);
 			Gson gson = new Gson();
-			ReleaseQueryResponse requestQueryResponse = gson.fromJson(responseString, ReleaseQueryResponse.class);
+			ReleaseModel requestQueryResponse = gson.fromJson(responseString, ReleaseModel.class);
 			boolean isPassed = requestQueryResponse.getData()[0].isPassed();
 			System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );
 			if(isPassed == false)
@@ -227,6 +229,7 @@ public class Main {
 		
 	}
 
+
 	private static int getScanStatus(FodApi fodApi) {
 		int result = -1;
 		try {
@@ -237,7 +240,7 @@ public class Main {
 			HttpEntity entity = response.getEntity();
 			String responseString = EntityUtils.toString(entity);
 			Gson gson = new Gson();
-			ReleaseQueryResponse requestQueryResponse = gson.fromJson(responseString, ReleaseQueryResponse.class);
+			ReleaseModel requestQueryResponse = gson.fromJson(responseString, ReleaseModel.class);
 			if(requestQueryResponse != null)  // did not get back the expected response
 			{
 				int responseCode = requestQueryResponse.getResponseCode();
@@ -254,7 +257,7 @@ public class Main {
 				{
 					System.out.println("Token expired re-authorizing");
                     //TODO: this is lame will clean up
-                    token = fodApi.authenticate(tenantCode, username, password, fodApi.useClientId());
+                    //token = fodApi.authenticate(tenantCode, username, password, fodApi.useClientId());
 					if(token == null || token.isEmpty() )
 					{
 						System.out.println("Failed to reauthorize");
@@ -282,4 +285,5 @@ public class Main {
 		}
 		return result;
 	}
+
 }

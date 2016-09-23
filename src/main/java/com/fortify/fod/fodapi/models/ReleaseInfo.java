@@ -1,4 +1,4 @@
-package com.fortify.fod;
+package com.fortify.fod.fodapi.models;
 
 public class ReleaseInfo {
 

@@ -1,6 +1,7 @@
 package com.fortify.fod.fodapi;
 
 import com.fortify.fod.MessageResponse;
+import com.fortify.fod.fodapi.controllers.ReleaseController;
 import com.fortify.fod.fodapi.controllers.StaticScanController;
 import com.fortify.fod.parser.Proxy;
 import com.google.gson.Gson;
@@ -30,12 +31,16 @@ public class FodApi {
     private final int READ_TIMEOUT = 30;
 
     private StaticScanController staticScanController;
+    public StaticScanController getStaticScanController() { return staticScanController; }
+    private ReleaseController releaseController;
+    public ReleaseController getReleaseController() { return releaseController; }
 
     public FodApi(String url, Proxy clProxy) {
         baseUrl = url;
         client = Create(clProxy);
 
         staticScanController = new StaticScanController(this);
+        releaseController = new ReleaseController(this);
     }
 
     public void authenticate(String tenantCode, String username, String password, String grantType) {
@@ -161,7 +166,7 @@ public class FodApi {
         return client;
     }
 
-    public StaticScanController getStaticScanController() {
-        return staticScanController;
+    public String getBaseUrl() {
+        return baseUrl;
     }
 }
