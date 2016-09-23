@@ -10,12 +10,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class StaticScanController {
+public class StaticScanController extends ControllerBase {
     private final int CHUNK_SIZE = 1024 * 1024;
-    private FodApi api;
 
-    public StaticScanController(final FodApi a) {
-        api = a;
+    public StaticScanController(final FodApi api) {
+        super(api);
     }
 
     /**
