@@ -90,13 +90,16 @@ public class Main {
                         uploadSucceeded = fodApi.getStaticScanController().StartStaticScan(bsiUrl, cl);
                     }
 
-                    // TODO: Refactor since this is no longer hit
                     //check success status exit appropriately
                     if (uploadSucceeded) {
                         System.out.println("Upload completed successfully. Total bytes sent: " + bytesSent);
-                        //TODO: wtf does this do
-                        //int completionsStatus = pollServerForScanStatus(cl.getPollingInterval(), fodApi);
-                        fodApi.getReleaseController().getScanStatus(bsiUrl.getProjectVersionId());
+
+                        // Why do we need to poll for this?
+                        if (cl.hasPollingInterval()) {
+                            PollStatus listener = new PollStatus(bsiUrl.getProjectVersionId(), cl.getPollingInterval());
+                            // Until status is is complete or cancelled
+                            listener.releaseStatus(fodApi);
+                        }
                         fodApi.retireToken();
                         System.exit(1);
                     } else {
@@ -123,12 +126,10 @@ public class Main {
 	//need to parse urls like this:
 	//http://www.fod.local/bsi2.aspx?tid=1&tc=tt0@qweqwe.com&pv=187&payloadType=ANALYSIS_PAYLOAD&astid=1&ts=JAVA/J2EE&ll=1.7
 	
-	private static int pollServerForScanStatus(long pollingInterval, FodApi fodApi) {
+	private static int pollServerForScanStatus(FodApi fodApi, BsiUrl bsiUrl, int pollingInterval) {
 		boolean finished = false;
         int completionStatus = 1; // default is failure
-		if(pollingInterval == 0)
-			return 0;
-	
+
 		try 
 		{
 			while(!finished)

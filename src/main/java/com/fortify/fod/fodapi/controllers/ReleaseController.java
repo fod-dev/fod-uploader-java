@@ -43,9 +43,7 @@ public class ReleaseController extends ControllerBase {
             response.body().close();
 
             Gson gson = new Gson();
-            ReleaseModel messageResponse = gson.fromJson(content, ReleaseModel.class);
-
-            return messageResponse;
+            return gson.fromJson(content, ReleaseModel.class);
         } catch(Exception e) {
             e.printStackTrace();
         }
