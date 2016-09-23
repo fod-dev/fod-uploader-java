@@ -1,5 +1,6 @@
 package com.fortify.fod.fodapi.controllers;
 
+import com.fortify.fod.fodapi.models.ReleaseInfo;
 import com.fortify.fod.fodapi.models.ReleaseModel;
 import com.fortify.fod.fodapi.FodApi;
 import com.google.gson.Gson;
@@ -14,7 +15,8 @@ public class ReleaseController extends ControllerBase {
         super(api);
     }
 
-    public void getScanStatus(int releaseId) {
+    public int getScanStatus(int releaseId) {
+        int returnValue = 0;
         try {
             Request request = new Request.Builder()
                     .url(api.getBaseUrl() + "/api/v2/releases?q=releaseId:" + releaseId + "&fields=status")
@@ -34,11 +36,12 @@ public class ReleaseController extends ControllerBase {
 
             Gson gson = new Gson();
             ReleaseModel messageResponse = gson.fromJson(content, ReleaseModel.class);
-
-
+            
+            returnValue = messageResponse.getData()[0].getStatus();
         } catch(Exception e) {
             e.printStackTrace();
         }
+        return returnValue;
     }
 
 /*    private static int getScanStatus(FodApi fodApi) {
