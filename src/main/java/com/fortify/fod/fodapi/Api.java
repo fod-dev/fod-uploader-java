@@ -13,7 +13,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.auth.*;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
@@ -26,7 +25,10 @@ public class Api {
     private boolean useClientId = false;
     private String token;
 
-    private final int segmentLength = 1024 * 1024;        // chunk size
+    private final int CHUNK_SIZE = 1024 * 1024;
+    private final int CONNECTION_TIMEOUT = 10;
+    private final int WRITE_TIMEOUT = 30;
+    private final int READ_TIMEOUT = 30;
 
     public Api(String url, Proxy clProxy) {
         baseUrl = url;
@@ -113,7 +115,6 @@ public class Api {
      * Starts a scan based on the V3 API
      * @param bsiUrl releaseId, assessmentTypeId, technologyStack, languageLevel
      * @param cl scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
-     * @return url string
      */
     public void StartStaticScan(BsiUrl bsiUrl, FortifyCommandLine cl) {
         boolean lastFragment = false;
@@ -121,13 +122,13 @@ public class Api {
         try {
             FileInputStream fs = new FileInputStream(cl.getZipLocation());
 
-            byte[] readByteArray = new byte[segmentLength];
+            byte[] readByteArray = new byte[CHUNK_SIZE];
             byte[] sendByteArray;
             int fragmentNumber = 0;
             int byteCount = 0;
             long offset = 0;
             while ((byteCount = fs.read(readByteArray)) != -1) {
-                if (byteCount < segmentLength) {
+                if (byteCount < CHUNK_SIZE) {
                     fragmentNumber = -1;
                     lastFragment = true;
                     sendByteArray = Arrays.copyOf(readByteArray, byteCount);
@@ -172,9 +173,9 @@ public class Api {
 
     private OkHttpClient Create(Proxy clProxy) {
         OkHttpClient.Builder c = new OkHttpClient().newBuilder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS);
+                .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS);
 
         // If there's no proxy just create a normal client
         if(clProxy == null)
