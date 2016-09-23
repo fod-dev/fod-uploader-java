@@ -26,6 +26,12 @@ public class FodApi {
     private boolean useClientId = false;
     private String token;
 
+    // Used for automatically re-authenticating if need be
+    private String tenantCode = "";
+    private String username = "";
+    private String password = "";
+    private String grantType = "";
+
     private final int CONNECTION_TIMEOUT = 10;
     private final int WRITE_TIMEOUT = 30;
     private final int READ_TIMEOUT = 30;
@@ -48,7 +54,7 @@ public class FodApi {
             // Build the form body
             FormBody.Builder formBodyBuilder = new FormBody.Builder().add("scope", "https://hpfod.com/tenant");
             // Has username/password stuff
-            if (grantType == GRANT_TYPE_PASSWORD) {
+            if (grantType.equals(GRANT_TYPE_PASSWORD)) {
                 formBodyBuilder.add("grant_type", GRANT_TYPE_PASSWORD)
                         .add("username", tenantCode + "\\" + username)
                         .add("password", password);
@@ -82,10 +88,18 @@ public class FodApi {
             JsonParser parser = new JsonParser();
             JsonObject obj = parser.parse(content).getAsJsonObject();
             token = obj.get("access_token").getAsString();
-
+            // You've authenticated once, so we can use this again during polling if need be
+            this.tenantCode = tenantCode;
+            this.username = username;
+            this.password = password;
+            this.grantType = grantType;
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void authenticate() {
+        this.authenticate(tenantCode, username, password, grantType);
     }
 
     public void retireToken() {

@@ -29,6 +29,11 @@ public class ReleaseController extends ControllerBase {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code: " + response);
             }
+            if (response.code() == 401) {  // got logged out during polling so log back in
+                System.out.println("Token expired re-authorizing");
+                // Re-authenticate
+                api.authenticate();
+            }
 
             // Read the results and close the response
             String content = IOUtils.toString(response.body().byteStream(), "utf-8");
@@ -36,7 +41,7 @@ public class ReleaseController extends ControllerBase {
 
             Gson gson = new Gson();
             ReleaseModel messageResponse = gson.fromJson(content, ReleaseModel.class);
-            
+
             returnValue = messageResponse.getData()[0].getStatus();
         } catch(Exception e) {
             e.printStackTrace();
