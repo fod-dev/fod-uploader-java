@@ -36,10 +36,14 @@ java -jar FodUpload.jar -u <url> -z <file> [-a <1|2>] -uc <username> <password> 
     [-s <true|false>] [-v]
 ```
 
+
+
+
 Each option has a short and long name:
+
 Short Name | Long Name          | Description                                                      
------------|--------------------|------------------------------------------------------------------
- -u        | -bsiUrl            | build server url                                                 
+---------- | ----------------- | ------------------------------------------------------------------
+ -u         | -bsiUrl            | build server url                                                 
  -z        | -zipLocation       | location of scan                                                 
  -ac       | -apiCredentials    | api credentials                                                  
  -uc       | -userCredentials   | user login credentials                                           
