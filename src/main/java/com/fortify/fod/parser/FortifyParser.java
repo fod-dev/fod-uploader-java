@@ -8,18 +8,41 @@ import java.util.Comparator;
 import java.util.regex.Pattern;
 
 public class FortifyParser {
-    static final String USERNAME = "username";
-    static final String API = "api";
+    static final String USERNAME = "username"; //TODO: Rename
+    static final String USERNAME_SHORT = "c1"; //TODO: Rename
+
+    static final String API = "api";//TODO: Rename
+    static final String API_SHORT = "c2";//TODO: Rename
+
     static final String ZIP_LOCATION = "zipLocation";
+    static final String ZIP_LOCATION_SHORT = "z";
+
     static final String BSI_URL = "bsiUrl";
+    static final String BSI_URL_SHORT = "u";
+
     private static final String HELP = "help";
+    private static final String HELP_SHORT = "h";
+
     private static final String VERSION = "version";
+    private static final String VERSION_SHORT = "v";
+
     static final String POLLING_INTERVAL = "pollingInterval";
+    static final String POLLING_INTERVAL_SHORT = "I";
+
     static final String RUN_SONATYPE_SCAN = "runSonatypeScan";
+    static final String RUN_SONATYPE_SCAN_SHORT = "s";
+
     static final String AUDIT_PREFERENCE_ID = "auditPreferenceId";
+    static final String AUDIT_PREFERENCE_ID_SHORT = "a";
+
     static final String SCAN_PREFERENCE_ID = "scanPreferenceId";
+    static final String SCAN_PREFERENCE_ID_SHORT = "p";
+
     static final String PROXY = "proxy";
+    static final String PROXY_SHORT = "P";
+
     static final String LEGACY = "legacy";
+    static final String LEGACY_SHORT = "l";
 
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
@@ -30,45 +53,51 @@ public class FortifyParser {
      */
     public FortifyParser() {
         // creates 2 arguments which aren't required. #documentation
-        Option help = new       Option(HELP, "print this message");
-        Option version = new    Option(VERSION, "print the version information and exit");
+        Option help = new       Option(HELP_SHORT, HELP, false, "print this message");
+        Option version = new    Option(VERSION_SHORT, VERSION, false, "print the version information and exit");
 
         // Creates the polling interval argument ( -pollingInterval <<minutes> required=false interval between
         // checking scan status
-        Option pollingInterval = Option.builder(POLLING_INTERVAL)
+        Option pollingInterval = Option.builder(POLLING_INTERVAL_SHORT)
+                .longOpt(POLLING_INTERVAL)
                 .hasArg(true).argName("minutes")
                 .desc("interval between checking scan status")
                 .required(false).build();
 
         // Creates the run sonatype scan argument ( -runSonatypeScan <true | false> required=false whether to run a
         // Sonatype Scan
-        Option runSonatypeScan = Option.builder(RUN_SONATYPE_SCAN)
+        Option runSonatypeScan = Option.builder(RUN_SONATYPE_SCAN_SHORT)
+                .longOpt(RUN_SONATYPE_SCAN)
                 .hasArg(true).argName("true|false")
                 .desc("whether to run a Sonatype Scan")
                 .required(false).build();
 
         // Creates the audit preference id argument ( -auditPreferenceId <1 | 2> required=false false positive audit
         // type (Manual or Automated) )
-        Option auditPreferenceId = Option.builder(AUDIT_PREFERENCE_ID)
+        Option auditPreferenceId = Option.builder(AUDIT_PREFERENCE_ID_SHORT)
+                .longOpt(AUDIT_PREFERENCE_ID)
                 .hasArg(true).argName("1|2")
                 .desc("false positive audit type (Manual or Automated)")
                 .required(false).build();
 
         // Creates the scan preference id argument ( -scanPreferenceId <1 | 2> required=false scan mode (Standard or
         // Express) )
-        Option scanPreferenceId = Option.builder(SCAN_PREFERENCE_ID)
+        Option scanPreferenceId = Option.builder(SCAN_PREFERENCE_ID_SHORT)
+                .longOpt(SCAN_PREFERENCE_ID)
                 .hasArg(true).argName("1|2")
                 .desc("scan mode (Standard or Express)")
                 .required(false).build();
 
         // Creates the bsi url argument ( -bsiUrl <url> required=true build server url )
-        Option bsiUrl = Option.builder(BSI_URL)
+        Option bsiUrl = Option.builder(BSI_URL_SHORT)
+                .longOpt(BSI_URL)
                 .hasArg(true).argName("url")
                 .desc("build server url")
                 .required(true).build();
 
         // Creates the zip location argument ( -zipLocation <file> required=true location of scan )
-        Option zipLocation = Option.builder(ZIP_LOCATION)
+        Option zipLocation = Option.builder(ZIP_LOCATION_SHORT)
+                .longOpt(ZIP_LOCATION)
                 .hasArg(true).argName("file")
                 .desc("location of scan")
                 .required(true).build();
@@ -86,7 +115,8 @@ public class FortifyParser {
         // This one is so dirty I separated it from the rest of the pack.
         // I put all proxy settings into one option with **up to** 5 arguments. Then I do a little cheese
         // for the argName so that it will display with "-help"
-        Option proxy = Option.builder(PROXY)
+        Option proxy = Option.builder(PROXY_SHORT)
+                .longOpt(PROXY)
                 .hasArgs().numberOfArgs(5).argName("proxyUrl> <username> <password> <ntDomain> <ntWorkstation")
                 .desc("credentials for accessing the proxy")
                 .required(false).build();
@@ -95,11 +125,13 @@ public class FortifyParser {
 
         // I've put the log-in credentials into a special group to denote that either can be used.
         // Similar build as Proxy, but I won't be using a custom class for these.
-        Option username = Option.builder(USERNAME)
+        Option username = Option.builder(USERNAME_SHORT)
+                .longOpt(USERNAME)
                 .hasArg().numberOfArgs(2).argName("username> <password")
                 .desc("login credentials")
                 .build();
-        Option api = Option.builder(API)
+        Option api = Option.builder(API_SHORT)
+                .longOpt(API)
                 .hasArg().numberOfArgs(2).argName("key> <secret")
                 .desc("api credentials")
                 .build();
@@ -128,14 +160,14 @@ public class FortifyParser {
             // If the user types just -help or just -version, then it will handle that command.
             // Regex is used here since cmd isn't accessible.
             if(args.length > 0) {
-                if (Pattern.matches("(-{1,2})" + HELP, args[0])) {
+                if (Pattern.matches("(-{1,2}("+HELP+"|"+HELP_SHORT+"))", args[0])) {
                     help();
                     return new FortifyCommandLine(null);
-                } else if (Pattern.matches("(-{1,2})" + VERSION, args[0])) {
+                } else if (Pattern.matches("(-{1,2}("+VERSION+"|"+VERSION_SHORT+"))", args[0])) {
                     System.out.println("upload version FodUploader 5.3.0");
                     return new FortifyCommandLine(null);
                 }
-                if (Pattern.matches("(-{1,2})" + LEGACY, args[0])) {
+                if (Pattern.matches("(-{1,2}("+LEGACY+"|"+LEGACY_SHORT+"))", args[0])) {
                     System.out.println("Using legacy argument parsing....");
                     legacy = true;
                     return new FortifyCommandLine(null);
