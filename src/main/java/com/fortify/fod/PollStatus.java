@@ -76,6 +76,8 @@ class PollStatus {
         {
             ReleaseModel requestQueryResponse = fodApi.getReleaseController()
                     .getRelease(releaseId, "isPassed,passFailReasonId,critical,high,medium,low");
+            if (requestQueryResponse == null)
+                this.failCount++;
 
             boolean isPassed = requestQueryResponse.getData()[0].isPassed();
             System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );

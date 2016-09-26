@@ -46,7 +46,7 @@ public class ReleaseController extends ControllerBase {
             return gson.fromJson(content, ReleaseModel.class);
         } catch(Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 }
