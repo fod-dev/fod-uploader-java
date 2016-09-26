@@ -24,13 +24,15 @@ import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
@@ -45,7 +47,8 @@ public class LegacyMain {
     private static String url = "";
     private static String releaseId = "";
     private static int consecutiveGetStatusFailureCount = 0;
-    private static DefaultHttpClient httpclient;
+    private static CloseableHttpClient httpClient;
+
     private static String username = "";
     private static String password = "";
     private static String tenantCode = "";
@@ -54,6 +57,7 @@ public class LegacyMain {
      * @param args all arguments except "-l" which is cut out before getting here
      */
     public static void main(String[] args) {
+        HttpClientBuilder httpClientBuilder;
         final int segmentLength = 1024*1024;        // chunk size
         final long maxFileSize = 5000*1024*1024L;
         boolean uploadSucceeded = false;
@@ -84,7 +88,6 @@ public class LegacyMain {
             long pollingInterval = 0L;
             try
             {
-                httpclient = new DefaultHttpClient();
                 Map<String,String> argMap = new LegacyParser(args).getArgsMap();
 
                 if(argMap.containsKey("tenantId") &&
@@ -120,7 +123,9 @@ public class LegacyMain {
                     {
                         proxyUri = new URI(argMap.get("proxy"));
                         HttpHost proxy = new HttpHost(proxyUri.getHost(), proxyUri.getPort(), proxyUri.getScheme());
-                        httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+                        httpClientBuilder = HttpClientBuilder.create().setProxy(proxy);
+                    } else {
+                        httpClientBuilder = HttpClientBuilder.create();
                     }
 
                     if(argMap.containsKey("proxyUsername")  && argMap.containsKey("proxyPassword"))
@@ -128,17 +133,24 @@ public class LegacyMain {
                         proxyUsername = argMap.get("proxyUsername");
                         proxyPassword = argMap.get("proxyPassword");
 
+                        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+
                         if(argMap.containsKey("ntDomain") && argMap.containsKey("ntWorkstation"))
                         {
                             ntWorkstation = argMap.get("ntWorkstation");
                             ntDomain = argMap.get("ntDomain");
-                            httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new NTCredentials(proxyUsername , proxyPassword, ntWorkstation, ntDomain));
+                            credentialsProvider.setCredentials(AuthScope.ANY, new NTCredentials(proxyUsername , proxyPassword, ntWorkstation, ntDomain));
                         }
                         else
                         {
-                            httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(proxyUsername , proxyPassword));
+                            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(proxyUsername, proxyPassword);
+                            credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+                            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
                         }
+                        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
                     }
+
+                    httpClient = httpClientBuilder.build();
                     //first thing check file size
                     File zipFileInfo = new File(zipLocation);
                     if(zipFileInfo.length() > maxFileSize)
@@ -147,7 +159,7 @@ public class LegacyMain {
                         return;
                     }
 
-                    token = authorize(url, tenantCode, username, password, httpclient);
+                    token = authorize(url, tenantCode, username, password, httpClient);
                     if(token != null && !token.isEmpty())
                     {
                         authenticationSucceeded = true;
@@ -191,7 +203,7 @@ public class LegacyMain {
                                 fragUrl += "&doSonatypeScan=" + argMap.get("runSonatypeScan");
                             }
 
-                            SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpclient, token);
+                            SendPostResponse postResponse = sendPost(fragUrl, sendByteArray, httpClient, token);
                             HttpResponse response = postResponse.getResponse();
                             if(response == null)
                             {
@@ -276,7 +288,7 @@ public class LegacyMain {
         get.addHeader("Authorization","Bearer " + token);
         HttpResponse response;
         try {
-            response = httpclient.execute(get);
+            response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
             String responseString = EntityUtils.toString(entity);
             Gson gson = new Gson();
@@ -359,7 +371,7 @@ public class LegacyMain {
             String passFailUrl = url + "/api/v2/releases?q=releaseId:" + releaseId + "&fields=isPassed,passFailReasonId,critical,high,medium,low";
             HttpGet get = new HttpGet(passFailUrl);
             get.addHeader("Authorization","Bearer " + token);
-            HttpResponse response  = httpclient.execute(get);
+            HttpResponse response  = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
             String responseString = EntityUtils.toString(entity);
             Gson gson = new Gson();
@@ -406,7 +418,7 @@ public class LegacyMain {
             String statusUrl = url + "/api/v2/releases?q=releaseId:" + releaseId + "&fields=status";
             HttpGet get = new HttpGet(statusUrl);
             get.addHeader("Authorization","Bearer " + token);
-            HttpResponse response  = httpclient.execute(get);
+            HttpResponse response  = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
             String responseString = EntityUtils.toString(entity);
             Gson gson = new Gson();
@@ -426,7 +438,7 @@ public class LegacyMain {
                 else if(responseCode == 401)   // got logged out during polling so log back in
                 {
                     System.out.println("Token expired re-authorizing");
-                    token = authorize(url, tenantCode, username, password, httpclient);
+                    token = authorize(url, tenantCode, username, password, httpClient);
                     if(token == null || token.isEmpty() )
                     {
                         System.out.println("Failed to reauthorize");
