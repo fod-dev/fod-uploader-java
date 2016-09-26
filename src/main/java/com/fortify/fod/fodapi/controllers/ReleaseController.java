@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 
 import java.io.IOException;
 
@@ -32,7 +33,7 @@ public class ReleaseController extends ControllerBase {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code: " + response);
             }
-            if (response.code() == 401) {  // got logged out during polling so log back in
+            if (response.code() == HttpStatus.SC_UNAUTHORIZED) {  // got logged out during polling so log back in
                 System.out.println("Token expired re-authorizing");
                 // Re-authenticate
                 api.authenticate();

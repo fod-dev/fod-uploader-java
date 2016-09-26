@@ -16,11 +16,7 @@ import com.fortify.fod.MessageResponse;
 import com.fortify.fod.fodapi.models.ReleaseInfo;
 import com.fortify.fod.fodapi.models.ReleaseModel;
 import com.fortify.fod.SendPostResponse;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -426,7 +422,7 @@ public class LegacyMain {
             if(requestQueryResponse != null)  // did not get back the expected response
             {
                 int responseCode = requestQueryResponse.getResponseCode();
-                if(responseCode == 200)
+                if(responseCode == HttpStatus.SC_OK)
                 {
                     ReleaseInfo[] releaseInfo = requestQueryResponse.getData();
                     if(releaseInfo != null && releaseInfo.length == 1 )
