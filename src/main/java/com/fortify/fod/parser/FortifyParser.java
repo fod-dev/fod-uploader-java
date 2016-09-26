@@ -8,11 +8,11 @@ import java.util.Comparator;
 import java.util.regex.Pattern;
 
 public class FortifyParser {
-    static final String USERNAME = "username"; //TODO: Rename
-    private static final String USERNAME_SHORT = "c1"; //TODO: Rename
+    static final String USERNAME = "userCredentials";
+    private static final String USERNAME_SHORT = "uc";
 
-    static final String API = "api";//TODO: Rename
-    private static final String API_SHORT = "c2";//TODO: Rename
+    static final String API = "apiCredentials";
+    private static final String API_SHORT = "ac";
 
     static final String ZIP_LOCATION = "zipLocation";
     private static final String ZIP_LOCATION_SHORT = "z";
