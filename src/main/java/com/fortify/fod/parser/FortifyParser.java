@@ -9,16 +9,16 @@ import java.util.regex.Pattern;
 
 public class FortifyParser {
     static final String USERNAME = "username"; //TODO: Rename
-    static final String USERNAME_SHORT = "c1"; //TODO: Rename
+    private static final String USERNAME_SHORT = "c1"; //TODO: Rename
 
     static final String API = "api";//TODO: Rename
-    static final String API_SHORT = "c2";//TODO: Rename
+    private static final String API_SHORT = "c2";//TODO: Rename
 
     static final String ZIP_LOCATION = "zipLocation";
-    static final String ZIP_LOCATION_SHORT = "z";
+    private static final String ZIP_LOCATION_SHORT = "z";
 
     static final String BSI_URL = "bsiUrl";
-    static final String BSI_URL_SHORT = "u";
+    private static final String BSI_URL_SHORT = "u";
 
     private static final String HELP = "help";
     private static final String HELP_SHORT = "h";
@@ -27,22 +27,22 @@ public class FortifyParser {
     private static final String VERSION_SHORT = "v";
 
     static final String POLLING_INTERVAL = "pollingInterval";
-    static final String POLLING_INTERVAL_SHORT = "I";
+    private static final String POLLING_INTERVAL_SHORT = "I";
 
     static final String RUN_SONATYPE_SCAN = "runSonatypeScan";
-    static final String RUN_SONATYPE_SCAN_SHORT = "s";
+    private static final String RUN_SONATYPE_SCAN_SHORT = "s";
 
     static final String AUDIT_PREFERENCE_ID = "auditPreferenceId";
-    static final String AUDIT_PREFERENCE_ID_SHORT = "a";
+    private static final String AUDIT_PREFERENCE_ID_SHORT = "a";
 
     static final String SCAN_PREFERENCE_ID = "scanPreferenceId";
-    static final String SCAN_PREFERENCE_ID_SHORT = "p";
+    private static final String SCAN_PREFERENCE_ID_SHORT = "p";
 
     static final String PROXY = "proxy";
-    static final String PROXY_SHORT = "P";
+    private static final String PROXY_SHORT = "P";
 
-    static final String LEGACY = "legacy";
-    static final String LEGACY_SHORT = "l";
+    private static final String LEGACY = "legacy";
+    private static final String LEGACY_SHORT = "l";
 
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
@@ -225,7 +225,5 @@ public class FortifyParser {
         return result;
     };
 
-    public boolean useLegacy() {
-        return legacy;
-    }
+    public boolean useLegacy() { return legacy; }
 }
