@@ -1,7 +1,9 @@
 package com.fortify.fod.fodapi;
 
+import com.fortify.fod.fodapi.controllers.LookupItemsController;
 import com.fortify.fod.fodapi.controllers.ReleaseController;
 import com.fortify.fod.fodapi.controllers.StaticScanController;
+import com.fortify.fod.fodapi.models.LookupItemsModel;
 import com.fortify.fod.parser.Proxy;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -37,6 +39,8 @@ public class FodApi {
     public StaticScanController getStaticScanController() { return staticScanController; }
     private ReleaseController releaseController;
     public ReleaseController getReleaseController() { return releaseController; }
+    private LookupItemsController lookupItemsController;
+    public LookupItemsController getLookupController() { return lookupItemsController; }
 
     public FodApi(String url, Proxy clProxy) {
         baseUrl = url;
@@ -44,6 +48,7 @@ public class FodApi {
 
         staticScanController = new StaticScanController(this);
         releaseController = new ReleaseController(this);
+        lookupItemsController = new LookupItemsController(this);
     }
 
     public void authenticate(String tenantCode, String username, String password, String grantType) {

@@ -1,4 +1,6 @@
-package com.fortify.fod.fodapi.models;
+package com.fortify.fod.legacy.models;
+
+import com.fortify.fod.fodapi.models.ReleaseDTO;
 
 public class ReleaseModel {
 

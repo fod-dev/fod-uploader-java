@@ -12,7 +12,6 @@ import org.apache.http.HttpStatus;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 
 public class ReleaseController extends ControllerBase {
     public ReleaseController(FodApi api) {
@@ -48,9 +47,8 @@ public class ReleaseController extends ControllerBase {
 
             Gson gson = new Gson();
             Type t = new TypeToken<GenericListResponse<ReleaseDTO>>(){}.getType();
-            GenericListResponse<ReleaseDTO> x =  gson.fromJson(content, t);
-            System.out.println(x.getItems()[0].getCurrentAnalysisStatusType());
-            return x.getItems()[0];
+            GenericListResponse<ReleaseDTO> results =  gson.fromJson(content, t);
+            return results.getItems()[0];
         } catch(Exception e) {
             e.printStackTrace();
             return null;

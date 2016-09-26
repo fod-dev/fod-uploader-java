@@ -1,15 +1,16 @@
 package com.fortify.fod;
 
 import com.fortify.fod.fodapi.FodApi;
-import com.fortify.fod.fodapi.models.GenericListResponse;
+import com.fortify.fod.fodapi.models.LookupItemsModel;
 import com.fortify.fod.fodapi.models.ReleaseDTO;
-import com.fortify.fod.fodapi.models.ReleaseModel;
 
 class PollStatus {
     private int releaseId;
     private int pollingInterval;
     private int failCount = 0;
     private final int MAX_FAILS = 3;
+
+    private LookupItemsModel[] analysisStatusTypes = null;
 
     PollStatus(int releaseId, int pollingInterval) {
         this.releaseId = releaseId;
@@ -27,6 +28,10 @@ class PollStatus {
                 Thread.sleep(pollingInterval*10*1000);
                 int status = fodApi.getReleaseController().getRelease(releaseId, "currentAnalysisStatusType")
                         .getCurrentAnalysisStatusTypeId();
+                if(analysisStatusTypes == null) {
+                    analysisStatusTypes = fodApi.getLookupController().getLookupItems("AnalysisStatusTypes");
+                }
+
                 if(failCount < MAX_FAILS)
                 {
                     String statusString = "";

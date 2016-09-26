@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fortify.fod.fodapi.models.ReleaseDTO;
-import com.fortify.fod.fodapi.models.ReleaseModel;
+import com.fortify.fod.legacy.models.ReleaseModel;
 import com.fortify.fod.legacy.models.MessageResponse;
 import com.fortify.fod.legacy.models.SendPostResponse;
 import org.apache.http.*;
