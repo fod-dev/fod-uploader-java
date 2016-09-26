@@ -1,10 +1,8 @@
 package com.fortify.fod.fodapi;
 
-import com.fortify.fod.MessageResponse;
 import com.fortify.fod.fodapi.controllers.ReleaseController;
 import com.fortify.fod.fodapi.controllers.StaticScanController;
 import com.fortify.fod.parser.Proxy;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import okhttp3.*;
@@ -23,7 +21,6 @@ public class FodApi {
 
     private String baseUrl;
     private OkHttpClient client;
-    private boolean useClientId = false;
     private String token;
 
     // Used for automatically re-authenticating if need be
@@ -60,7 +57,6 @@ public class FodApi {
                         .add("password", password);
             // Has api key/secret
             } else {
-                useClientId = true;
                 formBodyBuilder.add("grant_type", GRANT_TYPE_CLIENT_CREDENTIALS)
                         .add("client_id", username)
                         .add("client_secret", password);
@@ -116,11 +112,11 @@ public class FodApi {
                 String content = IOUtils.toString(response.body().byteStream(), "utf-8");
                 response.body().close();
 
-                Gson gson = new Gson();
-                MessageResponse messageResponse = gson.fromJson(content, MessageResponse.class);
+                JsonParser parser = new JsonParser();
+                JsonObject obj = parser.parse(content).getAsJsonObject();
+                String messageResponse = obj.get("message").getAsString();
 
-                if(messageResponse != null)  // did not get back the expected response
-                    System.out.println("Retiring Token : " + messageResponse.getMessage());
+                System.out.println("Retiring Token : " + messageResponse);
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -166,10 +162,6 @@ public class FodApi {
             builder.proxyAuthenticator(proxyAuthenticator);
         }
         return builder.build();
-    }
-
-    public boolean useClientId() {
-        return useClientId;
     }
 
     public String getToken() {

@@ -2,15 +2,15 @@ package com.fortify.fod.fodapi.models;
 
 public class ReleaseModel {
 
-	private ReleaseInfo[] data;
+	private ReleaseDTO[] data;
 	private int responseCode;
 	private int count;
 	
 	
-	public ReleaseInfo[] getData() {
+	public ReleaseDTO[] getData() {
 		return data;
 	}
-	public void setData(ReleaseInfo[] data) {
+	public void setData(ReleaseDTO[] data) {
 		this.data = data;
 	}
 	public int getCount() {

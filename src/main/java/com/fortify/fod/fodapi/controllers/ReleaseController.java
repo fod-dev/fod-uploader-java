@@ -1,6 +1,5 @@
 package com.fortify.fod.fodapi.controllers;
 
-import com.fortify.fod.fodapi.models.ReleaseInfo;
 import com.fortify.fod.fodapi.models.ReleaseModel;
 import com.fortify.fod.fodapi.FodApi;
 import com.google.gson.Gson;

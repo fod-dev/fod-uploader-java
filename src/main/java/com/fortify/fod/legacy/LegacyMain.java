@@ -12,10 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.fortify.fod.MessageResponse;
-import com.fortify.fod.fodapi.models.ReleaseInfo;
+import com.fortify.fod.fodapi.models.ReleaseDTO;
 import com.fortify.fod.fodapi.models.ReleaseModel;
-import com.fortify.fod.SendPostResponse;
+import com.fortify.fod.legacy.models.MessageResponse;
+import com.fortify.fod.legacy.models.SendPostResponse;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
@@ -424,7 +424,7 @@ public class LegacyMain {
                 int responseCode = requestQueryResponse.getResponseCode();
                 if(responseCode == HttpStatus.SC_OK)
                 {
-                    ReleaseInfo[] releaseInfo = requestQueryResponse.getData();
+                    ReleaseDTO[] releaseInfo = requestQueryResponse.getData();
                     if(releaseInfo != null && releaseInfo.length == 1 )
                     {
                         result = requestQueryResponse.getData()[0].getStatus();
