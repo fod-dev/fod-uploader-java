@@ -377,7 +377,7 @@ public class LegacyMain {
             if(!isPassed)
             {
                 String passFailReason;
-                switch(requestQueryResponse.getData()[0].getPassedFailReasonId())
+                switch(requestQueryResponse.getData()[0].getPassFailReasonTypeId())
                 {
                     case 1:
                         passFailReason = "Unassessed";
@@ -427,7 +427,7 @@ public class LegacyMain {
                     ReleaseDTO[] releaseInfo = requestQueryResponse.getData();
                     if(releaseInfo != null && releaseInfo.length == 1 )
                     {
-                        result = requestQueryResponse.getData()[0].getStatus();
+                        result = requestQueryResponse.getData()[0].getCurrentAnalysisStatusTypeId();
                         consecutiveGetStatusFailureCount = 0;
                     }
                 }

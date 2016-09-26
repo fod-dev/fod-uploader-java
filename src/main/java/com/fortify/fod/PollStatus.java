@@ -1,6 +1,8 @@
 package com.fortify.fod;
 
 import com.fortify.fod.fodapi.FodApi;
+import com.fortify.fod.fodapi.models.GenericListResponse;
+import com.fortify.fod.fodapi.models.ReleaseDTO;
 import com.fortify.fod.fodapi.models.ReleaseModel;
 
 class PollStatus {
@@ -22,9 +24,9 @@ class PollStatus {
         {
             while(!finished)
             {
-                Thread.sleep(pollingInterval*60*1000);
-                int status = fodApi.getReleaseController().getRelease(releaseId, "status")
-                        .getData()[0].getStatus();
+                Thread.sleep(pollingInterval*10*1000);
+                int status = fodApi.getReleaseController().getRelease(releaseId, "currentAnalysisStatusType")
+                        .getCurrentAnalysisStatusTypeId();
                 if(failCount < MAX_FAILS)
                 {
                     String statusString = "";
@@ -74,17 +76,16 @@ class PollStatus {
     private void printPassFail(FodApi fodApi) {
         try
         {
-            ReleaseModel requestQueryResponse = fodApi.getReleaseController()
+            ReleaseDTO requestQueryResponse = fodApi.getReleaseController()
                     .getRelease(releaseId, "isPassed,passFailReasonId,critical,high,medium,low");
             if (requestQueryResponse == null)
                 this.failCount++;
-
-            boolean isPassed = requestQueryResponse.getData()[0].isPassed();
+            boolean isPassed = requestQueryResponse.isPassed();
             System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );
             if (!isPassed)
             {
                 String passFailReason;
-                switch(requestQueryResponse.getData()[0].getPassedFailReasonId())
+                switch(requestQueryResponse.getPassFailReasonTypeId())
                 {
                     case 1:
                         passFailReason = "Unassessed";
@@ -103,10 +104,10 @@ class PollStatus {
                         break;
                 }
                 System.out.println("Failure Reason: " + passFailReason);
-                System.out.println("Number of criticals: " +  requestQueryResponse.getData()[0].getCritical());
-                System.out.println("Number of highs: " +  requestQueryResponse.getData()[0].getHigh());
-                System.out.println("Number of mediums: " +  requestQueryResponse.getData()[0].getMedium());
-                System.out.println("Number of lows: " +  requestQueryResponse.getData()[0].getLow());
+                System.out.println("Number of criticals: " +  requestQueryResponse.getCritical());
+                System.out.println("Number of highs: " +  requestQueryResponse.getHigh());
+                System.out.println("Number of mediums: " +  requestQueryResponse.getMedium());
+                System.out.println("Number of lows: " +  requestQueryResponse.getLow());
 
             }
         } catch (Exception e) {
