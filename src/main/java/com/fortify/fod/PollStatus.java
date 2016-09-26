@@ -4,70 +4,73 @@ import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.LookupItemsModel;
 import com.fortify.fod.fodapi.models.ReleaseDTO;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 class PollStatus {
     private int releaseId;
     private int pollingInterval;
     private int failCount = 0;
     private final int MAX_FAILS = 3;
 
-    private LookupItemsModel[] analysisStatusTypes = null;
+    private List<LookupItemsModel> analysisStatusTypes = null;
 
     PollStatus(int releaseId, int pollingInterval) {
         this.releaseId = releaseId;
         this.pollingInterval = pollingInterval;
     }
 
-    int releaseStatus(FodApi fodApi) {
-        boolean finished = false;
-        int completionStatus = 1; // default is failure
+    boolean releaseStatus(FodApi fodApi) {
+        boolean finished = false; // default is failure
 
         try
         {
             while(!finished)
             {
-                Thread.sleep(pollingInterval*10*1000);
-                int status = fodApi.getReleaseController().getRelease(releaseId, "currentAnalysisStatusType")
+                Thread.sleep(pollingInterval*60*1000);
+                int status = fodApi.getReleaseController().getRelease(releaseId, "currentAnalysisStatusTypeId")
                         .getCurrentAnalysisStatusTypeId();
+
+                // Get the possible statuses only once
                 if(analysisStatusTypes == null) {
-                    analysisStatusTypes = fodApi.getLookupController().getLookupItems("AnalysisStatusTypes");
+                    analysisStatusTypes = Arrays.asList(fodApi.getLookupController().getLookupItems("AnalysisStatusTypes"));
                 }
 
                 if(failCount < MAX_FAILS)
                 {
                     String statusString = "";
-                    switch(status)
-                    {
-                        case 1:
-                            finished = false;
-                            statusString = "In Progress";
-                            break;
-                        case 2:
-                            finished = true;
-                            statusString = "Completed";
-                            completionStatus = 0;
-                            break;
-                        case 3:
-                            finished = true;
-                            statusString = "Cancelled";
-                            break;
-                        case 4:
-                            finished = false;
-                            statusString = "Waiting";
-                            break;
-                        default:  // for every other status value continue polling
-                            break;
+
+                    // Create a list of values that will be used to break the loop if found
+                    // This way if any of this changes we don't need to redo the keys or something
+                    List<String> complete = analysisStatusTypes.stream()
+                            .filter(p -> p.getText().equals("Completed") || p.getText().equals("Canceled"))
+                            .map(l -> l.getValue())
+                            .collect(Collectors.toCollection(ArrayList::new));
+
+                    // Look for and print the status OR break the loop.
+                    for(LookupItemsModel o: analysisStatusTypes) {
+                        if(o != null) {
+                            int analysisStatus = Integer.parseInt(o.getValue());
+                            if (analysisStatus == status) {
+                                statusString = o.getText().replace("_", " ");
+                            }
+                            if (complete.contains(Integer.toString(status))) {
+                                finished = true;
+                            }
+                        }
                     }
                     System.out.println("Status: " + statusString);
-                    if(completionStatus == 0)
+                    if(finished)
                     {
                         printPassFail(fodApi);
                     }
                 }
                 else
                 {
-                    finished = true;
                     System.out.println("getStatus failed 3 consecutive times terminating polling");
-                    completionStatus = 1;
+                    finished = true;
                 }
             }
         }
@@ -75,7 +78,7 @@ class PollStatus {
         {
             e.printStackTrace();
         }
-        return completionStatus;
+        return finished;
     }
 
     private void printPassFail(FodApi fodApi) {

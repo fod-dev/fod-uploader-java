@@ -10,7 +10,6 @@ import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 
 public class LookupItemsController extends ControllerBase {
     public LookupItemsController(FodApi api) {
@@ -29,8 +28,6 @@ public class LookupItemsController extends ControllerBase {
             // Read the results and close the response
             String content = IOUtils.toString(response.body().byteStream(), "utf-8");
             response.body().close();
-
-            System.out.println(content);
 
             Gson gson = new Gson();
             Type t = new TypeToken<GenericListResponse<LookupItemsModel>>(){}.getType();
