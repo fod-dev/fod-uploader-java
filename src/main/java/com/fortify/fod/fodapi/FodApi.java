@@ -140,39 +140,24 @@ public class FodApi {
         if (clProxy.hasUsername() && clProxy.hasPassword()) {
             // Include NTDomain and NTWorkstation in auth
             Authenticator proxyAuthenticator;
-            if (clProxy.hasNTDomain() && clProxy.hasNTWorkstation()) {
-                proxyAuthenticator = (Route route, Response response) -> {
-                    String credentials = new NTCredentials(clProxy.getUsername(), clProxy.getPassword(),
-                            clProxy.getNTWorkstation(), clProxy.getNTDomain()).toString();
+            String credentials;
 
-                    return response.request().newBuilder()
-                            .header("Proxy-Authorization", credentials)
-                            .build();
-                };
+            if (clProxy.hasNTDomain() && clProxy.hasNTWorkstation()) {
+                credentials = new NTCredentials(clProxy.getUsername(), clProxy.getPassword(),
+                        clProxy.getNTWorkstation(), clProxy.getNTDomain()).toString();
             // Just use username and password
             } else {
-                proxyAuthenticator = (Route route, Response response) -> {
-                    String credentials = Credentials.basic(clProxy.getUsername(), clProxy.getPassword());
-                    return response.request().newBuilder()
-                            .header("Proxy-Authorization", credentials)
-                            .build();
-                };
-
+                credentials = Credentials.basic(clProxy.getUsername(), clProxy.getPassword());
             }
+            proxyAuthenticator = (route, response) -> response.request().newBuilder()
+                    .header("Proxy-Authorization", credentials)
+                    .build();
             builder.proxyAuthenticator(proxyAuthenticator);
         }
         return builder.build();
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public OkHttpClient getClient() {
-        return client;
-    }
-
-    public String getBaseUrl() {
-        return baseUrl;
-    }
+    public String getToken() { return token; }
+    public OkHttpClient getClient() { return client; }
+    public String getBaseUrl() { return baseUrl; }
 }
