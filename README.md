@@ -37,19 +37,19 @@ java -jar FodUpload.jar -u <url> -z <file> [-a <1|2>] -uc <username> <password> 
 ```
 
 Each option has a short and long name:
-|Short Name | Long Name          | Description                                                      |
-|-----------|--------------------|------------------------------------------------------------------|
-| -u        | -bsiUrl            | build server url                                                 |
-| -z        | -zipLocation       | location of scan                                                 |
-| -ac       | -apiCredentials    | api credentials                                                  |
-| -uc       | -userCredentials   | user login credentials                                           |
-| -a        | -auditPreferenceId | false positive audit type (Manual = 1, Automated = 2)            |
-| -p        | -scanPreferenceId  | scan mode (Standard = 1, Express = 2)                            |
-| -I        | -pollingInterval   | interval between checking scan status in minutes                 |
-| -P        | -proxy             | credentials for accessing the proxy                              |
-| -s        | -runSonatypeScan   | whether to run a Sonatype Scan (can be 'true' or 'false')        |
-| -h        | -help              | print help dialog                                                |
-| -v        | -version           | print jar version                                                |
+Short Name | Long Name          | Description                                                      
+-----------|--------------------|------------------------------------------------------------------
+ -u        | -bsiUrl            | build server url                                                 
+ -z        | -zipLocation       | location of scan                                                 
+ -ac       | -apiCredentials    | api credentials                                                  
+ -uc       | -userCredentials   | user login credentials                                           
+ -a        | -auditPreferenceId | false positive audit type (Manual = 1, Automated = 2)            
+ -p        | -scanPreferenceId  | scan mode (Standard = 1, Express = 2)                            
+ -I        | -pollingInterval   | interval between checking scan status in minutes                 
+ -P        | -proxy             | credentials for accessing the proxy                              
+ -s        | -runSonatypeScan   | whether to run a Sonatype Scan (can be 'true' or 'false')        
+ -h        | -help              | print help dialog                                                
+ -v        | -version           | print jar version                                                
 
 Use either apiCredentials *or* userCredentials.
 
