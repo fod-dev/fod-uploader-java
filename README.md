@@ -25,13 +25,12 @@ systemProp.https.proxyPort=8080
 ```
 
 
-Usage
-======
+## Usage
 
 ### Current
 The command line arguments have been completely reworked for 5.3. Arguments are now named and can be in any order: 
 
-```Command Line
+```
 java -jar FodUpload.jar -u <url> -z <file> [-a <1|2>] -uc <username> <password> | -ac <key> <secret>  
     [-h] [-I <minutes>] [-p <1|2>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] 
     [-s <true|false>] [-v]
@@ -59,7 +58,7 @@ A legacy tag (-l) is also available if you want to access the old format. Simply
 
 The old format is similar to below:
 
-```Command Line
+```
 java -jar FodUpload.jar [-version] ['api key' 'api secret' | 'username' 'password'] 'bsiUrl' 
     'payloadLocation' ['proxyUrl' ['proxyUsername' 'proxyPassword' 'ntDomain' 'ntWorkstation']] 
     [-pollingInterval <minutes>]
