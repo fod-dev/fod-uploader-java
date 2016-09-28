@@ -35,8 +35,8 @@ public class LegacyParser {
         result.put("password", args[1]);
         result.put("bsiUrl", args[2]);
         result.put("zipLocation",args[3]);
-        result.put("entitlementId", args[4].split(":")[1]);
-        result.put("entitlementFrequency", args[5].split(":")[1]);
+        result.put("entitlementId", args[4]);
+        result.put("entitlementFrequency", args[5]);
         processOptionalArgs(args,result);
 
         return result;
@@ -45,14 +45,14 @@ public class LegacyParser {
     private static void processOptionalArgs(String[] args, Map<String, String> result)
     {
         ArrayList<String> unnamedArgs = removeNamedOptionalArgs(args,result);
-        if(unnamedArgs.size() >= 5)
+        if(unnamedArgs.size() >= 7)
         {
             result.put("proxy",unnamedArgs.get(4));
-            if(unnamedArgs.size() >= 7)
+            if(unnamedArgs.size() >= 9)
             {
                 result.put("proxyUsername",unnamedArgs.get(5));
                 result.put("proxyPassword",unnamedArgs.get(6));
-                if(unnamedArgs.size() == 9)
+                if(unnamedArgs.size() == 11)
                 {
                     result.put("ntWorkStation",unnamedArgs.get(7));
                     result.put("ntDomain",unnamedArgs.get(8));

@@ -69,11 +69,11 @@ public class FortifyCommandLine {
 
         zipLocation = legacyArgs.get("zipLocation");
         entitlementId = Integer.parseInt(legacyArgs.get("entitlementId"));
-        entitlementFrequencyType = Integer.parseInt(legacyArgs.get("entitlementFrequencyType"));
+        entitlementFrequencyType = Integer.parseInt(legacyArgs.get("entitlementFrequency"));
         bsiUrl = new BsiUrl(legacyArgs.get("bsiUrl"));
         String legacyUsername = legacyArgs.get("username");
         if (legacyUsername.toLowerCase().startsWith("key")) {
-            apiCredentials.put("key", legacyUsername);
+            apiCredentials.put("key", legacyUsername.substring(4));
             apiCredentials.put("secret", legacyArgs.get("password"));
         } else {
             loginCredentials.put("username", legacyUsername);
@@ -96,9 +96,11 @@ public class FortifyCommandLine {
         if (legacyRunSonatypeScan != null)
             runSonatypeScan = Boolean.parseBoolean(legacyRunSonatypeScan);
 
-        String[] proxyArgs = {legacyArgs.get("proxy"), legacyArgs.get("proxyUsername"), legacyArgs.get("proxyPassword"),
-                legacyArgs.get("ntDomain"), legacyArgs.get("ntWorkStation")};
-        proxy = new Proxy(proxyArgs);
+        if (legacyArgs.get("proxy") != null) {
+            String[] proxyArgs = {legacyArgs.get("proxy"), legacyArgs.get("proxyUsername"), legacyArgs.get("proxyPassword"),
+                    legacyArgs.get("ntDomain"), legacyArgs.get("ntWorkStation")};
+            proxy = new Proxy(proxyArgs);
+        }
     }
 
     /**
