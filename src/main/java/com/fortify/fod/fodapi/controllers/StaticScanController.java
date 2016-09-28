@@ -103,7 +103,7 @@ public class StaticScanController extends ControllerBase {
                     } else {
                         Gson gson = new Gson();
                         GenericErrorResponse errors = gson.fromJson(finalResponse, GenericErrorResponse.class);
-                        System.out.println("Package upload failed: " +
+                        System.out.println("Package upload failed for the following reasons: " +
                                 errors.toString());
                     }
                 }

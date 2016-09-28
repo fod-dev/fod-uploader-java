@@ -11,8 +11,11 @@ public class GenericErrorResponse {
 
     @Override
     public String toString() {
-        String result = "";
-        for (ErrorResponse error : errors) result += error.getMessage() + "\n";
+        String result = "\n";
+        for (ErrorResponse error : errors) {
+            int errorNumber = errors.indexOf(error) + 1;
+            result += errorNumber + ") " + error.getMessage() + (errorNumber > 1 ? "\n" : "");
+        }
         return result;
     }
 }
