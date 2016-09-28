@@ -44,6 +44,12 @@ public class FortifyParser {
     private static final String LEGACY = "legacy";
     private static final String LEGACY_SHORT = "l";
 
+    static final String ENTITLEMENT_ID = "entitlementId";
+    private static final String ENTITLEMENT_ID_SHORT = "e";
+
+    static final String ENTITLEMENT_FREQUENCY_TYPE = "entitlementFrequency";
+    private static final String ENTITLEMENT_FREQUENCE_TYPE_SHORT = "f";
+
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
     private boolean legacy = false;
@@ -102,6 +108,19 @@ public class FortifyParser {
                 .desc("location of scan")
                 .required(true).build();
 
+        // creates the entitlement id argument ( -entitlementId <id> required=true entitlement id )
+        Option entitlementId = Option.builder(ENTITLEMENT_ID_SHORT)
+                .longOpt(ENTITLEMENT_ID)
+                .hasArg(true).argName("id")
+                .desc("entitlement id")
+                .required(true).build();
+
+        Option entitlementFrequencyType = Option.builder(ENTITLEMENT_FREQUENCE_TYPE_SHORT)
+                .longOpt(ENTITLEMENT_FREQUENCY_TYPE)
+                .hasArg(true).argName("1|2")
+                .desc("entitlement frequency type")
+                .required(true).build();
+
         // Add the options to the options list
         options.addOption(help);
         options.addOption(version);
@@ -111,6 +130,8 @@ public class FortifyParser {
         options.addOption(runSonatypeScan);
         options.addOption(auditPreferenceId);
         options.addOption(scanPreferenceId);
+        options.addOption(entitlementId);
+        options.addOption(entitlementFrequencyType);
 
         // This one is so dirty I separated it from the rest of the pack.
         // I put all proxy settings into one option with **up to** 5 arguments. Then I do a little cheese
