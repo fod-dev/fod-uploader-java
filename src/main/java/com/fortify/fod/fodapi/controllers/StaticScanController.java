@@ -1,14 +1,20 @@
 package com.fortify.fod.fodapi.controllers;
 
 import com.fortify.fod.fodapi.FodApi;
+import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
+import com.google.gson.Gson;
 import okhttp3.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
 
 public class StaticScanController extends ControllerBase {
     private final int CHUNK_SIZE = 1024 * 1024;
@@ -21,10 +27,11 @@ public class StaticScanController extends ControllerBase {
     }
 
     /**
-     * TODO: entitlementId, entitlementFrequencyType, isRemediationScan, excludeThirdPartyLibs
+     * TODO: isRemediationScan, excludeThirdPartyLibs
      * Starts a scan based on the V3 API
      * @param bsiUrl releaseId, assessmentTypeId, technologyStack, languageLevel
      * @param cl scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
+     * @return true if successful upload
      */
     public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommandLine cl) {
         boolean successfulUpload = false;
@@ -38,12 +45,19 @@ public class StaticScanController extends ControllerBase {
             int byteCount;
             long offset = 0;
 
+            if(!bsiUrl.hasAssessmentTypeId() && !bsiUrl.hasTechnologyStack() && !cl.hasEntitlementId() &&
+                    !cl.hasEntitlementFrequencyType()) {
+                return false;
+            }
+
             // Build 'static' portion of url
-            String fragUrl = api.getBaseUrl() + "/api/v1/release/" + bsiUrl.getProjectVersionId() + "/scan/?";
-            if (bsiUrl.hasAssessmentTypeId())
-                fragUrl += "&assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
-            if (bsiUrl.hasTechnologyStack())
-                fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
+            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + bsiUrl.getProjectVersionId() +
+                    "/static-scans/start-scan?";
+            fragUrl += "assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
+            fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
+            fragUrl += "&entitlementId=" + cl.getEntitlementId();
+            fragUrl += "&entitlementFrequencyType=" + cl.getEntitlementFrequencyType();
+
             if (bsiUrl.hasLanguageLevel())
                 fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
             if (cl.hasScanPreferenceId())
@@ -74,11 +88,6 @@ public class StaticScanController extends ControllerBase {
                 // Get the response
                 Response response = api.getClient().newCall(request).execute();
 
-                // The endpoint call was unsuccessful. Maybe unauthorized who knows.
-                if (!response.isSuccessful()) {
-                    throw new IOException("Unexpected code: " + response);
-                }
-
                 if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
                     System.out.println("Upload Status - Bytes sent:" + offset);
                 }
@@ -92,7 +101,10 @@ public class StaticScanController extends ControllerBase {
                         successfulUpload = true;
                     // There was an error along the lines of 'another scan in progress' or something
                     } else {
-                        System.out.println("Package upload failed: " + finalResponse);
+                        Gson gson = new Gson();
+                        GenericErrorResponse errors = gson.fromJson(finalResponse, GenericErrorResponse.class);
+                        System.out.println("Package upload failed: " +
+                                errors.toString());
                     }
                 }
                 offset += byteCount;

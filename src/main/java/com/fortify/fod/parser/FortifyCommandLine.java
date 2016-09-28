@@ -13,6 +13,8 @@ public class FortifyCommandLine {
     private int auditPreferenceId = 0;
     private int scanPreferenceId = 0;
     private int pollingInterval = 0;
+    private int entitlementId;
+    private int entitlementFrequencyType;
     private Proxy proxy = null;
     private boolean runSonatypeScan = false;
 
@@ -36,6 +38,10 @@ public class FortifyCommandLine {
             runSonatypeScan = Boolean.parseBoolean(cmd.getOptionValue(FortifyParser.RUN_SONATYPE_SCAN));
         if (cmd.hasOption(FortifyParser.SCAN_PREFERENCE_ID))
             scanPreferenceId = Integer.parseInt(cmd.getOptionValue(FortifyParser.SCAN_PREFERENCE_ID));
+        if (cmd.hasOption(FortifyParser.ENTITLEMENT_ID))
+            entitlementId = Integer.parseInt(cmd.getOptionValue(FortifyParser.ENTITLEMENT_ID));
+        if (cmd.hasOption(FortifyParser.ENTITLEMENT_FREQUENCY_TYPE))
+            entitlementFrequencyType = Integer.parseInt(cmd.getOptionValue(FortifyParser.ENTITLEMENT_FREQUENCY_TYPE));
         String[] loginValues = cmd.getOptionValues(FortifyParser.USERNAME);
         if (loginValues != null && loginValues[0] != null && loginValues[1] != null) {
             loginCredentials.put("username", loginValues[0]);
@@ -106,5 +112,19 @@ public class FortifyCommandLine {
     }
     public boolean hasScanPreferenceId() {
         return scanPreferenceId != 0;
+    }
+
+    public int getEntitlementId() {
+        return entitlementId;
+    }
+    public boolean hasEntitlementId() {
+        return entitlementId != 0;
+    }
+
+    public int getEntitlementFrequencyType() {
+        return entitlementFrequencyType;
+    }
+    public boolean hasEntitlementFrequencyType() {
+        return entitlementFrequencyType != 0;
     }
 }
