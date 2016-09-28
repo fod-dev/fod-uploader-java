@@ -32,6 +32,7 @@ dependencies {
 shadowJar {
     classifier = null
     configurations = [project.configurations.compile]
+    archiveName = "${baseName}.${extension}"
 }
 
 jar {
