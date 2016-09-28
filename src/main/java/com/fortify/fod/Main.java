@@ -2,11 +2,9 @@ package com.fortify.fod;
 
 import java.io.File;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import com.fortify.fod.fodapi.FodApi;
-import com.fortify.fod.legacy.LegacyMain;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
 import com.fortify.fod.parser.FortifyParser;
