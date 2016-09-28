@@ -21,10 +21,10 @@ import java.util.Map;
  * need to parse urls like this:
  * http://www.fod.local/bsi2.aspx?tid=1&tc=tt0@qweqwe.com&pv=187&payloadType=ANALYSIS_PAYLOAD&astid=1&ts=JAVA/J2EE&ll=1.7
  */
-class LegacyParser {
+public class LegacyParser {
     private Map<String, String> argsMap;
 
-    LegacyParser(String[] args) {
+    public LegacyParser(String[] args) {
         argsMap = parseArgs(args);
     }
 
@@ -33,37 +33,11 @@ class LegacyParser {
         Map<String,String> result = new HashMap<>();
         result.put("username", args[0]);
         result.put("password", args[1]);
-        String urlString = args[2];
+        result.put("bsiUrl", args[2]);
         result.put("zipLocation",args[3]);
+        result.put("entitlementId", args[4].split(":")[1]);
+        result.put("entitlementFrequency", args[5].split(":")[1]);
         processOptionalArgs(args,result);
-        URL url;
-        try {
-            url = new URL(urlString);
-            result.put("endpoint",url.getProtocol() + "://" + url.getAuthority());
-            String query = url.getQuery();
-            String[] queryNVPairs = query.split("&");
-            Map<String,String> queryMap = new HashMap<>();
-            for(String pair : queryNVPairs)
-            {
-                String[] nvPair = pair.split("=");
-                if(nvPair.length == 2)
-                {
-                    queryMap.put(nvPair[0], nvPair[1]);
-                }
-                else
-                {
-                    queryMap.put(nvPair[0], "");
-                }
-            }
-            result.put("releaseId", queryMap.get("pv"));
-            result.put("technologyType", queryMap.get("ts"));
-            result.put("assessmentTypeId", queryMap.get("astid"));
-            result.put("tenantId", queryMap.get("tid"));
-            result.put("tenantCode", queryMap.get("tc"));
-            result.put("languageLevel", queryMap.get("ll"));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
 
         return result;
     }
@@ -133,7 +107,7 @@ class LegacyParser {
         return result;
     }
 
-    Map<String, String> getArgsMap() {
+    public Map<String, String> getArgsMap() {
         return argsMap;
     }
 }
