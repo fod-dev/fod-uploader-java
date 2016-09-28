@@ -35,27 +35,23 @@ java -jar FodUpload.jar -u <url> -z <file> [-a <1|2>] -uc <username> <password> 
     [-h] [-I <minutes>] [-p <1|2>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] 
     [-s <true|false>] [-v]
 ```
-
-
-
-
 Each option has a short and long name:
 
-Short Name | Long Name          | Description                                                      
----------- | ----------------- | ------------------------------------------------------------------
- -u         | -bsiUrl            | build server url                                                 
- -z        | -zipLocation       | location of scan                                                 
- -ac       | -apiCredentials    | api credentials                                                  
- -uc       | -userCredentials   | user login credentials                                           
- -a        | -auditPreferenceId | false positive audit type (Manual = 1, Automated = 2)            
- -p        | -scanPreferenceId  | scan mode (Standard = 1, Express = 2)                            
- -I        | -pollingInterval   | interval between checking scan status in minutes                 
- -P        | -proxy             | credentials for accessing the proxy                              
- -s        | -runSonatypeScan   | whether to run a Sonatype Scan (can be 'true' or 'false')        
- -h        | -help              | print help dialog                                                
- -v        | -version           | print jar version                                                
+Short Name | Long Name          | Required? | Description                                                      
+---------- | ------------------ |:---------:| --------------------------------------------------------
+ -u        | -bsiUrl            | Yes       | Build server url                                                 
+ -z        | -zipLocation       | Yes       | Location of scan                                                 
+ -ac       | -apiCredentials    | Yes*      | Api credentials                                                  
+ -uc       | -userCredentials   | Yes*      | User login credentials                                           
+ -a        | -auditPreferenceId | No        | False positive audit type (Manual = 1, Automated = 2)            
+ -p        | -scanPreferenceId  | No        | Scan mode (Standard = 1, Express = 2)                            
+ -I        | -pollingInterval   | No        | Interval between checking scan status in minutes                 
+ -P        | -proxy             | No        | Credentials for accessing the proxy                   
+ -s        | -runSonatypeScan   | No        | Whether to run a Sonatype Scan (can be 'true' or 'false')        
+ -h        | -help              | No        | Print help dialog                                                
+ -v        | -version           | No        | Print jar version                                                
 
-Use either apiCredentials *or* userCredentials.
+*One of either apiCredentials or userCredentials is required.
 
 ### Legacy
 A legacy tag (-l) is also available if you want to access the old format. Simply append the legacy tag at the beginning of your list of arguments.
@@ -67,4 +63,4 @@ java -jar FodUpload.jar [-version] ['api key' 'api secret' | 'username' 'passwor
     'payloadLocation' ['proxyUrl' ['proxyUsername' 'proxyPassword' 'ntDomain' 'ntWorkstation']] 
     [-pollingInterval <minutes>]
 ```
-*Note: if you use an api key, you must append 'key-' to the beginnining.*
+*Note: if you use an api key, you must append 'key-' to the beginning.*
