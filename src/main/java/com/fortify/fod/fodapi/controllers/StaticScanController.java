@@ -8,13 +8,8 @@ import com.fortify.fod.parser.FortifyCommandLine;
 import com.google.gson.Gson;
 import okhttp3.*;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
 
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.util.*;
 
 public class StaticScanController extends ControllerBase {
@@ -67,6 +62,10 @@ public class StaticScanController extends ControllerBase {
                 fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
             if (cl.hasRunSonatypeScan())
                 fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
+            if (cl.isRemediationScan())
+                fragUrl += "&isRemediationScan=" + cl.isRemediationScan();
+            if (cl.hasExcludeThirdPartyLibs())
+                fragUrl += "&excludeThirdPartyLibs=" + cl.hasExcludeThirdPartyLibs();
 
             // Loop through chunks
             while ((byteCount = fs.read(readByteArray)) != -1) {

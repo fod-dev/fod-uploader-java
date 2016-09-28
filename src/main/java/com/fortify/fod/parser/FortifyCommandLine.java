@@ -4,7 +4,6 @@ import com.fortify.fod.legacy.LegacyParser;
 import org.apache.commons.cli.CommandLine;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class FortifyCommandLine {
@@ -19,12 +18,14 @@ public class FortifyCommandLine {
     private int entitlementFrequencyType = 0;
     private Proxy proxy = null;
     private boolean runSonatypeScan = false;
+    private boolean isRemediationScan = false;
+    private boolean excludeThirdPartyLibs = false;
 
     /**
      * Constructor for Fortify CLI
      * @param cmd cli object
      */
-    FortifyCommandLine(CommandLine cmd) {
+    FortifyCommandLine(final CommandLine cmd) {
         // null is passed in in the event that the user wants "-legacy", "-help", or "-version".
         // In any of those cases we don't care what else is here so stop building the object.
         if (cmd == null)
@@ -48,6 +49,11 @@ public class FortifyCommandLine {
             entitlementId = Integer.parseInt(cmd.getOptionValue(FortifyParser.ENTITLEMENT_ID));
         if (cmd.hasOption(FortifyParser.ENTITLEMENT_FREQUENCY_TYPE))
             entitlementFrequencyType = Integer.parseInt(cmd.getOptionValue(FortifyParser.ENTITLEMENT_FREQUENCY_TYPE));
+        if (cmd.hasOption(FortifyParser.EXCLUDE_THIRD_PARTY_LIBS))
+            excludeThirdPartyLibs = Boolean.parseBoolean(cmd.getOptionValue(FortifyParser.EXCLUDE_THIRD_PARTY_LIBS));
+        if (cmd.hasOption(FortifyParser.IS_REMEDIATION_SCAN))
+            isRemediationScan = Boolean.parseBoolean((cmd.getOptionValue(FortifyParser.IS_REMEDIATION_SCAN)));
+
         String[] loginValues = cmd.getOptionValues(FortifyParser.USERNAME);
         if (loginValues != null && loginValues[0] != null && loginValues[1] != null) {
             loginCredentials.put("username", loginValues[0]);
@@ -95,6 +101,14 @@ public class FortifyCommandLine {
         String legacyRunSonatypeScan = legacyArgs.get("runSonatypeScan");
         if (legacyRunSonatypeScan != null)
             runSonatypeScan = Boolean.parseBoolean(legacyRunSonatypeScan);
+
+        String legacyIsRemediationScan = legacyArgs.get("isRemediationScan");
+        if (legacyIsRemediationScan != null)
+            isRemediationScan = Boolean.parseBoolean(legacyIsRemediationScan);
+
+        String legacyExcludeThirdPartyLibs = legacyArgs.get("excludeThirdPartyLibs");
+        if (legacyExcludeThirdPartyLibs != null)
+            excludeThirdPartyLibs = Boolean.parseBoolean(legacyExcludeThirdPartyLibs);
 
         if (legacyArgs.get("proxy") != null) {
             String[] proxyArgs = {legacyArgs.get("proxy"), legacyArgs.get("proxyUsername"), legacyArgs.get("proxyPassword"),
@@ -180,5 +194,12 @@ public class FortifyCommandLine {
     }
     public boolean hasEntitlementFrequencyType() {
         return entitlementFrequencyType != 0;
+    }
+
+    public boolean isRemediationScan() {
+        return isRemediationScan;
+    }
+    public boolean hasExcludeThirdPartyLibs() {
+        return excludeThirdPartyLibs;
     }
 }

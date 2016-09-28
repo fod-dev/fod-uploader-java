@@ -49,7 +49,13 @@ public class FortifyParser {
     private static final String ENTITLEMENT_ID_SHORT = "e";
 
     static final String ENTITLEMENT_FREQUENCY_TYPE = "entitlementFrequency";
-    private static final String ENTITLEMENT_FREQUENCE_TYPE_SHORT = "f";
+    private static final String ENTITLEMENT_FREQUENCY_TYPE_SHORT = "f";
+
+    static final String IS_REMEDIATION_SCAN = "isRemediationScan";
+    private static final String IS_REMEDIATION_SCAN_SHORT = "r";
+
+    static final String EXCLUDE_THIRD_PARTY_LIBS = "excludeThirdPartyApps";
+    private static final String EXCLUDE_THIRD_PARTY_LIBS_SHORT = "x";
 
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
@@ -116,11 +122,24 @@ public class FortifyParser {
                 .desc("entitlement id")
                 .required(true).build();
 
-        Option entitlementFrequencyType = Option.builder(ENTITLEMENT_FREQUENCE_TYPE_SHORT)
+        // creates the entitlement frequency type argument ( -entitlementFrequencyType <id> required=true entitlement frequency type )
+        Option entitlementFrequencyType = Option.builder(ENTITLEMENT_FREQUENCY_TYPE_SHORT)
                 .longOpt(ENTITLEMENT_FREQUENCY_TYPE)
                 .hasArg(true).argName("1|2")
                 .desc("entitlement frequency type")
                 .required(true).build();
+
+        Option excludeThirdPartyLibs = Option.builder(EXCLUDE_THIRD_PARTY_LIBS_SHORT)
+                .longOpt(EXCLUDE_THIRD_PARTY_LIBS)
+                .hasArg(true).argName("true|false")
+                .desc("whether to exclude third party apps")
+                .required(false).build();
+
+        Option isRemediationScan = Option.builder(IS_REMEDIATION_SCAN_SHORT)
+                .longOpt(IS_REMEDIATION_SCAN)
+                .hasArg(true).argName("true|false")
+                .desc("whether the scan is in remediation")
+                .required(false).build();
 
         // Add the options to the options list
         options.addOption(help);
@@ -133,6 +152,8 @@ public class FortifyParser {
         options.addOption(scanPreferenceId);
         options.addOption(entitlementId);
         options.addOption(entitlementFrequencyType);
+        options.addOption(isRemediationScan);
+        options.addOption(excludeThirdPartyLibs);
 
         // This one is so dirty I separated it from the rest of the pack.
         // I put all proxy settings into one option with **up to** 5 arguments. Then I do a little cheese

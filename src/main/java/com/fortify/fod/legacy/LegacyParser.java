@@ -99,6 +99,21 @@ public class LegacyParser {
                     argMap.put("runSonatypeScan", split[1]);
                 }
             }
+            else if(arg.startsWith("-excludeThirdPartyLibs"))
+            {
+                String[] split = arg.split(":");
+                if(split.length == 2) {
+                    argMap.put("excludeThirdPartyLibs", split[1]);
+                }
+            }
+            else if(arg.startsWith("-isRemediationScan"))
+            {
+                String[] split = arg.split(":");
+                if(split.length == 2)
+                {
+                    argMap.put("isRemediationScan", split[1]);
+                }
+            }
             else  // unnamed argument
             {
                 result.add(arg);
