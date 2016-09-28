@@ -1,6 +1,7 @@
 package com.fortify.fod.fodapi.controllers;
 
 import com.fortify.fod.fodapi.FodApi;
+import com.fortify.fod.fodapi.FodEnums;
 import com.fortify.fod.fodapi.models.GenericListResponse;
 import com.fortify.fod.fodapi.models.LookupItemsModel;
 import com.google.gson.Gson;
@@ -25,10 +26,10 @@ public class LookupItemsController extends ControllerBase {
      * @param type enum to look up
      * @return array of enum values and text or null
      */
-    public LookupItemsModel[] getLookupItems(String type) {
+    public LookupItemsModel[] getLookupItems(FodEnums.APILookupItemTypes type) {
         try {
             Request request = new Request.Builder()
-                    .url(api.getBaseUrl() + "/api/v3/lookup-items?type=" + type)
+                    .url(api.getBaseUrl() + "/api/v3/lookup-items?type=" + type.toString())
                     .addHeader("Authorization", "Bearer " + api.getToken())
                     .get()
                     .build();

@@ -1,5 +1,6 @@
 package com.fortify.fod;
 
+import com.fortify.fod.fodapi.FodEnums.APILookupItemTypes;
 import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.LookupItemsModel;
 import com.fortify.fod.fodapi.models.ReleaseDTO;
@@ -52,7 +53,7 @@ class PollStatus {
 
                 // Get the possible statuses only once
                 if(analysisStatusTypes == null)
-                    analysisStatusTypes = Arrays.asList(fodApi.getLookupController().getLookupItems("AnalysisStatusTypes"));
+                    analysisStatusTypes = Arrays.asList(fodApi.getLookupController().getLookupItems(APILookupItemTypes.AnalysisStatusTypes));
 
                 if(failCount < MAX_FAILS)
                 {
