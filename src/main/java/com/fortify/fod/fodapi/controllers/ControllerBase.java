@@ -5,7 +5,9 @@ import com.fortify.fod.fodapi.FodApi;
 class ControllerBase {
     FodApi api;
 
-    ControllerBase(FodApi a) {
-        api = a;
-    }
+    /**
+     * Base constructor for all api controllers
+     * @param api api object (containing client etc.) of controller
+     */
+    ControllerBase(FodApi api) { this.api = api; }
 }

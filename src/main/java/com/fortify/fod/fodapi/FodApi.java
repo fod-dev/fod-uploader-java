@@ -1,9 +1,6 @@
 package com.fortify.fod.fodapi;
 
-import com.fortify.fod.fodapi.controllers.LookupItemsController;
-import com.fortify.fod.fodapi.controllers.ReleaseController;
-import com.fortify.fod.fodapi.controllers.StaticScanController;
-import com.fortify.fod.fodapi.models.LookupItemsModel;
+import com.fortify.fod.fodapi.controllers.*;
 import com.fortify.fod.parser.Proxy;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -42,15 +39,28 @@ public class FodApi {
     private LookupItemsController lookupItemsController;
     public LookupItemsController getLookupController() { return lookupItemsController; }
 
+    /**
+     * Constructor that encapsulates the api
+     * @param url baseUrl for the api (derived from the bsiUrl
+     * @param clProxy Proxy for the api calls to use
+     */
     public FodApi(String url, Proxy clProxy) {
         baseUrl = url;
         client = Create(clProxy);
 
+        // Creates the various api controllers
         staticScanController = new StaticScanController(this);
         releaseController = new ReleaseController(this);
         lookupItemsController = new LookupItemsController(this);
     }
 
+    /**
+     * Create a token for authentication with the api.
+     * @param tenantCode user tenant code
+     * @param username username (or api key)
+     * @param password password (or api secret)
+     * @param grantType the type of authentication client_credentials | password
+     */
     public void authenticate(String tenantCode, String username, String password, String grantType) {
         try {
             // Build the form body
@@ -99,10 +109,16 @@ public class FodApi {
         }
     }
 
+    /**
+     * Used for re-authenticating in the case of a time out using the saved api credentials.
+     */
     public void authenticate() {
         this.authenticate(tenantCode, username, password, grantType);
     }
 
+    /**
+     * Retire the current token. Unclear if this actually does anything on the backend.
+     */
     public void retireToken() {
         try {
             Request request = new Request.Builder()
@@ -128,18 +144,23 @@ public class FodApi {
         }
     }
 
+    /**
+     * Creates a okHttp client to connect with.
+     * @param clProxy Proxy object (can be null)
+     * @return returns a client object
+     */
     private OkHttpClient Create(Proxy clProxy) {
-        OkHttpClient.Builder c = new OkHttpClient().newBuilder()
+        OkHttpClient.Builder baseClient = new OkHttpClient().newBuilder()
                 .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS);
 
         // If there's no proxy just create a normal client
         if(clProxy == null)
-            return c.build();
+            return baseClient.build();
 
         // Build out the proxy
-        OkHttpClient.Builder builder = c
+        OkHttpClient.Builder builder = baseClient
             .proxy(new java.net.Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort())));
 
         if (clProxy.hasUsername() && clProxy.hasPassword()) {
@@ -154,6 +175,7 @@ public class FodApi {
             } else {
                 credentials = Credentials.basic(clProxy.getUsername(), clProxy.getPassword());
             }
+            // authenticate the proxy
             proxyAuthenticator = (route, response) -> response.request().newBuilder()
                     .header("Proxy-Authorization", credentials)
                     .build();

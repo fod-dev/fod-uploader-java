@@ -12,7 +12,10 @@ import java.util.Arrays;
 
 public class StaticScanController extends ControllerBase {
     private final int CHUNK_SIZE = 1024 * 1024;
-
+    /**
+     * Constructor
+     * @param api api object with client info
+     */
     public StaticScanController(final FodApi api) {
         super(api);
     }

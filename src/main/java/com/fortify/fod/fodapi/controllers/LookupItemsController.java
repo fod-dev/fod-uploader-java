@@ -12,10 +12,19 @@ import org.apache.commons.io.IOUtils;
 import java.lang.reflect.Type;
 
 public class LookupItemsController extends ControllerBase {
+    /**
+     * Constructor
+     * @param api api object with client info
+     */
     public LookupItemsController(FodApi api) {
         super(api);
     }
 
+    /**
+     * GET given enum
+     * @param type enum to look up
+     * @return array of enum values and text or null
+     */
     public LookupItemsModel[] getLookupItems(String type) {
         try {
             Request request = new Request.Builder()

@@ -14,10 +14,20 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 public class ReleaseController extends ControllerBase {
+    /**
+     * Constructor
+     * @param api api object with client info
+     */
     public ReleaseController(FodApi api) {
         super(api);
     }
 
+    /**
+     * GET specific release with given fields if applicable
+     * @param releaseId release to get
+     * @param fields specific fields to return
+     * @return returns ReleaseDTO object containing specified fields or null
+     */
     public ReleaseDTO getRelease(int releaseId, String fields) {
         try {
             String url = api.getBaseUrl() + "/api/v3/releases?filters=releaseId:" + releaseId;
@@ -46,6 +56,7 @@ public class ReleaseController extends ControllerBase {
             response.body().close();
 
             Gson gson = new Gson();
+            // Create a type of GenericList<ReleaseDTO> to play nice with gson.
             Type t = new TypeToken<GenericListResponse<ReleaseDTO>>(){}.getType();
             GenericListResponse<ReleaseDTO> results =  gson.fromJson(content, t);
             return results.getItems()[0];
