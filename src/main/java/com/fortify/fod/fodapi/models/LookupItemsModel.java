@@ -12,5 +12,4 @@ public class LookupItemsModel {
 
     public String getValue() {return value;}
     public String getText() {return text;}
-    public String getGroup() {return group;}
 }

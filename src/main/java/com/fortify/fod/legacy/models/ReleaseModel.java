@@ -12,19 +12,7 @@ public class ReleaseModel {
 	public ReleaseDTO[] getData() {
 		return data;
 	}
-	public void setData(ReleaseDTO[] data) {
-		this.data = data;
-	}
-	public int getCount() {
-		return count;
-	}
-	public void setCount(int count) {
-		this.count = count;
-	}
 	public int getResponseCode() {
 		return responseCode;
-	}
-	public void setResponseCode(int responseCode) {
-		this.responseCode = responseCode;
 	}
 }
