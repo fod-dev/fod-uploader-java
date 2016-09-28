@@ -31,9 +31,9 @@ systemProp.https.proxyPort=8080
 The command line arguments have been completely reworked for 5.3. Arguments are now named and can be in any order: 
 
 ```
-java -jar FodUpload.jar -u <url> -z <file> [-a <1|2>] -uc <username> <password> | -ac <key> <secret>  
-    [-h] [-I <minutes>] [-p <1|2>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] 
-    [-s <true|false>] [-v]
+FodUpload-5.3.jar -e <id> -f <1|2> -u <url> -z <file> [-a <1|2>] -ac <key> <secret> | -uc <username> <password>
+[-h] [-I <minutes>] [-p <1|2>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-s <true|false>]
+[-v]
 ```
 Each option has a short and long name:
 
@@ -58,11 +58,11 @@ Short Name | Long Name              | Required? | Description
 ### Legacy
 A legacy tag (-l) is also available if you want to access the old format. Simply append the legacy tag at the beginning of your list of arguments.
 
-The old format is similar to below:
+```
+java -jar FodUpload.jar -l [-version] <username> <password> <bsiUrl> <zipLocation> <entitlementId> 
+<entitlementFrequency> [<proxy> <proxyUsername> <proxyPassword> <ntWorkStation> <ntDomain>] 
+[-pollingInterval:<interval>] [-scanPreferenceId:<id>] [-auditPreferenceId:<id>] [-runSonatypeScan:<run>]
+```
+All unnamed arguments above must be presented in the order seen above. The optional arguments can appear in any order. `<username> <password>` can be either an api key/secret or username/password, however if using an api key/secret then the `<username>` field must begin with "key-".
 
-```
-java -jar FodUpload.jar [-version] ['api key' 'api secret' | 'username' 'password'] 'bsiUrl' 
-    'payloadLocation' ['proxyUrl' ['proxyUsername' 'proxyPassword' 'ntDomain' 'ntWorkstation']] 
-    [-pollingInterval <minutes>]
-```
-*Note: if you use an api key, you must append 'key-' to the beginning.*
+Legacy formatting accepts the same values as above for auditPreferenceId, runSonatypeScan, scanPreferenceType and EntitlementFrequency.
