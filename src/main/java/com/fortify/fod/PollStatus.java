@@ -43,8 +43,10 @@ class PollStatus {
                 // Get the status of the release
                 ReleaseDTO release = fodApi.getReleaseController().getRelease(releaseId,
                             "currentAnalysisStatusTypeId,isPassed,passFailReasonId,critical,high,medium,low");
-                if (release == null)
+                if (release == null) {
                     failCount++;
+                    continue;
+                }
 
                 int status = release.getCurrentAnalysisStatusTypeId();
 
