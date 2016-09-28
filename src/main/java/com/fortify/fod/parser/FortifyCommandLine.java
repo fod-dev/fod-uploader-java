@@ -1,6 +1,6 @@
 package com.fortify.fod.parser;
 
-import com.fortify.fod.legacy.LegacyParser;
+import com.fortify.fod.parser.legacy.LegacyParser;
 import org.apache.commons.cli.CommandLine;
 
 import java.util.HashMap;

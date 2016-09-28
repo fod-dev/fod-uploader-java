@@ -1,7 +1,7 @@
-package com.fortify.fod.legacy;
+package com.fortify.fod.parser.legacy;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.fortify.fod.parser.FortifyParser;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,51 +67,51 @@ public class LegacyParser {
         ArrayList<String> result = new ArrayList<>();
         for(String arg : args)
         {
-            if(arg.startsWith("-pollingInterval"))
+            if(arg.startsWith("-" + FortifyParser.POLLING_INTERVAL))
             {
                 String[] split = arg.split(":");
                 if(split.length == 2)
                 {
-                    argMap.put("pollingInterval", split[1]);
+                    argMap.put(FortifyParser.POLLING_INTERVAL, split[1]);
                 }
             }
-            else if(arg.startsWith("-scanPreferenceId"))
+            else if(arg.startsWith("-" + FortifyParser.SCAN_PREFERENCE_ID))
             {
                 String[] split = arg.split(":");
                 if(split.length == 2)
                 {
-                    argMap.put("scanPreferenceId", split[1]);
+                    argMap.put(FortifyParser.SCAN_PREFERENCE_ID, split[1]);
                 }
             }
-            else if(arg.startsWith("-auditPreferenceId"))
+            else if(arg.startsWith("-" + FortifyParser.AUDIT_PREFERENCE_ID))
             {
                 String[] split = arg.split(":");
                 if(split.length == 2)
                 {
-                    argMap.put("auditPreferenceId", split[1]);
+                    argMap.put(FortifyParser.AUDIT_PREFERENCE_ID, split[1]);
                 }
             }
-            else if(arg.startsWith("-runSonatypeScan"))
+            else if(arg.startsWith("-" + FortifyParser.RUN_SONATYPE_SCAN))
             {
                 String[] split = arg.split(":");
                 if(split.length == 2)
                 {
-                    argMap.put("runSonatypeScan", split[1]);
+                    argMap.put(FortifyParser.RUN_SONATYPE_SCAN, split[1]);
                 }
             }
-            else if(arg.startsWith("-excludeThirdPartyLibs"))
+            else if(arg.startsWith("-" + FortifyParser.EXCLUDE_THIRD_PARTY_LIBS))
             {
                 String[] split = arg.split(":");
                 if(split.length == 2) {
-                    argMap.put("excludeThirdPartyLibs", split[1]);
+                    argMap.put(FortifyParser.EXCLUDE_THIRD_PARTY_LIBS, split[1]);
                 }
             }
-            else if(arg.startsWith("-isRemediationScan"))
+            else if(arg.startsWith("-" + FortifyParser.IS_REMEDIATION_SCAN))
             {
                 String[] split = arg.split(":");
                 if(split.length == 2)
                 {
-                    argMap.put("isRemediationScan", split[1]);
+                    argMap.put(FortifyParser.IS_REMEDIATION_SCAN, split[1]);
                 }
             }
             else  // unnamed argument

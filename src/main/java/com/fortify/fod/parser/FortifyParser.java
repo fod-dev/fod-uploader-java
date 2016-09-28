@@ -27,16 +27,16 @@ public class FortifyParser {
     private static final String VERSION = "version";
     private static final String VERSION_SHORT = "v";
 
-    static final String POLLING_INTERVAL = "pollingInterval";
+    public static final String POLLING_INTERVAL = "pollingInterval";
     private static final String POLLING_INTERVAL_SHORT = "I";
 
-    static final String RUN_SONATYPE_SCAN = "runSonatypeScan";
+    public static final String RUN_SONATYPE_SCAN = "runSonatypeScan";
     private static final String RUN_SONATYPE_SCAN_SHORT = "s";
 
-    static final String AUDIT_PREFERENCE_ID = "auditPreferenceId";
+    public static final String AUDIT_PREFERENCE_ID = "auditPreferenceId";
     private static final String AUDIT_PREFERENCE_ID_SHORT = "a";
 
-    static final String SCAN_PREFERENCE_ID = "scanPreferenceId";
+    public static final String SCAN_PREFERENCE_ID = "scanPreferenceId";
     private static final String SCAN_PREFERENCE_ID_SHORT = "p";
 
     static final String PROXY = "proxy";
@@ -51,10 +51,10 @@ public class FortifyParser {
     static final String ENTITLEMENT_FREQUENCY_TYPE = "entitlementFrequency";
     private static final String ENTITLEMENT_FREQUENCY_TYPE_SHORT = "f";
 
-    static final String IS_REMEDIATION_SCAN = "isRemediationScan";
+    public static final String IS_REMEDIATION_SCAN = "isRemediationScan";
     private static final String IS_REMEDIATION_SCAN_SHORT = "r";
 
-    static final String EXCLUDE_THIRD_PARTY_LIBS = "excludeThirdPartyApps";
+    public static final String EXCLUDE_THIRD_PARTY_LIBS = "excludeThirdPartyApps";
     private static final String EXCLUDE_THIRD_PARTY_LIBS_SHORT = "x";
 
     private Options options = new Options();
