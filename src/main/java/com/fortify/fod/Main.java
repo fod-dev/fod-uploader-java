@@ -14,7 +14,7 @@ import com.fortify.fod.parser.FortifyParser;
 public class Main {
 
     /**
-	 * @param args Required:  zip location, bsi url, username/password or api key/secret
+	 * @param args Required: zip location, bsi url, username/password or api key/secret
 	 */
 	public static void main(String[] args) {
         FortifyParser fortifyCommands = new FortifyParser();
@@ -36,6 +36,7 @@ public class Main {
                     FodApi fodApi = new FodApi(bsiUrl.getEndpoint(), cl.getProxy());
 
                     if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials())) {
+                        System.out.println("Authenticating");
 
                         String zipLocation = cl.getZipLocation();
 
@@ -58,6 +59,8 @@ public class Main {
                         String grantType = cl.hasLoginCredentials() ? fodApi.GRANT_TYPE_PASSWORD : fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
                         fodApi.authenticate(tenantCode, username, password, grantType);
 
+                        System.out.println("Beginning upload");
+
                         //first thing check file size
                         File zipFileInfo = new File(zipLocation);
                         if (zipFileInfo.length() > maxFileSize) {
@@ -72,9 +75,9 @@ public class Main {
                     if (uploadSucceeded) {
                         // Why do we need to poll for this?
                         if (cl.hasPollingInterval()) {
-                            PollStatus listener = new PollStatus(bsiUrl.getProjectVersionId(), cl.getPollingInterval());
+                            PollStatus listener = new PollStatus(fodApi, cl.getPollingInterval());
                             // Until status is is complete or cancelled
-                            listener.releaseStatus(fodApi);
+                            listener.releaseStatus(bsiUrl.getProjectVersionId());
                         }
                         fodApi.retireToken();
                         System.exit(1);

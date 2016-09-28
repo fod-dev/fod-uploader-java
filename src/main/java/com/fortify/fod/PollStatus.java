@@ -10,33 +10,47 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 class PollStatus {
-    private int releaseId;
+    private FodApi fodApi;
     private int pollingInterval;
     private int failCount = 0;
     private final int MAX_FAILS = 3;
 
     private List<LookupItemsModel> analysisStatusTypes = null;
 
-    PollStatus(int releaseId, int pollingInterval) {
-        this.releaseId = releaseId;
+    /**
+     * Constructor
+     * @param api api connection to use
+     * @param pollingInterval interval to poll
+     */
+    PollStatus(final FodApi api, final int pollingInterval) {
+        fodApi = api;
         this.pollingInterval = pollingInterval;
     }
 
-    boolean releaseStatus(FodApi fodApi) {
+    /**
+     * Polls the release status
+     * @param releaseId release to poll
+     * @return true if status is completed | cancelled.
+     */
+    boolean releaseStatus(final int releaseId) {
         boolean finished = false; // default is failure
 
         try
         {
             while(!finished)
             {
-                Thread.sleep(pollingInterval*60*1000);
-                int status = fodApi.getReleaseController().getRelease(releaseId, "currentAnalysisStatusTypeId")
-                        .getCurrentAnalysisStatusTypeId();
+                Thread.sleep(pollingInterval*20*1000);
+                // Get the status of the release
+                ReleaseDTO release = fodApi.getReleaseController().getRelease(releaseId,
+                            "currentAnalysisStatusTypeId,isPassed,passFailReasonId,critical,high,medium,low");
+                if (release == null)
+                    failCount++;
+
+                int status = release.getCurrentAnalysisStatusTypeId();
 
                 // Get the possible statuses only once
-                if(analysisStatusTypes == null) {
+                if(analysisStatusTypes == null)
                     analysisStatusTypes = Arrays.asList(fodApi.getLookupController().getLookupItems("AnalysisStatusTypes"));
-                }
 
                 if(failCount < MAX_FAILS)
                 {
@@ -64,7 +78,7 @@ class PollStatus {
                     System.out.println("Status: " + statusString);
                     if(finished)
                     {
-                        printPassFail(fodApi);
+                        printPassFail(release);
                     }
                 }
                 else
@@ -81,47 +95,35 @@ class PollStatus {
         return finished;
     }
 
-    private void printPassFail(FodApi fodApi) {
+    /**
+     * Prints some info about the release including a vuln breakdown and pass/fail reason
+     * @param release release to print info on
+     */
+    private void printPassFail(ReleaseDTO release) {
         try
         {
-            ReleaseDTO requestQueryResponse = fodApi.getReleaseController()
-                    .getRelease(releaseId, "isPassed,passFailReasonId,critical,high,medium,low");
-            if (requestQueryResponse == null)
+            // Break if release is null
+            if (release == null) {
                 this.failCount++;
-            boolean isPassed = requestQueryResponse.isPassed();
+                return;
+            }
+            boolean isPassed = release.isPassed();
             System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );
             if (!isPassed)
             {
-                String passFailReason;
-                switch(requestQueryResponse.getPassFailReasonTypeId())
-                {
-                    case 1:
-                        passFailReason = "Unassessed";
-                        break;
-                    case 2:
-                        passFailReason = "Override";
-                        break;
-                    case 3:
-                        passFailReason = "GracePeriod";
-                        break;
-                    case 14:
-                        passFailReason = "ScanFrequency";
-                        break;
-                    default:
-                        passFailReason = "Pass/Fail Policy requirements not met ";
-                        break;
-                }
+                String passFailReason = release.getPassFailReasonType() == null ?
+                        "Pass/Fail Policy requirements not met " :
+                        release.getPassFailReasonType();
+
                 System.out.println("Failure Reason: " + passFailReason);
-                System.out.println("Number of criticals: " +  requestQueryResponse.getCritical());
-                System.out.println("Number of highs: " +  requestQueryResponse.getHigh());
-                System.out.println("Number of mediums: " +  requestQueryResponse.getMedium());
-                System.out.println("Number of lows: " +  requestQueryResponse.getLow());
+                System.out.println("Number of criticals: " +  release.getCritical());
+                System.out.println("Number of highs: " +  release.getHigh());
+                System.out.println("Number of mediums: " +  release.getMedium());
+                System.out.println("Number of lows: " +  release.getLow());
 
             }
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
     }
 }
