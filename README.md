@@ -37,19 +37,21 @@ java -jar FodUpload.jar -u <url> -z <file> [-a <1|2>] -uc <username> <password> 
 ```
 Each option has a short and long name:
 
-Short Name | Long Name          | Required? | Description                                                      
----------- | ------------------ |:---------:| --------------------------------------------------------
- -u        | -bsiUrl            | Yes       | Build server url                                                 
- -z        | -zipLocation       | Yes       | Location of scan                                                 
- -ac       | -apiCredentials    | Yes*      | Api credentials                                                  
- -uc       | -userCredentials   | Yes*      | User login credentials                                           
- -a        | -auditPreferenceId | No        | False positive audit type (Manual = 1, Automated = 2)            
- -p        | -scanPreferenceId  | No        | Scan mode (Standard = 1, Express = 2)                            
- -I        | -pollingInterval   | No        | Interval between checking scan status in minutes                 
- -P        | -proxy             | No        | Credentials for accessing the proxy                   
- -s        | -runSonatypeScan   | No        | Whether to run a Sonatype Scan (can be 'true' or 'false')        
- -h        | -help              | No        | Print help dialog                                                
- -v        | -version           | No        | Print jar version                                                
+Short Name | Long Name              | Required? | Description                                                      
+---------- | ---------------------- |:---------:| --------------------------------------------------------
+ -u        | -bsiUrl                | Yes       | Build server url                                                 
+ -z        | -zipLocation           | Yes       | Location of scan 
+ -e        | -entitlementId         | Yes       | Entitlement Id
+ -f        | -entitlementFrequency  | Yes       | Entitlement Freqeuncy Type (Single = 1, Subscription = 2)
+ -ac       | -apiCredentials        | Yes*      | Api credentials                                                  
+ -uc       | -userCredentials       | Yes*      | User login credentials                                           
+ -a        | -auditPreferenceId     | No        | False positive audit type (Manual = 1, Automated = 2)            
+ -p        | -scanPreferenceId      | No        | Scan mode (Standard = 1, Express = 2)                            
+ -I        | -pollingInterval       | No        | Interval between checking scan status in minutes                 
+ -P        | -proxy                 | No        | Credentials for accessing the proxy                   
+ -s        | -runSonatypeScan       | No        | Whether to run a Sonatype Scan (can be 'true' or 'false')        
+ -h        | -help                  | No        | Print help dialog                                                
+ -v        | -version               | No        | Print jar version                                                
 
 *One of either apiCredentials or userCredentials is required.
 
