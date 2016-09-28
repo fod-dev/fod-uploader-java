@@ -4,6 +4,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.cli.CommandLine;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.regex.Pattern;
 
@@ -183,25 +184,25 @@ public class FortifyParser {
             if(args.length > 0) {
                 if (Pattern.matches("(-{1,2}("+HELP+"|"+HELP_SHORT+"))", args[0])) {
                     help();
-                    return new FortifyCommandLine(null);
+                    return new FortifyCommandLine();
                 } else if (Pattern.matches("(-{1,2}("+VERSION+"|"+VERSION_SHORT+"))", args[0])) {
                     System.out.println("upload version FodUploader 5.3.0");
-                    return new FortifyCommandLine(null);
+                    return new FortifyCommandLine();
                 }
                 if (Pattern.matches("(-{1,2}("+LEGACY+"|"+LEGACY_SHORT+"))", args[0])) {
                     System.out.println("Using legacy argument parsing....");
                     legacy = true;
-                    return new FortifyCommandLine(null);
+                    return new FortifyCommandLine(Arrays.copyOfRange(args, 1, args.length));
                 }
             }
             // I can no longer hope to imagine the command you intended.
             System.err.println(e.getMessage());
             System.err.println("try \"-" + HELP + "\" for info");
 
-            return new FortifyCommandLine(null);
+            return new FortifyCommandLine();
         } catch(Exception e) {
             e.printStackTrace();
-            return new FortifyCommandLine(null);
+            return new FortifyCommandLine();
         }
     }
 

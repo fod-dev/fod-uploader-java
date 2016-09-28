@@ -1,8 +1,10 @@
 package com.fortify.fod.parser;
 
+import com.fortify.fod.legacy.LegacyParser;
 import org.apache.commons.cli.CommandLine;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FortifyCommandLine {
@@ -13,11 +15,15 @@ public class FortifyCommandLine {
     private int auditPreferenceId = 0;
     private int scanPreferenceId = 0;
     private int pollingInterval = 0;
-    private int entitlementId;
-    private int entitlementFrequencyType;
+    private int entitlementId = 0;
+    private int entitlementFrequencyType = 0;
     private Proxy proxy = null;
     private boolean runSonatypeScan = false;
 
+    /**
+     * Constructor for Fortify CLI
+     * @param cmd cli object
+     */
     FortifyCommandLine(CommandLine cmd) {
         // null is passed in in the event that the user wants "-legacy", "-help", or "-version".
         // In any of those cases we don't care what else is here so stop building the object.
@@ -53,6 +59,52 @@ public class FortifyCommandLine {
             apiCredentials.put("secret", loginValues[1]);
         }
     }
+
+    /**
+     * Constructor for translating Legacy CLI
+     * @param args string array of arguments
+     */
+    FortifyCommandLine(String[] args) {
+        Map<String, String> legacyArgs = new LegacyParser(args).getArgsMap();
+
+        zipLocation = legacyArgs.get("zipLocation");
+        entitlementId = Integer.parseInt(legacyArgs.get("entitlementId"));
+        entitlementFrequencyType = Integer.parseInt(legacyArgs.get("entitlementFrequencyType"));
+        bsiUrl = new BsiUrl(legacyArgs.get("bsiUrl"));
+        String legacyUsername = legacyArgs.get("username");
+        if (legacyUsername.toLowerCase().startsWith("key")) {
+            apiCredentials.put("key", legacyUsername);
+            apiCredentials.put("secret", legacyArgs.get("password"));
+        } else {
+            loginCredentials.put("username", legacyUsername);
+            loginCredentials.put("password", legacyArgs.get("password"));
+        }
+
+        String legacyAuditPreferenceId = legacyArgs.get("auditPreferenceId");
+        if (legacyAuditPreferenceId != null)
+            auditPreferenceId = Integer.parseInt(legacyAuditPreferenceId);
+
+        String legacyScanPreferenceId = legacyArgs.get("scanPreferenceId");
+        if (legacyScanPreferenceId != null)
+            scanPreferenceId = Integer.parseInt(legacyScanPreferenceId);
+
+        String legacyPollingInterval = legacyArgs.get("pollingInterval");
+        if (legacyPollingInterval != null)
+            pollingInterval = Integer.parseInt(legacyPollingInterval);
+
+        String legacyRunSonatypeScan = legacyArgs.get("runSonatypeScan");
+        if (legacyRunSonatypeScan != null)
+            runSonatypeScan = Boolean.parseBoolean(legacyRunSonatypeScan);
+
+        String[] proxyArgs = {legacyArgs.get("proxy"), legacyArgs.get("proxyUsername"), legacyArgs.get("proxyPassword"),
+                legacyArgs.get("ntDomain"), legacyArgs.get("ntWorkStation")};
+        proxy = new Proxy(proxyArgs);
+    }
+
+    /**
+     * Empty Constructor
+     */
+    FortifyCommandLine() {}
 
     public BsiUrl getBsiUrl() {
         return bsiUrl;
