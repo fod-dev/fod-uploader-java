@@ -186,13 +186,23 @@ public class FortifyParser {
                     help();
                     return new FortifyCommandLine();
                 } else if (Pattern.matches("(-{1,2}("+VERSION+"|"+VERSION_SHORT+"))", args[0])) {
-                    System.out.println("upload version FodUploader 5.3.0");
+                    version();
                     return new FortifyCommandLine();
                 }
                 if (Pattern.matches("(-{1,2}("+LEGACY+"|"+LEGACY_SHORT+"))", args[0])) {
                     System.out.println("Using legacy argument parsing....");
                     legacy = true;
-                    return new FortifyCommandLine(Arrays.copyOfRange(args, 1, args.length));
+                    String[] legacyArgs = Arrays.copyOfRange(args, 1, args.length);
+                    if (legacyArgs.length == 1 && legacyArgs[0].equals("-version")) {
+                        version();
+                        return new FortifyCommandLine();
+                    }
+                    if (legacyArgs.length <= 4) {
+                        System.out.println("Username/key:Api Key, password/secret, endpoint url and payload location, " +
+                                "entitlement id and entitlement frequency type required");
+                        return new FortifyCommandLine();
+                    }
+                    return new FortifyCommandLine(legacyArgs);
                 }
             }
             // I can no longer hope to imagine the command you intended.
@@ -226,6 +236,10 @@ public class FortifyParser {
         formatter.printOptions(out, width, options, formatter.getLeftPadding(), formatter.getDescPadding());
     }
 
+    private void version() {
+        Package p = getClass().getPackage();
+        System.out.println("Version " + p.getImplementationVersion());
+    }
     /**
      * Compares options so that they are ordered:
      * 1.) by required, then by
