@@ -22,11 +22,15 @@ public class Proxy {
             final int NTDOMAIN_LOCATION = 3;
             final int NTWORKSTATION_LOCATION = 4;
 
-            proxyUri =      args.length > URI_LOCATION              ? new URI(args[URI_LOCATION])   : null;
-            username =      args.length > USERNAME_LOCATION         ? args[USERNAME_LOCATION]       : null;
-            password =      args.length > PASSWORD_LOCATION         ? args[PASSWORD_LOCATION]       : null;
-            ntDomain =      args.length > NTDOMAIN_LOCATION         ? args[NTDOMAIN_LOCATION]       : null;
-            ntWorkstation = args.length > NTWORKSTATION_LOCATION    ? args[NTWORKSTATION_LOCATION]  : null;
+            proxyUri = args.length > URI_LOCATION ? new URI(args[URI_LOCATION]) : null;
+            username = args.length > USERNAME_LOCATION && args[USERNAME_LOCATION] != null
+                    ? args[USERNAME_LOCATION] : null;
+            password = args.length > PASSWORD_LOCATION && args[PASSWORD_LOCATION] != null
+                    ? args[PASSWORD_LOCATION] : null;
+            ntDomain = args.length > NTDOMAIN_LOCATION && args[NTDOMAIN_LOCATION] != null
+                    ? args[NTDOMAIN_LOCATION] : null;
+            ntWorkstation = args.length > NTWORKSTATION_LOCATION && args[NTWORKSTATION_LOCATION] != null
+                    ? args[NTWORKSTATION_LOCATION] : null;
 
         } catch(URISyntaxException | ArrayIndexOutOfBoundsException e) {
             System.err.println(e.getMessage());
