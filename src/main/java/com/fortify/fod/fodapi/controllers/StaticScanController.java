@@ -2,6 +2,7 @@ package com.fortify.fod.fodapi.controllers;
 
 import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
+import com.fortify.fod.fodapi.models.PostStartScanResponse;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
 import com.google.gson.Gson;
@@ -34,7 +35,7 @@ public class StaticScanController extends ControllerBase {
      * @return true if successful upload
      */
     public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommandLine cl) {
-        boolean successfulUpload = false;
+        PostStartScanResponse scanStartedResponse = null;
         boolean lastFragment = false;
         try {
             FileInputStream fs = new FileInputStream(cl.getZipLocation());
@@ -96,12 +97,12 @@ public class StaticScanController extends ControllerBase {
                     String finalResponse = IOUtils.toString(response.body().byteStream(), "utf-8");
                     response.body().close();
 
+                    Gson gson = new Gson();
                     // Scan successfully uploaded
-                    if (finalResponse.toUpperCase().equals("ACK")) {
-                        successfulUpload = true;
+                    if (response.isSuccessful()) {
+                        scanStartedResponse = gson.fromJson(finalResponse, PostStartScanResponse.class);
                     // There was an error along the lines of 'another scan in progress' or something
                     } else {
-                        Gson gson = new Gson();
                         GenericErrorResponse errors = gson.fromJson(finalResponse, GenericErrorResponse.class);
                         System.out.println("Package upload failed for the following reasons: " +
                                 errors.toString());
@@ -110,11 +111,13 @@ public class StaticScanController extends ControllerBase {
                 offset += byteCount;
             }
             fs.close();
-            if (successfulUpload)
-                System.out.println("Upload completed successfully. Total bytes sent: " + offset);
+            if (scanStartedResponse != null) {
+                System.out.println("Scan " + scanStartedResponse.getScanId() +
+                        " uploaded successfully. Total bytes sent: " + offset);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return successfulUpload;
+        return scanStartedResponse != null;
     }
 }
