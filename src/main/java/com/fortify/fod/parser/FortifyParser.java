@@ -132,7 +132,7 @@ public class FortifyParser {
         Option excludeThirdPartyLibs = Option.builder(EXCLUDE_THIRD_PARTY_LIBS_SHORT)
                 .longOpt(EXCLUDE_THIRD_PARTY_LIBS)
                 .hasArg(true).argName("true|false")
-                .desc("whether to exclude third party apps")
+                .desc("whether to exclude third party libraries")
                 .required(false).build();
 
         Option isRemediationScan = Option.builder(IS_REMEDIATION_SCAN_SHORT)
