@@ -37,7 +37,7 @@ systemProp.https.proxyPort=8080
 The command line arguments have been completely reworked for 5.3. Arguments are now named and can be in any order: 
 
 ```
-FodUpload-5.3.jar -e <id> -f <1|2> -u <url> -z <file> [-a <1|2>] -ac <key> <secret> | -uc <username> <password>
+FodUpload.jar -e <id> -f <1|2> -u <url> -z <file> [-a <1|2>] -ac <key> <secret> | -uc <username> <password>
 [-h] [-I <minutes>] [-p <1|2>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-s <true|false>]
 [-v] [-x <true|false>] [-r <true|false]
 ```
