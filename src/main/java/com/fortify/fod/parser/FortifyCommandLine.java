@@ -1,6 +1,5 @@
 package com.fortify.fod.parser;
 
-import com.fortify.fod.parser.legacy.LegacyParser;
 import org.apache.commons.cli.CommandLine;
 
 import java.util.HashMap;
@@ -63,57 +62,6 @@ public class FortifyCommandLine {
         if (loginValues != null && loginValues[0] != null && loginValues[1] != null) {
             apiCredentials.put("key", loginValues[0]);
             apiCredentials.put("secret", loginValues[1]);
-        }
-    }
-
-    /**
-     * Constructor for translating Legacy CLI
-     * @param args string array of arguments
-     */
-    FortifyCommandLine(String[] args) {
-        Map<String, String> legacyArgs = new LegacyParser(args).getArgsMap();
-
-        zipLocation = legacyArgs.get("zipLocation");
-        entitlementId = Integer.parseInt(legacyArgs.get("entitlementId"));
-        entitlementFrequencyType = Integer.parseInt(legacyArgs.get("entitlementFrequency"));
-        bsiUrl = new BsiUrl(legacyArgs.get("bsiUrl"));
-        String legacyUsername = legacyArgs.get("username");
-        if (legacyUsername.toLowerCase().startsWith("key")) {
-            apiCredentials.put("key", legacyUsername.substring(4));
-            apiCredentials.put("secret", legacyArgs.get("password"));
-        } else {
-            loginCredentials.put("username", legacyUsername);
-            loginCredentials.put("password", legacyArgs.get("password"));
-        }
-
-        String legacyAuditPreferenceId = legacyArgs.get("auditPreferenceId");
-        if (legacyAuditPreferenceId != null)
-            auditPreferenceId = Integer.parseInt(legacyAuditPreferenceId);
-
-        String legacyScanPreferenceId = legacyArgs.get("scanPreferenceId");
-        if (legacyScanPreferenceId != null)
-            scanPreferenceId = Integer.parseInt(legacyScanPreferenceId);
-
-        String legacyPollingInterval = legacyArgs.get("pollingInterval");
-        if (legacyPollingInterval != null)
-            pollingInterval = Integer.parseInt(legacyPollingInterval);
-
-        String legacyRunSonatypeScan = legacyArgs.get("runSonatypeScan");
-        if (legacyRunSonatypeScan != null)
-            runSonatypeScan = Boolean.parseBoolean(legacyRunSonatypeScan);
-
-        String legacyIsRemediationScan = legacyArgs.get("isRemediationScan");
-        if (legacyIsRemediationScan != null)
-            isRemediationScan = Boolean.parseBoolean(legacyIsRemediationScan);
-
-        String legacyExcludeThirdPartyLibs = legacyArgs.get("excludeThirdPartyLibs");
-        if (legacyExcludeThirdPartyLibs != null)
-            excludeThirdPartyLibs = Boolean.parseBoolean(legacyExcludeThirdPartyLibs);
-
-        if (legacyArgs.get("proxy") != null) {
-            String[] proxyArgs = {legacyArgs.get("proxy"), legacyArgs.get("proxyUsername"), legacyArgs.get("proxyPassword"),
-                    legacyArgs.get("ntDomain"), legacyArgs.get("ntWorkStation")};
-            proxy = new Proxy(proxyArgs);
         }
     }
 

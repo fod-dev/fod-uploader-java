@@ -42,9 +42,6 @@ public class FortifyParser {
     static final String PROXY = "proxy";
     private static final String PROXY_SHORT = "P";
 
-    private static final String LEGACY = "legacy";
-    private static final String LEGACY_SHORT = "l";
-
     static final String ENTITLEMENT_ID = "entitlementId";
     private static final String ENTITLEMENT_ID_SHORT = "e";
 
@@ -59,7 +56,6 @@ public class FortifyParser {
 
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
-    private boolean legacy = false;
 
     /**
      * Argument paring wrapper for the Fod Uploader.
@@ -210,21 +206,6 @@ public class FortifyParser {
                     version();
                     return new FortifyCommandLine();
                 }
-                if (Pattern.matches("(-{1,2}("+LEGACY+"|"+LEGACY_SHORT+"))", args[0])) {
-                    System.out.println("Using legacy argument parsing....");
-                    legacy = true;
-                    String[] legacyArgs = Arrays.copyOfRange(args, 1, args.length);
-                    if (legacyArgs.length == 1 && legacyArgs[0].equals("-version")) {
-                        version();
-                        return new FortifyCommandLine();
-                    }
-                    if (legacyArgs.length <= 4) {
-                        System.out.println("Username/key:Api Key, password/secret, endpoint url and payload location, " +
-                                "entitlement id and entitlement frequency type required");
-                        return new FortifyCommandLine();
-                    }
-                    return new FortifyCommandLine(legacyArgs);
-                }
             }
             // I can no longer hope to imagine the command you intended.
             System.err.println(e.getMessage());
@@ -281,6 +262,4 @@ public class FortifyParser {
         }
         return result;
     };
-
-    public boolean useLegacy() { return legacy; }
 }
