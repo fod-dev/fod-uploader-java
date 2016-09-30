@@ -63,24 +63,8 @@ Short Name | Long Name              | Required? | Description
 
 *One of either apiCredentials or userCredentials is required.
 
-### Legacy
-A legacy tag (-l) is also available if you want to access the old format. Simply append the legacy tag at the beginning of your list of arguments.
-
-```
-java -jar FodUpload.jar -l [-version] <username> <password> <bsiUrl> <zipLocation> <entitlementId> 
-<entitlementFrequency> [<proxy> <proxyUsername> <proxyPassword> <ntWorkStation> <ntDomain>] 
-[-pollingInterval:<interval>] [-scanPreferenceId:<id>] [-auditPreferenceId:<id>] [-runSonatypeScan:<run>] 
-[-isRemediationScan:<bool>] [-excludethirdPartyLibs:<bool>]
-```
-All unnamed arguments above must be presented in the order seen above. The optional arguments can appear in any order. `<username> <password>` can be either an api key/secret or username/password, however if using an api key/secret then the `<username>` field must begin with "key-".
-
-Legacy formatting accepts the same values as above for auditPreferenceId, runSonatypeScan, excludeThirdPartyLibs, isRemediationScan, scanPreferenceId and entitlementFrequency.
-
 ### Migration to 5.3
 If moving from the old version to this version, there are a few changes required:
 
-1. Legacy formatting now requires entitlementId and entitlementFrequencyType. Both of these fields come after the file location, but but before the proxy: `<username> <password> <bsiUrl> <zipLocation> <entitlementId> 
-<entitlementFrequency> [<proxy> ...` vs. `<username> <password> <bsiUrl> <zipLocation> [<proxy> ...` and must appear in that specific order.
-2. Legacy formatting also requires that you append `-l` to the beginning of your call such as `java -jar FodUpload.jar -l username password ...`
-3. If you choose to use the new formatting, commands must be rearranged as per the documentation under **Usage Current**.
+Please be sure to adjust your arguments to fit the format described under **Current**.
 
