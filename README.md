@@ -49,7 +49,7 @@ Short Name | Long Name              | Required? | Description
  -z        | -zipLocation           | Yes       | Location of scan 
  -e        | -entitlementId         | Yes       | Entitlement Id
  -f        | -entitlementFrequency  | Yes       | Entitlement Freqeuncy Type (Single = 1, Subscription = 2)
- -ac       | -apiCredentials        | Yes*      | Api credentials                                                  
+ -ac       | -apiCredentials        | Yes*      | Api credentials ("key:" does not need to be appended to `<key>`)                                                  
  -uc       | -userCredentials       | Yes*      | User login credentials                                           
  -a        | -auditPreferenceId     | No        | False positive audit type (Manual = 1, Automated = 2)            
  -p        | -scanPreferenceId      | No        | Scan mode (Standard = 1, Express = 2)                            
