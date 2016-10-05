@@ -23,7 +23,6 @@ public class StaticScanController extends ControllerBase {
     }
 
     /**
-     * TODO: isRemediationScan, excludeThirdPartyLibs
      * Starts a scan based on the V3 API
      * @param bsiUrl releaseId, assessmentTypeId, technologyStack, languageLevel
      * @param cl scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
@@ -32,8 +31,8 @@ public class StaticScanController extends ControllerBase {
     public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommandLine cl) {
         PostStartScanResponse scanStartedResponse = null;
         boolean lastFragment = false;
-        try {
-            FileInputStream fs = new FileInputStream(cl.getZipLocation());
+        try(FileInputStream fs = new FileInputStream(cl.getZipLocation())) {
+
 
             byte[] readByteArray = new byte[CHUNK_SIZE];
             byte[] sendByteArray;
@@ -41,7 +40,7 @@ public class StaticScanController extends ControllerBase {
             int byteCount;
             long offset = 0;
 
-            if(!bsiUrl.hasAssessmentTypeId() && !bsiUrl.hasTechnologyStack() && !cl.hasEntitlementId() &&
+            if (!bsiUrl.hasAssessmentTypeId() && !bsiUrl.hasTechnologyStack() && !cl.hasEntitlementId() &&
                     !cl.hasEntitlementFrequencyType()) {
                 return false;
             }
@@ -79,7 +78,7 @@ public class StaticScanController extends ControllerBase {
 
                 MediaType byteArray = MediaType.parse("application/octet-stream");
                 Request request = new Request.Builder()
-                        .addHeader("Authorization","Bearer " + api.getToken())
+                        .addHeader("Authorization", "Bearer " + api.getToken())
                         .addHeader("Content-Type", "application/octet-stream")
                         // Add offsets
                         .url(fragUrl + "&fragNo=" + fragmentNumber + "&offset=" + offset)
@@ -100,7 +99,7 @@ public class StaticScanController extends ControllerBase {
                     // Scan successfully uploaded
                     if (response.isSuccessful()) {
                         scanStartedResponse = gson.fromJson(finalResponse, PostStartScanResponse.class);
-                    // There was an error along the lines of 'another scan in progress' or something
+                        // There was an error along the lines of 'another scan in progress' or something
                     } else {
                         GenericErrorResponse errors = gson.fromJson(finalResponse, GenericErrorResponse.class);
                         System.out.println("Package upload failed for the following reasons: " +
@@ -109,7 +108,6 @@ public class StaticScanController extends ControllerBase {
                 }
                 offset += byteCount;
             }
-            fs.close();
             if (scanStartedResponse != null) {
                 System.out.println("Scan " + scanStartedResponse.getScanId() +
                         " uploaded successfully. Total bytes sent: " + offset);
