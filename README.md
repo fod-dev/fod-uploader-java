@@ -1,4 +1,4 @@
-# fod-uploader
+# fod-uploader-java
 Java Utility for uploading packages to FoD
 
 ## Usage
