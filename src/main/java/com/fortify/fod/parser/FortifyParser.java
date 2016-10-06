@@ -233,7 +233,7 @@ public class FortifyParser {
         formatter.setOptionComparator(HelpComparator);
 
         formatter.printWrapped(out, width, header);
-        formatter.printUsage(out, width, "FodUpload-5.3.jar", options);
+        formatter.printUsage(out, width, "FodUpload.jar", options);
         formatter.printWrapped(out, width, ""); // New line
         formatter.printOptions(out, width, options, formatter.getLeftPadding(), formatter.getDescPadding());
     }
