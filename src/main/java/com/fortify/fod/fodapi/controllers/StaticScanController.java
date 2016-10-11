@@ -90,21 +90,20 @@ public class StaticScanController extends ControllerBase {
                 if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
                     System.out.println("Upload Status - Bytes sent:" + offset);
                 }
-                if (lastFragment) {
-                    // Read the results and close the response
-                    String finalResponse = IOUtils.toString(response.body().byteStream(), "utf-8");
-                    response.body().close();
+                // Read the results and close the response
+                String finalResponse = IOUtils.toString(response.body().byteStream(), "utf-8");
+                response.body().close();
 
-                    Gson gson = new Gson();
-                    // Scan successfully uploaded
-                    if (response.isSuccessful()) {
-                        scanStartedResponse = gson.fromJson(finalResponse, PostStartScanResponse.class);
-                        // There was an error along the lines of 'another scan in progress' or something
-                    } else {
-                        GenericErrorResponse errors = gson.fromJson(finalResponse, GenericErrorResponse.class);
-                        System.out.println("Package upload failed for the following reasons: " +
-                                errors.toString());
-                    }
+                Gson gson = new Gson();
+                // Scan successfully uploaded
+                if (response.isSuccessful()) {
+                    scanStartedResponse = gson.fromJson(finalResponse, PostStartScanResponse.class);
+                    // There was an error along the lines of 'another scan in progress' or something
+                } else {
+                    GenericErrorResponse errors = gson.fromJson(finalResponse, GenericErrorResponse.class);
+                    System.out.println("Package upload failed for the following reasons: " +
+                            errors.toString());
+                    break;
                 }
                 offset += byteCount;
             }
