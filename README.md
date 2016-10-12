@@ -5,7 +5,7 @@ Java Utility for uploading packages to FoD
 
 ### Current
 
-The command line arguments have been completely reworked for 5.3. Arguments are now named and can be in any order: 
+The command line arguments have been completely reworked for 2.x. Arguments are now named and can be in any order: 
 
 ```
 FodUpload.jar -e <id> -f <1|2> -u <url> -z <file> [-a <1|2>] -ac <key> <secret> | -uc <username> <password>
