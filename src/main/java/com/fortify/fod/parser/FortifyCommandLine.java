@@ -2,7 +2,6 @@ package com.fortify.fod.parser;
 
 import com.fortify.fod.fodapi.FodEnums;
 import org.apache.commons.cli.CommandLine;
-import sun.text.resources.ca.FormatData_ca_ES;
 
 import java.util.HashMap;
 import java.util.Map;
