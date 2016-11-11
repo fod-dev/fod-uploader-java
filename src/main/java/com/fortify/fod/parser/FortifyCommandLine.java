@@ -45,6 +45,7 @@ public class FortifyCommandLine {
             try {
                 int auditPreferenceId = Integer.parseInt(auditPrefInput);
                 this.auditPreferenceType = FodEnums.AuditPreferenceType.fromInt(auditPreferenceId);
+
             } catch (NumberFormatException nfe) {
                 switch (auditPrefInput) {
                     case "Manual":
