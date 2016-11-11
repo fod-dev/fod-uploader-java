@@ -59,6 +59,17 @@ public class FodEnums {
                     return "Standard";
             }
         }
+
+        public static ScanPreferenceType fromInt(int val) {
+            switch (val) {
+                case 2:
+                    return Express;
+                case 1:
+                    return Standard;
+                default:
+                    return null;
+            }
+        }
     }
 
     public enum AuditPreferenceType {
@@ -82,6 +93,17 @@ public class FodEnums {
                 case 1:
                 default:
                     return "Manual";
+            }
+        }
+
+        public static AuditPreferenceType fromInt(int val) {
+            switch (val) {
+                case 2:
+                    return Automated;
+                case 1:
+                    return Manual;
+                default:
+                    return null;
             }
         }
     }
