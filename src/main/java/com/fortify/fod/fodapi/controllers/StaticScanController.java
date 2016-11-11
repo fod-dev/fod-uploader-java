@@ -14,8 +14,10 @@ import java.util.*;
 
 public class StaticScanController extends ControllerBase {
     private final int CHUNK_SIZE = 1024 * 1024;
+
     /**
      * Constructor
+     *
      * @param api api object with client info
      */
     public StaticScanController(final FodApi api) {
@@ -24,15 +26,15 @@ public class StaticScanController extends ControllerBase {
 
     /**
      * Starts a scan based on the V3 API
+     *
      * @param bsiUrl releaseId, assessmentTypeId, technologyStack, languageLevel
-     * @param cl scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
+     * @param cl     scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
      * @return true if successful upload
      */
     public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommandLine cl) {
         PostStartScanResponse scanStartedResponse = null;
         boolean lastFragment = false;
-        try(FileInputStream fs = new FileInputStream(cl.getZipLocation())) {
-
+        try (FileInputStream fs = new FileInputStream(cl.getZipLocation())) {
 
             byte[] readByteArray = new byte[CHUNK_SIZE];
             byte[] sendByteArray;
@@ -55,10 +57,10 @@ public class StaticScanController extends ControllerBase {
 
             if (bsiUrl.hasLanguageLevel())
                 fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
-            if (cl.hasScanPreferenceId())
-                fragUrl += "&scanPreferenceId=" + cl.getScanPreferenceId();
-            if (cl.hasAuditPreferencesId())
-                fragUrl += "&auditPreferenceId=" + cl.getAuditPreferenceId();
+            if (cl.hasScanPreference())
+                fragUrl += "&scanPreferenceType=" + cl.getScanPreferenceType().toString();
+            if (cl.hasAuditPreference())
+                fragUrl += "&auditPreferenceType=" + cl.getAuditPreferenceType().toString();
             if (cl.hasRunSonatypeScan())
                 fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
             if (cl.isRemediationScan())

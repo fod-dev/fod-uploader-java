@@ -1,6 +1,8 @@
 package com.fortify.fod.parser;
 
+import com.fortify.fod.fodapi.FodEnums;
 import org.apache.commons.cli.CommandLine;
+import sun.text.resources.ca.FormatData_ca_ES;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +12,8 @@ public class FortifyCommandLine {
     private String zipLocation = "";
     private Map<String, String> apiCredentials = new HashMap<>();
     private Map<String, String> loginCredentials = new HashMap<>();
-    private int auditPreferenceId = 0;
-    private int scanPreferenceId = 0;
+    private FodEnums.ScanPreferenceType scanPreferenceType = FodEnums.ScanPreferenceType.Standard;
+    private FodEnums.AuditPreferenceType auditPreferenceType = FodEnums.AuditPreferenceType.Manual;
     private int pollingInterval = 0;
     private int entitlementId = 0;
     private int entitlementFrequencyType = 0;
@@ -22,6 +24,7 @@ public class FortifyCommandLine {
 
     /**
      * Constructor for Fortify CLI
+     *
      * @param cmd cli object
      */
     FortifyCommandLine(final CommandLine cmd) {
@@ -36,14 +39,40 @@ public class FortifyCommandLine {
             proxy = new Proxy(cmd.getOptionValues(FortifyParser.PROXY));
         if (cmd.hasOption(FortifyParser.ZIP_LOCATION))
             zipLocation = cmd.getOptionValue(FortifyParser.ZIP_LOCATION);
-        if (cmd.hasOption(FortifyParser.AUDIT_PREFERENCE_ID))
-            auditPreferenceId = Integer.parseInt(cmd.getOptionValue(FortifyParser.AUDIT_PREFERENCE_ID));
+        if (cmd.hasOption(FortifyParser.AUDIT_PREFERENCE_ID)) {
+
+            String auditPrefInput = cmd.getOptionValue(FortifyParser.AUDIT_PREFERENCE_ID);
+            try {
+                int auditPreferenceId = Integer.parseInt(auditPrefInput);
+                this.auditPreferenceType = FodEnums.AuditPreferenceType.fromInt(auditPreferenceId);
+            } catch (NumberFormatException nfe) {
+                switch (auditPrefInput) {
+                    case "Manual":
+                        auditPreferenceType = FodEnums.AuditPreferenceType.Manual;
+                    case "Automated":
+                        auditPreferenceType = FodEnums.AuditPreferenceType.Automated;
+                }
+            }
+        }
         if (cmd.hasOption(FortifyParser.POLLING_INTERVAL))
             pollingInterval = Integer.parseInt(cmd.getOptionValue(FortifyParser.POLLING_INTERVAL));
         if (cmd.hasOption(FortifyParser.RUN_SONATYPE_SCAN))
             runSonatypeScan = Boolean.parseBoolean(cmd.getOptionValue(FortifyParser.RUN_SONATYPE_SCAN));
-        if (cmd.hasOption(FortifyParser.SCAN_PREFERENCE_ID))
-            scanPreferenceId = Integer.parseInt(cmd.getOptionValue(FortifyParser.SCAN_PREFERENCE_ID));
+        if (cmd.hasOption(FortifyParser.SCAN_PREFERENCE_ID)) {
+
+            String scanPreferenceInput = cmd.getOptionValue(FortifyParser.SCAN_PREFERENCE_ID);
+            try {
+                int scanPreferenceId = Integer.parseInt(scanPreferenceInput);
+                this.scanPreferenceType = FodEnums.ScanPreferenceType.fromInt(scanPreferenceId);
+            } catch (NumberFormatException nfe) {
+                switch (scanPreferenceInput) {
+                    case "Standard":
+                        this.scanPreferenceType = FodEnums.ScanPreferenceType.Standard;
+                    case "Express":
+                        this.scanPreferenceType = FodEnums.ScanPreferenceType.Express;
+                }
+            }
+        }
         if (cmd.hasOption(FortifyParser.ENTITLEMENT_ID))
             entitlementId = Integer.parseInt(cmd.getOptionValue(FortifyParser.ENTITLEMENT_ID));
         if (cmd.hasOption(FortifyParser.ENTITLEMENT_FREQUENCY_TYPE))
@@ -68,11 +97,13 @@ public class FortifyCommandLine {
     /**
      * Empty Constructor
      */
-    FortifyCommandLine() {}
+    FortifyCommandLine() {
+    }
 
     public BsiUrl getBsiUrl() {
         return bsiUrl;
     }
+
     public boolean hasBsiUrl() {
         return bsiUrl != null;
     }
@@ -80,20 +111,23 @@ public class FortifyCommandLine {
     public Map<String, String> getLoginCredentials() {
         return loginCredentials;
     }
+
     public boolean hasLoginCredentials() {
         return loginCredentials.containsKey("username");
     }
 
-    public int getAuditPreferenceId() {
-        return auditPreferenceId;
+    public FodEnums.AuditPreferenceType getAuditPreferenceType() {
+        return this.auditPreferenceType;
     }
-    public boolean hasAuditPreferencesId() {
-        return auditPreferenceId != 0;
+
+    public boolean hasAuditPreference() {
+        return this.auditPreferenceType != null;
     }
 
     public int getPollingInterval() {
         return pollingInterval;
     }
+
     public boolean hasPollingInterval() {
         return pollingInterval > 0;
     }
@@ -101,6 +135,7 @@ public class FortifyCommandLine {
     public Proxy getProxy() {
         return proxy;
     }
+
     public boolean hasProxy() {
         return proxy != null;
     }
@@ -112,6 +147,7 @@ public class FortifyCommandLine {
     public Map<String, String> getApiCredentials() {
         return apiCredentials;
     }
+
     public boolean hasApiCredentials() {
         return apiCredentials.containsKey("key");
     }
@@ -119,20 +155,23 @@ public class FortifyCommandLine {
     public String getZipLocation() {
         return zipLocation;
     }
+
     public boolean hasZipLocation() {
         return !zipLocation.isEmpty();
     }
 
-    public int getScanPreferenceId() {
-        return scanPreferenceId;
+    public FodEnums.ScanPreferenceType getScanPreferenceType() {
+        return this.scanPreferenceType;
     }
-    public boolean hasScanPreferenceId() {
-        return scanPreferenceId != 0;
+
+    public boolean hasScanPreference() {
+        return this.scanPreferenceType != null;
     }
 
     public int getEntitlementId() {
         return entitlementId;
     }
+
     public boolean hasEntitlementId() {
         return entitlementId != 0;
     }
@@ -140,6 +179,7 @@ public class FortifyCommandLine {
     public int getEntitlementFrequencyType() {
         return entitlementFrequencyType;
     }
+
     public boolean hasEntitlementFrequencyType() {
         return entitlementFrequencyType != 0;
     }
@@ -147,6 +187,7 @@ public class FortifyCommandLine {
     public boolean isRemediationScan() {
         return isRemediationScan;
     }
+
     public boolean hasExcludeThirdPartyLibs() {
         return excludeThirdPartyLibs;
     }
