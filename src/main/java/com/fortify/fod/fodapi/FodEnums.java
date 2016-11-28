@@ -35,4 +35,76 @@ public class FodEnums {
         PassFailReasonTypes,
         DynamicScanWebServiceTypes
     }
+
+    public enum ScanPreferenceType {
+        Standard(1),
+        Express(2);
+
+        private final int _val;
+
+        ScanPreferenceType(int val) {
+            this._val = val;
+        }
+
+        public int getValue() {
+            return this._val;
+        }
+
+        public String toString() {
+            switch (this._val) {
+                case 2:
+                    return "Express";
+                case 1:
+                default:
+                    return "Standard";
+            }
+        }
+
+        public static ScanPreferenceType fromInt(int val) {
+            switch (val) {
+                case 2:
+                    return Express;
+                case 1:
+                    return Standard;
+                default:
+                    return null;
+            }
+        }
+    }
+
+    public enum AuditPreferenceType {
+        Manual(1),
+        Automated(2);
+
+        private final int _val;
+
+        AuditPreferenceType(int val) {
+            this._val = val;
+        }
+
+        public int getValue() {
+            return this._val;
+        }
+
+        public String toString() {
+            switch (this._val) {
+                case 2:
+                    return "Automated";
+                case 1:
+                default:
+                    return "Manual";
+            }
+        }
+
+        public static AuditPreferenceType fromInt(int val) {
+            switch (val) {
+                case 2:
+                    return Automated;
+                case 1:
+                    return Manual;
+                default:
+                    return null;
+            }
+        }
+    }
 }
