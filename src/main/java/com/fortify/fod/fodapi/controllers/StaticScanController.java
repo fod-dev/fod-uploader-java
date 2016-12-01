@@ -3,6 +3,7 @@ package com.fortify.fod.fodapi.controllers;
 import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.fodapi.models.PostStartScanResponse;
+import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
 import com.google.gson.Gson;
@@ -43,18 +44,21 @@ public class StaticScanController extends ControllerBase {
             int byteCount;
             long offset = 0;
 
-            if (!bsiUrl.hasAssessmentTypeId() && !bsiUrl.hasTechnologyStack() && !cl.hasEntitlementId() &&
-                    !cl.hasEntitlementFrequencyType()) {
+            if (!bsiUrl.hasAssessmentTypeId() && !bsiUrl.hasTechnologyStack()) {
                 return false;
             }
+
+            // Get entitlement info
+            ReleaseAssessmentTypeDTO assessment = api.getReleaseController()
+                    .getAssessmentType(bsiUrl.getProjectVersionId(), bsiUrl.getAssessmentTypeId());
 
             // Build 'static' portion of url
             String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + bsiUrl.getProjectVersionId() +
                     "/static-scans/start-scan?";
             fragUrl += "assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
             fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
-            fragUrl += "&entitlementId=" + cl.getEntitlementId();
-            fragUrl += "&entitlementFrequencyType=" + cl.getEntitlementFrequencyType();
+            fragUrl += "&entitlementId=" + assessment.getEntitlementId();
+            fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
 
             if (bsiUrl.hasLanguageLevel())
                 fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
@@ -121,7 +125,6 @@ public class StaticScanController extends ControllerBase {
                         errors.toString());
                         return false;
                     }
-
                 }
                 response.body().close();
             }
