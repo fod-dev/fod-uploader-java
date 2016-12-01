@@ -116,14 +116,14 @@ public class FortifyParser {
                 .longOpt(ENTITLEMENT_ID)
                 .hasArg(true).argName("id")
                 .desc("entitlement id")
-                .required(true).build();
+                .required(false).build();
 
         // creates the entitlement frequency type argument ( -entitlementFrequencyType <id> required=true entitlement frequency type )
         Option entitlementFrequencyType = Option.builder(ENTITLEMENT_FREQUENCY_TYPE_SHORT)
                 .longOpt(ENTITLEMENT_FREQUENCY_TYPE)
                 .hasArg(true).argName("1|2")
                 .desc("entitlement frequency type")
-                .required(true).build();
+                .required(false).build();
 
         Option excludeThirdPartyLibs = Option.builder(EXCLUDE_THIRD_PARTY_LIBS_SHORT)
                 .longOpt(EXCLUDE_THIRD_PARTY_LIBS)

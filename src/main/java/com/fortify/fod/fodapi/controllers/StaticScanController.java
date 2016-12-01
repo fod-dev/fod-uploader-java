@@ -3,11 +3,13 @@ package com.fortify.fod.fodapi.controllers;
 import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.fodapi.models.PostStartScanResponse;
+import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
 import com.google.gson.Gson;
 import okhttp3.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 
 import java.io.FileInputStream;
 import java.util.*;
@@ -33,7 +35,7 @@ public class StaticScanController extends ControllerBase {
      */
     public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommandLine cl) {
         PostStartScanResponse scanStartedResponse = null;
-        boolean lastFragment = false;
+
         try (FileInputStream fs = new FileInputStream(cl.getZipLocation())) {
 
             byte[] readByteArray = new byte[CHUNK_SIZE];
@@ -42,18 +44,21 @@ public class StaticScanController extends ControllerBase {
             int byteCount;
             long offset = 0;
 
-            if (!bsiUrl.hasAssessmentTypeId() && !bsiUrl.hasTechnologyStack() && !cl.hasEntitlementId() &&
-                    !cl.hasEntitlementFrequencyType()) {
+            if (!bsiUrl.hasAssessmentTypeId() && !bsiUrl.hasTechnologyStack()) {
                 return false;
             }
+
+            // Get entitlement info
+            ReleaseAssessmentTypeDTO assessment = api.getReleaseController()
+                    .getAssessmentType(bsiUrl.getProjectVersionId(), bsiUrl.getAssessmentTypeId());
 
             // Build 'static' portion of url
             String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + bsiUrl.getProjectVersionId() +
                     "/static-scans/start-scan?";
             fragUrl += "assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
             fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
-            fragUrl += "&entitlementId=" + cl.getEntitlementId();
-            fragUrl += "&entitlementFrequencyType=" + cl.getEntitlementFrequencyType();
+            fragUrl += "&entitlementId=" + assessment.getEntitlementId();
+            fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
 
             if (bsiUrl.hasLanguageLevel())
                 fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
@@ -68,12 +73,14 @@ public class StaticScanController extends ControllerBase {
             if (cl.hasExcludeThirdPartyLibs())
                 fragUrl += "&excludeThirdPartyLibs=" + cl.hasExcludeThirdPartyLibs();
 
+            Gson gson = new Gson();
+
             // Loop through chunks
             while ((byteCount = fs.read(readByteArray)) != -1) {
+
                 if (byteCount < CHUNK_SIZE) {
-                    fragmentNumber = -1;
-                    lastFragment = true;
                     sendByteArray = Arrays.copyOf(readByteArray, byteCount);
+                    fragmentNumber = -1;
                 } else {
                     sendByteArray = readByteArray;
                 }
@@ -89,33 +96,43 @@ public class StaticScanController extends ControllerBase {
                 // Get the response
                 Response response = api.getClient().newCall(request).execute();
 
-                if (fragmentNumber != 0 && fragmentNumber % 5 == 0) {
+                if (response.code() == HttpStatus.SC_FORBIDDEN) {  // got logged out during polling so log back in
+                    // Re-authenticate
+                    api.authenticate();
+
+                    // if you had to reauthenticate here, would the loop and request not need to be resubmitted?
+                    // possible continue?
+                }
+
+                offset += byteCount;
+
+                if (fragmentNumber % 5 == 0) {
                     System.out.println("Upload Status - Bytes sent:" + offset);
                 }
-                // Read the results and close the response
-                String finalResponse = IOUtils.toString(response.body().byteStream(), "utf-8");
-                response.body().close();
 
-                Gson gson = new Gson();
-                // Scan successfully uploaded
-                if (response.isSuccessful()) {
-                    scanStartedResponse = gson.fromJson(finalResponse, PostStartScanResponse.class);
-                    // There was an error along the lines of 'another scan in progress' or something
-                } else {
-                    GenericErrorResponse errors = gson.fromJson(finalResponse, GenericErrorResponse.class);
-                    System.out.println("Package upload failed for the following reasons: " +
-                            errors.toString());
-                    break;
+                if (response.code() != 202) {
+                    String responseJsonStr = IOUtils.toString(response.body().byteStream(), "utf-8");
+
+                    if (response.code() == 200) {
+                        scanStartedResponse = gson.fromJson(responseJsonStr, PostStartScanResponse.class);
+                        System.out.println("Scan " + scanStartedResponse.getScanId() +
+                                " uploaded successfully. Total bytes sent: " + offset);
+
+                        return true;
+                    } else if (!response.isSuccessful()) {
+                        GenericErrorResponse errors = gson.fromJson(responseJsonStr, GenericErrorResponse.class);
+                        System.out.println("Package upload failed for the following reasons: " +
+                        errors.toString());
+                        return false;
+                    }
                 }
-                offset += byteCount;
+                response.body().close();
             }
-            if (scanStartedResponse != null) {
-                System.out.println("Scan " + scanStartedResponse.getScanId() +
-                        " uploaded successfully. Total bytes sent: " + offset);
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return scanStartedResponse != null;
+        return false;
     }
 }
