@@ -19,8 +19,8 @@ Short Name | Long Name              | Required? | Description
 ---------- | ---------------------- |:---------:| --------------------------------------------------------
  -u        | -bsiUrl                | Yes       | Build server url                                                 
  -z        | -zipLocation           | Yes       | Location of scan 
- -e        | -entitlementId         | Yes       | Entitlement Id
- -f        | -entitlementFrequency  | Yes       | Entitlement Freqeuncy Type (Single = 1, Subscription = 2)
+ -e        | -entitlementId         | No        | Entitlement Id
+ -f        | -entitlementFrequency  | No        | Entitlement Freqeuncy Type (Single = 1, Subscription = 2)
  -ac       | -apiCredentials        | Yes*      | Api credentials ("key:" does not need to be appended to `<key>`)                                                  
  -uc       | -userCredentials       | Yes*      | User login credentials                                           
  -a        | -auditPreferenceId     | No        | False positive audit type (Manual = 1, Automated = 2)            
