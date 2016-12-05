@@ -14,7 +14,7 @@ public class BsiUrl {
     private String payloadType;
     private int assessmentTypeId;
     private String technologyStack;
-    private String languageLevel;
+    private String languageLevel = "";
     private String endpoint;
 
     /**
