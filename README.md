@@ -22,7 +22,7 @@ Short Name | Long Name              | Required? | Description
  -e        | -entitlementId         | No        | Entitlement Id
  -f        | -entitlementFrequency  | No        | Entitlement Freqeuncy Type (Single = 1, Subscription = 2)
  -ac       | -apiCredentials        | Yes*      | Api credentials ("key:" does not need to be appended to `<key>`)                                                  
- -uc       | -userCredentials       | Yes*      | User login credentials                                           
+ -uc       | -userCredentials       | Yes*      | User login credentials ex (wrap each in quotations to avoid escaping characters in the CLI)
  -a        | -auditPreferenceId     | No        | False positive audit type (Manual = 1, Automated = 2)            
  -p        | -scanPreferenceId      | No        | Scan mode (Standard = 1, Express = 2)                            
  -I        | -pollingInterval       | No        | Interval between checking scan status in minutes                 
