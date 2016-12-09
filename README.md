@@ -67,5 +67,4 @@ systemProp.http.proxyPort=<web-proxy-port>
 
 systemProp.https.proxyHost=<web-proxy-host>
 systemProp.https.proxyPort=<web-proxy-port>
-
 ```
