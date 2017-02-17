@@ -1,13 +1,12 @@
 package com.fortify.fod;
 
-import java.io.File;
-
-import java.util.Map;
-
 import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommandLine;
 import com.fortify.fod.parser.FortifyParser;
+
+import java.io.File;
+import java.util.Map;
 
 public class Main {
 
@@ -71,7 +70,7 @@ public class Main {
                         listener.releaseStatus(bsiUrl.getProjectVersionId());
                     }
                     fodApi.retireToken();
-                    System.exit(1);
+                    System.exit(0);
                 } else {
                     fodApi.retireToken();
                     System.exit(1);
@@ -79,6 +78,7 @@ public class Main {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(1);
         }
 	}
 }
