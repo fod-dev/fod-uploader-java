@@ -20,6 +20,8 @@ public class FortifyCommandLine {
     private boolean runSonatypeScan = false;
     private boolean isRemediationScan = false;
     private boolean excludeThirdPartyLibs = false;
+    private boolean isBundledAssessment = false;
+    private int parentAssessmentTypeId = 0;
 
     /**
      * Constructor for Fortify CLI
@@ -31,7 +33,10 @@ public class FortifyCommandLine {
         // In any of those cases we don't care what else is here so stop building the object.
         if (cmd == null)
             return;
-
+        if (cmd.hasOption(FortifyParser.IS_BUNDLED_ASSESSMENT))
+        	isBundledAssessment = Boolean.parseBoolean((cmd.getOptionValue(FortifyParser.IS_BUNDLED_ASSESSMENT)));
+        if (cmd.hasOption(FortifyParser.PARENT_ASSESSMENT_TYPE_ID))
+        	parentAssessmentTypeId = Integer.parseInt(cmd.getOptionValue(FortifyParser.PARENT_ASSESSMENT_TYPE_ID));
         if (cmd.hasOption(FortifyParser.BSI_URL))
             bsiUrl = new BsiUrl(cmd.getOptionValue(FortifyParser.BSI_URL));
         if (cmd.hasOption(FortifyParser.PROXY))
@@ -190,5 +195,17 @@ public class FortifyCommandLine {
 
     public boolean hasExcludeThirdPartyLibs() {
         return excludeThirdPartyLibs;
+    }
+    
+    public boolean isBundledAssessment() {
+    	return isBundledAssessment;
+    }
+    
+    public int getParentAssessmentTypeId() {
+    	return parentAssessmentTypeId;
+    }
+    
+    public boolean hasParentAssessmentTypeId() {
+    	return parentAssessmentTypeId != 0;
     }
 }

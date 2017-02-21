@@ -32,6 +32,8 @@ Short Name | Long Name              | Required? | Description
  -v        | -version               | No        | Print jar version   
  -x        | -excludeThirdPartyLibs | No        | Exclude Third Party Librarys from scan (can be 'true' or 'false')
  -r        | -isRemediationScan     | No        | Whether the scan is in remediation (can be 'true' or 'false')
+ -b        | -isBundledAssessment   | No        | Whether the scan is a bundled assessment (can be 'true' or 'false')
+ -pa       | -parentAssessmentTypeId| No        | Parent Assessment Type ID for Bundled Assessments
 
 *One of either apiCredentials or userCredentials is required.
 

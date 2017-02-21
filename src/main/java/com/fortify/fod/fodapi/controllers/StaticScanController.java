@@ -59,7 +59,7 @@ public class StaticScanController extends ControllerBase {
             fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
             fragUrl += "&entitlementId=" + assessment.getEntitlementId();
             fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
-
+            // ^^ This isn't actually working, it always puts 1 for the Frequency Type.
             if (bsiUrl.hasLanguageLevel())
                 fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
             if (cl.hasScanPreference())
@@ -72,6 +72,10 @@ public class StaticScanController extends ControllerBase {
                 fragUrl += "&isRemediationScan=" + cl.isRemediationScan();
             if (cl.hasExcludeThirdPartyLibs())
                 fragUrl += "&excludeThirdPartyLibs=" + cl.hasExcludeThirdPartyLibs();
+            if (cl.isBundledAssessment())
+            	fragUrl += "&isBundledAssessment=" + cl.isBundledAssessment();
+            if (cl.hasParentAssessmentTypeId())
+            	fragUrl += "&parentAssessmentTypeId=" + cl.getParentAssessmentTypeId();
 
             Gson gson = new Gson();
 

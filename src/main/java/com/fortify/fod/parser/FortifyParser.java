@@ -53,6 +53,12 @@ public class FortifyParser {
 
     public static final String EXCLUDE_THIRD_PARTY_LIBS = "excludeThirdPartyApps";
     private static final String EXCLUDE_THIRD_PARTY_LIBS_SHORT = "x";
+    
+    public static final String IS_BUNDLED_ASSESSMENT = "isBundledAssessment";
+    private static final String IS_BUNDLED_ASSESSMENT_SHORT = "b";
+    
+    public static final String PARENT_ASSESSMENT_TYPE_ID = "parentAssessmentTypeId";
+    private static final String PARENT_ASSESSMENT_TYPE_ID_SHORT = "pa";
 
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
@@ -136,6 +142,19 @@ public class FortifyParser {
                 .hasArg(true).argName("true|false")
                 .desc("whether the scan is in remediation")
                 .required(false).build();
+        
+        Option isBundledAssessment = Option.builder(IS_BUNDLED_ASSESSMENT_SHORT)
+                .longOpt(IS_BUNDLED_ASSESSMENT)
+                .hasArg(true).argName("true|false")
+                .desc("whether this is a bundled scan")
+                .required(false).build();
+
+        Option parentAssessmentTypeId = Option.builder(PARENT_ASSESSMENT_TYPE_ID_SHORT)
+                .longOpt(PARENT_ASSESSMENT_TYPE_ID)
+                .hasArg(true).argName("id")
+                .desc("the parent assessment's type ID for a bundled assessment")
+                .required(false).build();
+
 
         // Add the options to the options list
         options.addOption(help);
@@ -150,6 +169,8 @@ public class FortifyParser {
         options.addOption(entitlementFrequencyType);
         options.addOption(isRemediationScan);
         options.addOption(excludeThirdPartyLibs);
+        options.addOption(isBundledAssessment);
+        options.addOption(parentAssessmentTypeId);
 
         // This one is so dirty I separated it from the rest of the pack.
         // I put all proxy settings into one option with **up to** 5 arguments. Then I do a little cheese
