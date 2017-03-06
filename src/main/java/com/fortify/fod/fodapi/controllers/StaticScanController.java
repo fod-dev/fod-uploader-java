@@ -1,7 +1,6 @@
 package com.fortify.fod.fodapi.controllers;
 
 import com.fortify.fod.fodapi.FodApi;
-import com.fortify.fod.fodapi.FodEnums;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.fodapi.models.PostStartScanResponse;
 import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
@@ -64,11 +63,9 @@ public class StaticScanController extends ControllerBase {
             if (fc.bsiUrl.hasLanguageLevel())
                 fragUrl += "&languageLevel=" + fc.bsiUrl.getLanguageLevel();
             if (fc.hasScanPreferenceType())
-//                fragUrl += "&scanPreferenceType=" + fc.scanPreferenceType.toString();
-                fragUrl += "&scanPreferenceType=" + FodEnums.ScanPreferenceType.fromInt(fc.scanPreferenceType);
+                fragUrl += "&scanPreferenceType=" + fc.scanPreferenceType.toString();
             if (fc.hasAuditPreferenceType())
-//                fragUrl += "&auditPreferenceType=" + fc.auditPreferenceType.toString();
-                fragUrl += "&auditPreferenceType=" + FodEnums.AuditPreferenceType.fromInt(fc.auditPreferenceType);
+                fragUrl += "&auditPreferenceType=" + fc.auditPreferenceType.toString();
             fragUrl += "&doSonatypeScan=" + fc.runSonatypeScan;
             fragUrl += "&isRemediationScan=" + fc.isRemediationScan;
             fragUrl += "&excludeThirdPartyLibs=" + fc.excludeThirdPartyLibs;

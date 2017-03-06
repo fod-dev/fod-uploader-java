@@ -1,6 +1,7 @@
 package com.fortify.fod.parser;
 
 import com.beust.jcommander.Parameter;
+import com.fortify.fod.fodapi.FodEnums;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,23 +55,23 @@ public class FortifyCommands {
     private static final String AUDIT_PREFERENCE_ID = "-auditPreferenceId";
     private static final String AUDIT_PREFERENCE_ID_SHORT = "-a";
     @Parameter(names = { AUDIT_PREFERENCE_ID, AUDIT_PREFERENCE_ID_SHORT },
-            description = "false positive audit type (Manual or Automated)")
-    public int auditPreferenceType = 1;
+            description = "false positive audit type (Manual or Automated)",
+            converter = AuditPreferenceTypeConverter.class)
+    public FodEnums.AuditPreferenceType auditPreferenceType = null;
     public boolean hasAuditPreferenceType() {
-//        return auditPreferenceType != null &&
-//                auditPreferenceType.getValue() != 0;
-        return auditPreferenceType != 0;
+        return auditPreferenceType != null &&
+                auditPreferenceType.getValue() != 0;
     }
 
     private static final String SCAN_PREFERENCE_ID = "-scanPreferenceId";
     private static final String SCAN_PREFERENCE_ID_SHORT = "-p";
     @Parameter(names = { SCAN_PREFERENCE_ID, SCAN_PREFERENCE_ID_SHORT },
-            description = "scan mode (Standard or Express)")
-    public int scanPreferenceType = 1;
+            description = "scan mode (Standard or Express)",
+            converter = ScanPreferenceTypeConverter.class)
+    public FodEnums.ScanPreferenceType scanPreferenceType = null;
     public boolean hasScanPreferenceType() {
-//        return scanPreferenceType != null &&
-//                scanPreferenceType.getValue() != 0;
-        return scanPreferenceType != 0;
+        return scanPreferenceType != null &&
+                scanPreferenceType.getValue() != 0;
     }
 
     private static final String ENTITLEMENT_ID = "-entitlementId";
@@ -134,6 +135,7 @@ public class FortifyCommands {
     private static final String PROXY_SHORT = "P";
     @Parameter(names= { PROXY, PROXY_SHORT },
             description = "credentials for accessing the proxy",
-            arity = 5)
+            arity = 5,
+            variableArity = true)
     public List<String> proxy = new ArrayList<>();
 }
