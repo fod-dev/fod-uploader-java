@@ -2,6 +2,7 @@ package com.fortify.fod.parser;
 
 import com.beust.jcommander.Parameter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,16 +25,19 @@ public class FortifyCommands {
     private static final String BSI_URL_SHORT = "-u";
     @Parameter(names = { BSI_URL, BSI_URL_SHORT },
             description = "build server url",
-            required = true)
-    public String bsiUrl;
+            required = true,
+            converter = BsiUrlConverter.class)
+    public BsiUrl bsiUrl;
 
     // TODO: Use custom type FileConverter or something
     private static final String ZIP_LOCATION = "-zipLocation";
     private static final String ZIP_LOCATION_SHORT = "-z";
     @Parameter(names = { ZIP_LOCATION, ZIP_LOCATION_SHORT },
             description = "location of scan",
-            required = true)
-    public String zipLocation;
+            required = true,
+            converter = FileConverter.class,
+            validateWith = FileValidator.class)
+    public File payload;
 
     private static final String POLLING_INTERVAL = "-pollingInterval";
     private static final String POLLING_INTERVAL_SHORT = "-I";
@@ -131,5 +135,5 @@ public class FortifyCommands {
     @Parameter(names= { PROXY, PROXY_SHORT },
             description = "credentials for accessing the proxy",
             arity = 5)
-    public List<String> proxy  = new ArrayList<>();
+    public List<String> proxy = new ArrayList<>();
 }

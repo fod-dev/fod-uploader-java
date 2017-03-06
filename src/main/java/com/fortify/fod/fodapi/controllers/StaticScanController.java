@@ -5,7 +5,6 @@ import com.fortify.fod.fodapi.FodEnums;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.fodapi.models.PostStartScanResponse;
 import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
-import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommands;
 import com.google.gson.Gson;
 import okhttp3.MediaType;
@@ -32,14 +31,13 @@ public class StaticScanController extends ControllerBase {
 
     /**
      * Starts a scan based on the V3 API
-     * @param bsiUrl bsi url
      * @param fc fortify command object
      * @return true if scan successfully started
      */
-    public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommands fc) {
+    public boolean StartStaticScan(final FortifyCommands fc) {
         PostStartScanResponse scanStartedResponse = null;
 
-        try (FileInputStream fs = new FileInputStream(fc.zipLocation)) {
+        try (FileInputStream fs = new FileInputStream(fc.payload)) {
 
             byte[] readByteArray = new byte[CHUNK_SIZE];
             byte[] sendByteArray;
@@ -47,24 +45,24 @@ public class StaticScanController extends ControllerBase {
             int byteCount;
             long offset = 0;
 
-            if (!bsiUrl.hasAssessmentTypeId() && !bsiUrl.hasTechnologyStack()) {
+            if (!fc.bsiUrl.hasAssessmentTypeId() && !fc.bsiUrl.hasTechnologyStack()) {
                 return false;
             }
 
             // Get entitlement info
             ReleaseAssessmentTypeDTO assessment = api.getReleaseController()
-                    .getAssessmentType(bsiUrl.getProjectVersionId(), bsiUrl.getAssessmentTypeId());
+                    .getAssessmentType(fc.bsiUrl.getProjectVersionId(), fc.bsiUrl.getAssessmentTypeId());
 
             // Build 'static' portion of url
-            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + bsiUrl.getProjectVersionId() +
+            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiUrl.getProjectVersionId() +
                     "/static-scans/start-scan?";
-            fragUrl += "assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
-            fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
+            fragUrl += "assessmentTypeId=" + fc.bsiUrl.getAssessmentTypeId();
+            fragUrl += "&technologyStack=" + fc.bsiUrl.getTechnologyStack();
             fragUrl += "&entitlementId=" + assessment.getEntitlementId();
             fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
             // ^^ This isn't actually working, it always puts 1 for the Frequency Type.
-            if (bsiUrl.hasLanguageLevel())
-                fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
+            if (fc.bsiUrl.hasLanguageLevel())
+                fragUrl += "&languageLevel=" + fc.bsiUrl.getLanguageLevel();
             if (fc.hasScanPreferenceType())
 //                fragUrl += "&scanPreferenceType=" + fc.scanPreferenceType.toString();
                 fragUrl += "&scanPreferenceType=" + FodEnums.ScanPreferenceType.fromInt(fc.scanPreferenceType);

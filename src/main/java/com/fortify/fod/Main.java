@@ -2,11 +2,8 @@ package com.fortify.fod;
 
 import com.beust.jcommander.JCommander;
 import com.fortify.fod.fodapi.FodApi;
-import com.fortify.fod.parser.BsiUrl;
 import com.fortify.fod.parser.FortifyCommands;
 import com.fortify.fod.parser.Proxy;
-
-import java.io.File;
 
 public class Main {
 
@@ -25,13 +22,11 @@ public class Main {
             System.exit(1);
         }
 
-        final long maxFileSize = 5000 * 1024 * 1024L;
         boolean uploadSucceeded = false;
 
         try {
-            BsiUrl bsiUrl = new BsiUrl(fc.bsiUrl);
             Proxy proxy = new Proxy(fc.proxy);
-            FodApi fodApi = new FodApi(bsiUrl.getEndpoint(), proxy.getProxyUri() == null ? null : proxy);
+            FodApi fodApi = new FodApi(fc.bsiUrl.getEndpoint(), proxy.getProxyUri() == null ? null : proxy);
 
             if (fc.hasApiCredentials() || fc.hasUserCredentials()) {
                 System.out.println("Authenticating");
@@ -49,19 +44,12 @@ public class Main {
 
                 String grantType = fc.hasUserCredentials() ? fodApi.GRANT_TYPE_PASSWORD : fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
 
-                String tenantCode = bsiUrl.getTenantCode();
+                String tenantCode = fc.bsiUrl.getTenantCode();
                 fodApi.authenticate(tenantCode, username, password, grantType);
 
                 System.out.println("Beginning upload");
 
-                //first thing check file size
-                File zipFileInfo = new File(fc.zipLocation);
-                if (zipFileInfo.length() > maxFileSize) {
-                    System.out.println("Terminating upload. File Exceeds maximum length : " + maxFileSize);
-                    return;
-                }
-
-                uploadSucceeded = fodApi.getStaticScanController().StartStaticScan(bsiUrl, fc);
+                uploadSucceeded = fodApi.getStaticScanController().StartStaticScan(fc);
             }
 
             //check success status exit appropriately
@@ -70,7 +58,7 @@ public class Main {
                 if (fc.pollingInterval > 0) {
                     PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
                     // Until status is complete or cancelled
-                    listener.releaseStatus(bsiUrl.getProjectVersionId());
+                    listener.releaseStatus(fc.bsiUrl.getProjectVersionId());
                 }
                 fodApi.retireToken();
                 System.exit(0);
