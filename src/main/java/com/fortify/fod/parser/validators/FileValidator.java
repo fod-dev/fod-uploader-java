@@ -1,4 +1,4 @@
-package com.fortify.fod.parser;
+package com.fortify.fod.parser.validators;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.ParameterException;

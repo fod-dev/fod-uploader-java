@@ -1,4 +1,4 @@
-package com.fortify.fod.parser;
+package com.fortify.fod.parser.converters;
 
 import com.beust.jcommander.IStringConverter;
 

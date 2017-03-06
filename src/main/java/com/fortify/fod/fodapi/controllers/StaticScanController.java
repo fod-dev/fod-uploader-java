@@ -73,7 +73,6 @@ public class StaticScanController extends ControllerBase {
             if (fc.hasParentAssessmentTypeId())
             	fragUrl += "&parentAssessmentTypeId=" + fc.parentAssessmentTypeId;
 
-            System.out.println("fragurl: " + fragUrl);
             Gson gson = new Gson();
 
             // Loop through chunks

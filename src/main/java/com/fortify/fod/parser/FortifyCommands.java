@@ -2,6 +2,11 @@ package com.fortify.fod.parser;
 
 import com.beust.jcommander.Parameter;
 import com.fortify.fod.fodapi.FodEnums;
+import com.fortify.fod.parser.converters.AuditPreferenceTypeConverter;
+import com.fortify.fod.parser.converters.BsiUrlConverter;
+import com.fortify.fod.parser.converters.FileConverter;
+import com.fortify.fod.parser.converters.ScanPreferenceTypeConverter;
+import com.fortify.fod.parser.validators.FileValidator;
 
 import java.io.File;
 import java.util.ArrayList;
