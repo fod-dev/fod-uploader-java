@@ -1,18 +1,22 @@
 package com.fortify.fod.fodapi.controllers;
 
 import com.fortify.fod.fodapi.FodApi;
+import com.fortify.fod.fodapi.FodEnums;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.fodapi.models.PostStartScanResponse;
 import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
 import com.fortify.fod.parser.BsiUrl;
-import com.fortify.fod.parser.FortifyCommandLine;
+import com.fortify.fod.parser.FortifyCommands;
 import com.google.gson.Gson;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 import java.io.FileInputStream;
-import java.util.*;
+import java.util.Arrays;
 
 public class StaticScanController extends ControllerBase {
     private final int CHUNK_SIZE = 1024 * 1024;
@@ -28,15 +32,14 @@ public class StaticScanController extends ControllerBase {
 
     /**
      * Starts a scan based on the V3 API
-     *
-     * @param bsiUrl releaseId, assessmentTypeId, technologyStack, languageLevel
-     * @param cl     scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
-     * @return true if successful upload
+     * @param bsiUrl bsi url
+     * @param fc fortify command object
+     * @return true if scan successfully started
      */
-    public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommandLine cl) {
+    public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommands fc) {
         PostStartScanResponse scanStartedResponse = null;
 
-        try (FileInputStream fs = new FileInputStream(cl.getZipLocation())) {
+        try (FileInputStream fs = new FileInputStream(fc.zipLocation)) {
 
             byte[] readByteArray = new byte[CHUNK_SIZE];
             byte[] sendByteArray;
@@ -62,21 +65,20 @@ public class StaticScanController extends ControllerBase {
             // ^^ This isn't actually working, it always puts 1 for the Frequency Type.
             if (bsiUrl.hasLanguageLevel())
                 fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
-            if (cl.hasScanPreference())
-                fragUrl += "&scanPreferenceType=" + cl.getScanPreferenceType().toString();
-            if (cl.hasAuditPreference())
-                fragUrl += "&auditPreferenceType=" + cl.getAuditPreferenceType().toString();
-            if (cl.hasRunSonatypeScan())
-                fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
-            if (cl.isRemediationScan())
-                fragUrl += "&isRemediationScan=" + cl.isRemediationScan();
-            if (cl.hasExcludeThirdPartyLibs())
-                fragUrl += "&excludeThirdPartyLibs=" + cl.hasExcludeThirdPartyLibs();
-            if (cl.isBundledAssessment())
-            	fragUrl += "&isBundledAssessment=" + cl.isBundledAssessment();
-            if (cl.hasParentAssessmentTypeId())
-            	fragUrl += "&parentAssessmentTypeId=" + cl.getParentAssessmentTypeId();
+            if (fc.hasScanPreferenceType())
+//                fragUrl += "&scanPreferenceType=" + fc.scanPreferenceType.toString();
+                fragUrl += "&scanPreferenceType=" + FodEnums.ScanPreferenceType.fromInt(fc.scanPreferenceType);
+            if (fc.hasAuditPreferenceType())
+//                fragUrl += "&auditPreferenceType=" + fc.auditPreferenceType.toString();
+                fragUrl += "&auditPreferenceType=" + FodEnums.AuditPreferenceType.fromInt(fc.auditPreferenceType);
+            fragUrl += "&doSonatypeScan=" + fc.runSonatypeScan;
+            fragUrl += "&isRemediationScan=" + fc.isRemediationScan;
+            fragUrl += "&excludeThirdPartyLibs=" + fc.excludeThirdPartyLibs;
+            fragUrl += "&isBundledAssessment=" + fc.isBundledAssessment;
+            if (fc.hasParentAssessmentTypeId())
+            	fragUrl += "&parentAssessmentTypeId=" + fc.parentAssessmentTypeId;
 
+            System.out.println("fragurl: " + fragUrl);
             Gson gson = new Gson();
 
             // Loop through chunks

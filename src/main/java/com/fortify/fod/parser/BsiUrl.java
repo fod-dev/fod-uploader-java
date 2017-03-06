@@ -21,7 +21,7 @@ public class BsiUrl {
      * Creates a bsi url object.
      * @param bsiUrl build server url
      */
-    BsiUrl(String bsiUrl) {
+    public BsiUrl(String bsiUrl) {
         try {
             URI uri = new URI(bsiUrl);
 
