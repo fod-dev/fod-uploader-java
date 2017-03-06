@@ -143,4 +143,10 @@ public class FortifyCommands {
             arity = 5,
             variableArity = true)
     public List<String> proxy = new ArrayList<>();
+
+
+    public void version() {
+        Package p = getClass().getPackage();
+        System.out.println("Version " + p.getImplementationVersion());
+    }
 }

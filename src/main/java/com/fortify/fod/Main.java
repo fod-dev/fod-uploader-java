@@ -22,6 +22,16 @@ public class Main {
             System.exit(1);
         }
 
+        if (fc.version) {
+            fc.version();
+            System.exit(1);
+        }
+
+        if (fc.help) {
+            jc.usage();
+            System.exit(1);
+        }
+
         boolean uploadSucceeded = false;
 
         try {
