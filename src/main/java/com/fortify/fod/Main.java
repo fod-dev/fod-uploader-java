@@ -32,35 +32,38 @@ public class Main {
             System.exit(1);
         }
 
-        boolean uploadSucceeded = false;
+        if (!fc.hasApiCredentials() && !fc.hasUserCredentials()) {
+            System.out.println("The following options are required: -apiCredentials, -ac or -userCredentials, -uc");
+            jc.usage();
+            System.exit(1);
+        }
 
+        boolean uploadSucceeded;
         try {
             Proxy proxy = new Proxy(fc.proxy);
             FodApi fodApi = new FodApi(fc.bsiUrl.getEndpoint(), proxy.getProxyUri() == null ? null : proxy);
 
-            if (fc.hasApiCredentials() || fc.hasUserCredentials()) {
-                System.out.println("Authenticating");
+            System.out.println("Authenticating");
 
-                // Has username/password
-                String username, password;
-                if (fc.hasUserCredentials()) {
-                    username = fc.userCredentials.get(0);
-                    password = fc.userCredentials.get(1);
-                // Has key/secret
-                } else {
-                    username = fc.apiCredentials.get(0);
-                    password = fc.apiCredentials.get(1);
-                }
-
-                String grantType = fc.hasUserCredentials() ? fodApi.GRANT_TYPE_PASSWORD : fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
-
-                String tenantCode = fc.bsiUrl.getTenantCode();
-                fodApi.authenticate(tenantCode, username, password, grantType);
-
-                System.out.println("Beginning upload");
-
-                uploadSucceeded = fodApi.getStaticScanController().StartStaticScan(fc);
+            // Has username/password
+            String username, password, grantType;
+            if (fc.hasUserCredentials()) {
+                username = fc.userCredentials.get(0);
+                password = fc.userCredentials.get(1);
+                grantType = fodApi.GRANT_TYPE_PASSWORD;
+            // Has key/secret
+            } else {
+                username = fc.apiCredentials.get(0);
+                password = fc.apiCredentials.get(1);
+                grantType = fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
             }
+
+            String tenantCode = fc.bsiUrl.getTenantCode();
+            fodApi.authenticate(tenantCode, username, password, grantType);
+
+            System.out.println("Beginning upload");
+
+            uploadSucceeded = fodApi.getStaticScanController().StartStaticScan(fc);
 
             //check success status exit appropriately
             if (uploadSucceeded) {
