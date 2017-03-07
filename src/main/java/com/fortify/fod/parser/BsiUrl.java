@@ -79,7 +79,7 @@ public class BsiUrl {
         return tenantCode;
     }
     public boolean hasTenantCode() {
-        return !tenantCode.isEmpty();
+        return tenantCode != null && !tenantCode.isEmpty();
     }
 
     public int getProjectVersionId() {
@@ -107,7 +107,7 @@ public class BsiUrl {
         return technologyStack;
     }
     public boolean hasTechnologyStack() {
-        return !technologyStack.isEmpty();
+        return technologyStack != null && !technologyStack.isEmpty();
     }
 
     public String getLanguageLevel() {

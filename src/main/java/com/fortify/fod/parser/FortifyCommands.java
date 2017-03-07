@@ -6,6 +6,7 @@ import com.fortify.fod.parser.converters.AuditPreferenceTypeConverter;
 import com.fortify.fod.parser.converters.BsiUrlConverter;
 import com.fortify.fod.parser.converters.FileConverter;
 import com.fortify.fod.parser.converters.ScanPreferenceTypeConverter;
+import com.fortify.fod.parser.validators.BsiUrlValidator;
 import com.fortify.fod.parser.validators.FileValidator;
 
 import java.io.File;
@@ -32,10 +33,10 @@ public class FortifyCommands {
     @Parameter(names = { BSI_URL, BSI_URL_SHORT },
             description = "build server url",
             required = true,
-            converter = BsiUrlConverter.class)
+            converter = BsiUrlConverter.class,
+            validateWith = BsiUrlValidator.class)
     public BsiUrl bsiUrl;
 
-    // TODO: Use custom type FileConverter or something
     private static final String ZIP_LOCATION = "-zipLocation";
     private static final String ZIP_LOCATION_SHORT = "-z";
     @Parameter(names = { ZIP_LOCATION, ZIP_LOCATION_SHORT },

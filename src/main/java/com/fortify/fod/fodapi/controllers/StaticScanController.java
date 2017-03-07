@@ -34,7 +34,7 @@ public class StaticScanController extends ControllerBase {
      * @return true if scan successfully started
      */
     public boolean StartStaticScan(final FortifyCommands fc) {
-        PostStartScanResponse scanStartedResponse = null;
+        PostStartScanResponse scanStartedResponse;
 
         try (FileInputStream fs = new FileInputStream(fc.payload)) {
 
@@ -43,10 +43,6 @@ public class StaticScanController extends ControllerBase {
             int fragmentNumber = 0;
             int byteCount;
             long offset = 0;
-
-            if (!fc.bsiUrl.hasAssessmentTypeId() && !fc.bsiUrl.hasTechnologyStack()) {
-                return false;
-            }
 
             // Get entitlement info
             ReleaseAssessmentTypeDTO assessment = api.getReleaseController()
@@ -100,7 +96,7 @@ public class StaticScanController extends ControllerBase {
                     // Re-authenticate
                     api.authenticate();
 
-                    // if you had to reauthenticate here, would the loop and request not need to be resubmitted?
+                    // if you had to re-authenticate here, would the loop and request not need to be resubmitted?
                     // possible continue?
                 }
 
