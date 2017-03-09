@@ -2,6 +2,7 @@ package com.fortify.fod.parser;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class Proxy {
     private URI proxyUri;
@@ -14,7 +15,7 @@ public class Proxy {
      * Creates a Proxy object from -proxy option
      * @param args array of up to 5 arguments for configuring proxy.
      */
-    Proxy(String[] args) {
+    public Proxy(List<String> args) {
         try {
             final int URI_LOCATION = 0;
             final int USERNAME_LOCATION = 1;
@@ -22,15 +23,15 @@ public class Proxy {
             final int NTDOMAIN_LOCATION = 3;
             final int NTWORKSTATION_LOCATION = 4;
 
-            proxyUri = args.length > URI_LOCATION ? new URI(args[URI_LOCATION]) : null;
-            username = args.length > USERNAME_LOCATION && args[USERNAME_LOCATION] != null
-                    ? args[USERNAME_LOCATION] : null;
-            password = args.length > PASSWORD_LOCATION && args[PASSWORD_LOCATION] != null
-                    ? args[PASSWORD_LOCATION] : null;
-            ntDomain = args.length > NTDOMAIN_LOCATION && args[NTDOMAIN_LOCATION] != null
-                    ? args[NTDOMAIN_LOCATION] : null;
-            ntWorkstation = args.length > NTWORKSTATION_LOCATION && args[NTWORKSTATION_LOCATION] != null
-                    ? args[NTWORKSTATION_LOCATION] : null;
+            proxyUri = args.size() > URI_LOCATION ? new URI(args.get(URI_LOCATION)) : null;
+            username = args.size() > USERNAME_LOCATION && args.get(USERNAME_LOCATION) != null
+                    ? args.get(USERNAME_LOCATION) : null;
+            password = args.size() > PASSWORD_LOCATION && args.get(PASSWORD_LOCATION) != null
+                    ? args.get(PASSWORD_LOCATION) : null;
+            ntDomain = args.size() > NTDOMAIN_LOCATION && args.get(NTDOMAIN_LOCATION) != null
+                    ? args.get(NTDOMAIN_LOCATION) : null;
+            ntWorkstation = args.size() > NTWORKSTATION_LOCATION && args.get(NTWORKSTATION_LOCATION) != null
+                    ? args.get(NTWORKSTATION_LOCATION) : null;
 
         } catch(URISyntaxException | ArrayIndexOutOfBoundsException e) {
             System.err.println(e.getMessage());

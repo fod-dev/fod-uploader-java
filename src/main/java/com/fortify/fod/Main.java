@@ -1,12 +1,9 @@
 package com.fortify.fod;
 
+import com.beust.jcommander.JCommander;
 import com.fortify.fod.fodapi.FodApi;
-import com.fortify.fod.parser.BsiUrl;
-import com.fortify.fod.parser.FortifyCommandLine;
-import com.fortify.fod.parser.FortifyParser;
-
-import java.io.File;
-import java.util.Map;
+import com.fortify.fod.parser.FortifyCommands;
+import com.fortify.fod.parser.Proxy;
 
 public class Main {
 
@@ -14,67 +11,73 @@ public class Main {
 	 * @param args Required: zip location, bsi url, username/password or api key/secret
 	 */
 	public static void main(String[] args) {
-        FortifyParser fortifyCommands = new FortifyParser();
-        FortifyCommandLine cl = fortifyCommands.parse(args);
-
-        final long maxFileSize = 5000 * 1024 * 1024L;
-        boolean uploadSucceeded = false;
+        FortifyCommands fc = new FortifyCommands();
+        JCommander jc = new JCommander(fc);
 
         try {
-            if(cl.hasBsiUrl()) {
-                BsiUrl bsiUrl = cl.getBsiUrl();
-                FodApi fodApi = new FodApi(bsiUrl.getEndpoint(), cl.getProxy());
+            jc.parse(args);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            jc.usage();
+            System.exit(1);
+        }
 
-                if (cl.hasZipLocation() && (cl.hasApiCredentials() || cl.hasLoginCredentials())) {
-                    System.out.println("Authenticating");
+        if (fc.version) {
+            fc.version();
+            System.exit(1);
+        }
 
-                    String zipLocation = cl.getZipLocation();
+        if (fc.help) {
+            jc.usage();
+            System.exit(1);
+        }
 
-                    String tenantCode = bsiUrl.getTenantCode();
-                    Map<String, String> tempCredentials;
-                    // Has username/password
-                    String username;
-                    String password;
-                    if (cl.hasLoginCredentials()) {
-                        tempCredentials = cl.getLoginCredentials();
-                        username = tempCredentials.get("username");
-                        password = tempCredentials.get("password");
-                    // Has key/secret
-                    } else {
-                        tempCredentials = cl.getApiCredentials();
-                        username = tempCredentials.get("key");
-                        password = tempCredentials.get("secret");
-                    }
+        if (!fc.hasApiCredentials() && !fc.hasUserCredentials()) {
+            System.out.println("The following options are required: -apiCredentials, -ac or -userCredentials, -uc");
+            jc.usage();
+            System.exit(1);
+        }
 
-                    String grantType = cl.hasLoginCredentials() ? fodApi.GRANT_TYPE_PASSWORD : fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
-                    fodApi.authenticate(tenantCode, username, password, grantType);
+        boolean uploadSucceeded;
+        try {
+            Proxy proxy = new Proxy(fc.proxy);
+            FodApi fodApi = new FodApi(fc.bsiUrl.getEndpoint(), proxy.getProxyUri() == null ? null : proxy);
 
-                    System.out.println("Beginning upload");
+            System.out.println("Authenticating");
 
-                    //first thing check file size
-                    File zipFileInfo = new File(zipLocation);
-                    if (zipFileInfo.length() > maxFileSize) {
-                        System.out.println("Terminating upload. File Exceeds maximum length : " + maxFileSize);
-                        return;
-                    }
+            // Has username/password
+            String username, password, grantType;
+            if (fc.hasUserCredentials()) {
+                username = fc.userCredentials.get(0);
+                password = fc.userCredentials.get(1);
+                grantType = fodApi.GRANT_TYPE_PASSWORD;
+            // Has key/secret
+            } else {
+                username = fc.apiCredentials.get(0);
+                password = fc.apiCredentials.get(1);
+                grantType = fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
+            }
 
-                    uploadSucceeded = fodApi.getStaticScanController().StartStaticScan(bsiUrl, cl);
+            String tenantCode = fc.bsiUrl.getTenantCode();
+            fodApi.authenticate(tenantCode, username, password, grantType);
+
+            System.out.println("Beginning upload");
+
+            uploadSucceeded = fodApi.getStaticScanController().StartStaticScan(fc);
+
+            //check success status exit appropriately
+            if (uploadSucceeded) {
+                // Why do we need to poll for this?
+                if (fc.pollingInterval > 0) {
+                    PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
+                    // Until status is complete or cancelled
+                    listener.releaseStatus(fc.bsiUrl.getProjectVersionId());
                 }
-
-                //check success status exit appropriately
-                if (uploadSucceeded) {
-                    // Why do we need to poll for this?
-                    if (cl.hasPollingInterval()) {
-                        PollStatus listener = new PollStatus(fodApi, cl.getPollingInterval());
-                        // Until status is is complete or cancelled
-                        listener.releaseStatus(bsiUrl.getProjectVersionId());
-                    }
-                    fodApi.retireToken();
-                    System.exit(0);
-                } else {
-                    fodApi.retireToken();
-                    System.exit(1);
-                }
+                fodApi.retireToken();
+                System.exit(0);
+            } else {
+                fodApi.retireToken();
+                System.exit(1);
             }
         } catch (Exception e) {
             e.printStackTrace();

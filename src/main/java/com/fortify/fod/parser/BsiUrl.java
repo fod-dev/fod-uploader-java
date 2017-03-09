@@ -21,7 +21,7 @@ public class BsiUrl {
      * Creates a bsi url object.
      * @param bsiUrl build server url
      */
-    BsiUrl(String bsiUrl) {
+    public BsiUrl(String bsiUrl) {
         try {
             URI uri = new URI(bsiUrl);
 
@@ -79,7 +79,7 @@ public class BsiUrl {
         return tenantCode;
     }
     public boolean hasTenantCode() {
-        return !tenantCode.isEmpty();
+        return tenantCode != null && !tenantCode.isEmpty();
     }
 
     public int getProjectVersionId() {
@@ -107,7 +107,7 @@ public class BsiUrl {
         return technologyStack;
     }
     public boolean hasTechnologyStack() {
-        return !technologyStack.isEmpty();
+        return technologyStack != null && !technologyStack.isEmpty();
     }
 
     public String getLanguageLevel() {

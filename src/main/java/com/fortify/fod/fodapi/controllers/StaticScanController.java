@@ -4,15 +4,17 @@ import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.fodapi.models.PostStartScanResponse;
 import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
-import com.fortify.fod.parser.BsiUrl;
-import com.fortify.fod.parser.FortifyCommandLine;
+import com.fortify.fod.parser.FortifyCommands;
 import com.google.gson.Gson;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 import java.io.FileInputStream;
-import java.util.*;
+import java.util.Arrays;
 
 public class StaticScanController extends ControllerBase {
     private final int CHUNK_SIZE = 1024 * 1024;
@@ -28,15 +30,13 @@ public class StaticScanController extends ControllerBase {
 
     /**
      * Starts a scan based on the V3 API
-     *
-     * @param bsiUrl releaseId, assessmentTypeId, technologyStack, languageLevel
-     * @param cl     scanPreferenceType, ScanPreferenceId, AuditPreferenceId, doSonatypeScan,
-     * @return true if successful upload
+     * @param fc fortify command object
+     * @return true if scan successfully started
      */
-    public boolean StartStaticScan(final BsiUrl bsiUrl, final FortifyCommandLine cl) {
-        PostStartScanResponse scanStartedResponse = null;
+    public boolean StartStaticScan(final FortifyCommands fc) {
+        PostStartScanResponse scanStartedResponse;
 
-        try (FileInputStream fs = new FileInputStream(cl.getZipLocation())) {
+        try (FileInputStream fs = new FileInputStream(fc.payload)) {
 
             byte[] readByteArray = new byte[CHUNK_SIZE];
             byte[] sendByteArray;
@@ -44,38 +44,30 @@ public class StaticScanController extends ControllerBase {
             int byteCount;
             long offset = 0;
 
-            if (!bsiUrl.hasAssessmentTypeId() && !bsiUrl.hasTechnologyStack()) {
-                return false;
-            }
-
             // Get entitlement info
             ReleaseAssessmentTypeDTO assessment = api.getReleaseController()
-                    .getAssessmentType(bsiUrl.getProjectVersionId(), bsiUrl.getAssessmentTypeId());
+                    .getAssessmentType(fc.bsiUrl.getProjectVersionId(), fc.bsiUrl.getAssessmentTypeId());
 
             // Build 'static' portion of url
-            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + bsiUrl.getProjectVersionId() +
+            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiUrl.getProjectVersionId() +
                     "/static-scans/start-scan?";
-            fragUrl += "assessmentTypeId=" + bsiUrl.getAssessmentTypeId();
-            fragUrl += "&technologyStack=" + bsiUrl.getTechnologyStack();
+            fragUrl += "assessmentTypeId=" + fc.bsiUrl.getAssessmentTypeId();
+            fragUrl += "&technologyStack=" + fc.bsiUrl.getTechnologyStack();
             fragUrl += "&entitlementId=" + assessment.getEntitlementId();
             fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
             // ^^ This isn't actually working, it always puts 1 for the Frequency Type.
-            if (bsiUrl.hasLanguageLevel())
-                fragUrl += "&languageLevel=" + bsiUrl.getLanguageLevel();
-            if (cl.hasScanPreference())
-                fragUrl += "&scanPreferenceType=" + cl.getScanPreferenceType().toString();
-            if (cl.hasAuditPreference())
-                fragUrl += "&auditPreferenceType=" + cl.getAuditPreferenceType().toString();
-            if (cl.hasRunSonatypeScan())
-                fragUrl += "&doSonatypeScan=" + cl.hasRunSonatypeScan();
-            if (cl.isRemediationScan())
-                fragUrl += "&isRemediationScan=" + cl.isRemediationScan();
-            if (cl.hasExcludeThirdPartyLibs())
-                fragUrl += "&excludeThirdPartyLibs=" + cl.hasExcludeThirdPartyLibs();
-            if (cl.isBundledAssessment())
-            	fragUrl += "&isBundledAssessment=" + cl.isBundledAssessment();
-            if (cl.hasParentAssessmentTypeId())
-            	fragUrl += "&parentAssessmentTypeId=" + cl.getParentAssessmentTypeId();
+            if (fc.bsiUrl.hasLanguageLevel())
+                fragUrl += "&languageLevel=" + fc.bsiUrl.getLanguageLevel();
+            if (fc.hasScanPreferenceType())
+                fragUrl += "&scanPreferenceType=" + fc.scanPreferenceType.toString();
+            if (fc.hasAuditPreferenceType())
+                fragUrl += "&auditPreferenceType=" + fc.auditPreferenceType.toString();
+            fragUrl += "&doSonatypeScan=" + fc.runSonatypeScan;
+            fragUrl += "&isRemediationScan=" + fc.isRemediationScan;
+            fragUrl += "&excludeThirdPartyLibs=" + fc.excludeThirdPartyLibs;
+            fragUrl += "&isBundledAssessment=" + fc.isBundledAssessment;
+            if (fc.hasParentAssessmentTypeId())
+            	fragUrl += "&parentAssessmentTypeId=" + fc.parentAssessmentTypeId;
 
             Gson gson = new Gson();
 
@@ -104,7 +96,7 @@ public class StaticScanController extends ControllerBase {
                     // Re-authenticate
                     api.authenticate();
 
-                    // if you had to reauthenticate here, would the loop and request not need to be resubmitted?
+                    // if you had to re-authenticate here, would the loop and request not need to be resubmitted?
                     // possible continue?
                 }
 
