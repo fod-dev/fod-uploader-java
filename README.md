@@ -8,9 +8,9 @@ Java Utility for uploading packages to FoD
 The command line arguments have been completely reworked for 2.x. Arguments are now named and can be in any order: 
 
 ```
-FodUpload.jar -e <id> -f <1|2> -u <url> -z <file> [-a <1|2>] -ac <key> <secret> | -uc <username> <password>
-[-h] [-I <minutes>] [-p <1|2>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-s <true|false>]
-[-v] [-x <true|false>] [-r <true|false]
+FodUpload.jar -u <url> -z <file> -ac <key> <secret> | -uc <username> <password> -ep <1|SingleScan|2|Subscription>
+[-purchase] [-b] [-I <minutes>] [-p <1|Standard|2|Express>] [-a <1|Manual|2|Automated>] 
+[-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-x] [-s] [-r] [-h] [-v]
 ```
 
 Each option has a short and long name:
@@ -19,21 +19,20 @@ Short Name | Long Name              | Required? | Description
 ---------- | ---------------------- |:---------:| --------------------------------------------------------
  -u        | -bsiUrl                | Yes       | Build server url                                                 
  -z        | -zipLocation           | Yes       | Location of scan 
- -e        | -entitlementId         | No        | Entitlement Id
- -f        | -entitlementFrequency  | No        | Entitlement Freqeuncy Type (Single = 1, Subscription = 2)
+ -ep       | -entitlementPreference | Yes       | Whether to use a single scan or subscription assessment (if available) (1/Single, 2/Subscription)
  -ac       | -apiCredentials        | Yes*      | Api credentials ("key:" does not need to be appended to `<key>`)                                                  
  -uc       | -userCredentials       | Yes*      | User login credentials ex (wrap each in quotations to avoid escaping characters in the CLI)
- -a        | -auditPreferenceId     | No        | False positive audit type (Manual = 1, Automated = 2)            
- -p        | -scanPreferenceId      | No        | Scan mode (Standard = 1, Express = 2)                            
+ -a        | -auditPreferenceId     | No        | False positive audit type (1/Manual, 2/Automated)            
+ -p        | -scanPreferenceId      | No        | Scan mode (1/Standard, 2/Express)                            
  -I        | -pollingInterval       | No        | Interval between checking scan status in minutes                 
  -P        | -proxy                 | No        | Credentials for accessing the proxy                   
- -s        | -runSonatypeScan       | No        | Whether to run a Sonatype Scan (can be 'true' or 'false')        
+ -s        | -runSonatypeScan       | No        | Whether to run a Sonatype Scan         
  -h        | -help                  | No        | Print help dialog                                                
  -v        | -version               | No        | Print jar version   
- -x        | -excludeThirdPartyLibs | No        | Exclude Third Party Librarys from scan (can be 'true' or 'false')
- -r        | -isRemediationScan     | No        | Whether the scan is in remediation (can be 'true' or 'false')
- -b        | -isBundledAssessment   | No        | Whether the scan is a bundled assessment (can be 'true' or 'false')
- -pa       | -parentAssessmentTypeId| No        | Parent Assessment Type ID for Bundled Assessments
+ -x        | -excludeThirdPartyLibs | No        | Exclude Third Party Librarys from scan 
+ -r        | -isRemediationScan     | No        | Whether the scan is in remediation 
+ -b        | -isBundledAssessment   | No        | Whether the scan is a bundled assessment
+ -purchase | -purchaseEntitlement   | No		| Whether to purchase an entitlement (if available)
 
 *One of either apiCredentials or userCredentials is required.
 
