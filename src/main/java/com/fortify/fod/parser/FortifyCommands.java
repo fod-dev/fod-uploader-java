@@ -86,7 +86,7 @@ public class FortifyCommands {
     private static final String ENTITLEMENT_PREFERENCE = "-entitlementPreference";
     private static final String ENTITLEMENT_PREFERENCE_SHORT = "-ep";
     @Parameter(names = { ENTITLEMENT_PREFERENCE, ENTITLEMENT_PREFERENCE_SHORT },
-            description = "preferred entitlement type (Single Scan or Subscription)",
+            description = "preferred entitlement type (SingleScan or Subscription)",
             converter = EntitlementPreferenceTypeConverter.class,
             required = true)
     public FodEnums.EntitlementPreferenceType entitlementPreference = null;
@@ -94,7 +94,7 @@ public class FortifyCommands {
     private static final String PURCHASE_ENTITLEMENT = "-purchaseEntitlement";
     private static final String PURCHASE_ENTITLEMENT_SHORT = "-purchase";
     @Parameter(names = { PURCHASE_ENTITLEMENT, PURCHASE_ENTITLEMENT_SHORT },
-            description = "whether to purchase an entitlement if needed")
+            description = "whether to purchase an entitlement if available")
     public boolean purchaseEntitlement = false;
 
     private static final String EXCLUDE_THIRD_PARTY_LIBS = "-excludeThirdPartyApps";

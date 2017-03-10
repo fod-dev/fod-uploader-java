@@ -56,7 +56,7 @@ public class StaticScanController extends ControllerBase {
             fragUrl += "&entitlementId=" + assessment.getEntitlementId();
             fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
             fragUrl += "&isBundledAssessment=" + assessment.isBundledAssessment();
-            if (assessment.getParentAssessmentTypeId() != 0)
+            if (assessment.getParentAssessmentTypeId() != 0 && assessment.isBundledAssessment())
                 fragUrl += "&parentAssessmentTypeId=" + assessment.getParentAssessmentTypeId();
             if (fc.bsiUrl.hasLanguageLevel())
                 fragUrl += "&languageLevel=" + fc.bsiUrl.getLanguageLevel();
