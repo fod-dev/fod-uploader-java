@@ -10,6 +10,8 @@ public class ReleaseAssessmentTypeDTO {
     private int frequencyTypeId;
     private int units;
     private int unitsAvailable;
+    private int parentAssessmentTypeId;
+    private boolean isBundledAssessment;
 
     public int getAssessmentTypeId() {
         return assessmentTypeId;
@@ -49,6 +51,14 @@ public class ReleaseAssessmentTypeDTO {
 
     public int getUnitsAvailable() {
         return unitsAvailable;
+    }
+
+    public int getParentAssessmentTypeId() {
+        return parentAssessmentTypeId;
+    }
+
+    public boolean isBundledAssessment() {
+        return isBundledAssessment;
     }
 
 }

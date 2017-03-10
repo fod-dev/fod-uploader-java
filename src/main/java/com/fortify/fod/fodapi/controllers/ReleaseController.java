@@ -1,9 +1,10 @@
 package com.fortify.fod.fodapi.controllers;
 
+import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.GenericListResponse;
 import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
 import com.fortify.fod.fodapi.models.ReleaseDTO;
-import com.fortify.fod.fodapi.FodApi;
+import com.fortify.fod.parser.FortifyCommands;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import okhttp3.Request;
@@ -13,7 +14,6 @@ import org.apache.http.HttpStatus;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.List;
 
 public class ReleaseController extends ControllerBase {
     /**
@@ -69,14 +69,22 @@ public class ReleaseController extends ControllerBase {
     }
 
     /**
-     * Get a list of available assessment types for a given release
-     *
-     * @param releaseId release to get assessment types for
-     * @return array of possible assessment types
+     * Get Assessment Type from bsi url
+     * @param fc FortifyCommands object
+     * @return returns assessment type obj
      */
-    public ReleaseAssessmentTypeDTO getAssessmentType(final int releaseId, final int assessmentTypeId) {
+    public ReleaseAssessmentTypeDTO getAssessmentType(final FortifyCommands fc) {
         try {
-            String url = api.getBaseUrl() + "/api/v3/releases/" + releaseId + "/assessment-types?scanType=1";
+            //String url = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiUrl.getProjectVersionId() + "/assessment-types";
+
+            String filters = "frequencyTypeId:" + fc.entitlementPreference.getValue();
+            if (fc.isBundledAssessment)
+                filters += "+isBundledAssessment:true";
+
+            String url = String.format("%s/api/v3/releases/%s/assessment-types?scanType=1&filters=%s",
+                    api.getBaseUrl(),
+                    fc.bsiUrl.getProjectVersionId(),
+                    filters);
 
             if (api.getToken() == null)
                 api.authenticate();
@@ -103,14 +111,15 @@ public class ReleaseController extends ControllerBase {
             }.getType();
             GenericListResponse<ReleaseAssessmentTypeDTO> results = gson.fromJson(content, t);
 
-            // Finds the assessment given from the bsiUrl
-            ReleaseAssessmentTypeDTO retval = null;
+            // Get entitlement based on available options
             for (ReleaseAssessmentTypeDTO assessment : results.getItems()) {
-                if (assessment.getAssessmentTypeId() == assessmentTypeId && assessment.getEntitlementId() > 0)
-                    retval = assessment;
+                if (assessment.getAssessmentTypeId() == fc.bsiUrl.getAssessmentTypeId()) {
+                    if (fc.purchaseEntitlement || assessment.getEntitlementId() > 0)
+                        return assessment;
+                    return null;
+                }
             }
-
-            return retval;
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
