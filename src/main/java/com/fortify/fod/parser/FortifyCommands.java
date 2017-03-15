@@ -2,10 +2,7 @@ package com.fortify.fod.parser;
 
 import com.beust.jcommander.Parameter;
 import com.fortify.fod.fodapi.FodEnums;
-import com.fortify.fod.parser.converters.AuditPreferenceTypeConverter;
-import com.fortify.fod.parser.converters.BsiUrlConverter;
-import com.fortify.fod.parser.converters.FileConverter;
-import com.fortify.fod.parser.converters.ScanPreferenceTypeConverter;
+import com.fortify.fod.parser.converters.*;
 import com.fortify.fod.parser.validators.BsiUrlValidator;
 import com.fortify.fod.parser.validators.FileValidator;
 
@@ -80,26 +77,25 @@ public class FortifyCommands {
                 scanPreferenceType.getValue() != 0;
     }
 
-    private static final String ENTITLEMENT_ID = "-entitlementId";
-    private static final String ENTITLEMENT_ID_SHORT = "-e";
-    @Parameter(names = { ENTITLEMENT_ID, ENTITLEMENT_ID_SHORT },
-            description = "entitlement id")
-    public int entitlementId;
-
-    private static final String PARENT_ASSESSMENT_TYPE_ID = "-parentAssessmentTypeId";
-    private static final String PARENT_ASSESSMENT_TYPE_ID_SHORT = "-pa";
-    @Parameter(names = { PARENT_ASSESSMENT_TYPE_ID, PARENT_ASSESSMENT_TYPE_ID_SHORT },
-            description = "Parent Assessment Type ID for Bundled Assessments")
-    public int parentAssessmentTypeId;
-    public boolean hasParentAssessmentTypeId() {
-        return parentAssessmentTypeId != 0;
-    }
-
     private static final String IS_BUNDLED_ASSESSMENT = "-isBundledAssessment";
     private static final String IS_BUNDLED_ASSESSMENT_SHORT = "-b";
     @Parameter(names = { IS_BUNDLED_ASSESSMENT, IS_BUNDLED_ASSESSMENT_SHORT },
             description = "whether the scan is a bundled assessment")
     public boolean isBundledAssessment = false;
+
+    private static final String ENTITLEMENT_PREFERENCE = "-entitlementPreference";
+    private static final String ENTITLEMENT_PREFERENCE_SHORT = "-ep";
+    @Parameter(names = { ENTITLEMENT_PREFERENCE, ENTITLEMENT_PREFERENCE_SHORT },
+            description = "preferred entitlement type (SingleScan or Subscription)",
+            converter = EntitlementPreferenceTypeConverter.class,
+            required = true)
+    public FodEnums.EntitlementPreferenceType entitlementPreference = null;
+
+    private static final String PURCHASE_ENTITLEMENT = "-purchaseEntitlement";
+    private static final String PURCHASE_ENTITLEMENT_SHORT = "-purchase";
+    @Parameter(names = { PURCHASE_ENTITLEMENT, PURCHASE_ENTITLEMENT_SHORT },
+            description = "whether to purchase an entitlement if available")
+    public boolean purchaseEntitlement = false;
 
     private static final String EXCLUDE_THIRD_PARTY_LIBS = "-excludeThirdPartyApps";
     private static final String EXCLUDE_THIRD_PARTY_LIBS_SHORT = "-x";

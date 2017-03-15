@@ -107,4 +107,40 @@ public class FodEnums {
             }
         }
     }
+
+    public enum EntitlementPreferenceType {
+        SingleScan(1),
+        Subscription(2);
+
+        private final int _val;
+
+        EntitlementPreferenceType(int val) {
+            this._val = val;
+        }
+
+        public int getValue() {
+            return this._val;
+        }
+
+        public String toString() {
+            switch (this._val) {
+                case 2:
+                    return "Subscription";
+                case 1:
+                default:
+                    return "Single Scan";
+            }
+        }
+
+        public static EntitlementPreferenceType fromInt(int val) {
+            switch (val) {
+                case 2:
+                    return Subscription;
+                case 1:
+                    return SingleScan;
+                default:
+                    return null;
+            }
+        }
+    }
 }

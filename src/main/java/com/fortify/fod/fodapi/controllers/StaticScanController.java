@@ -46,7 +46,7 @@ public class StaticScanController extends ControllerBase {
 
             // Get entitlement info
             ReleaseAssessmentTypeDTO assessment = api.getReleaseController()
-                    .getAssessmentType(fc.bsiUrl.getProjectVersionId(), fc.bsiUrl.getAssessmentTypeId());
+                    .getAssessmentType(fc);
 
             // Build 'static' portion of url
             String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiUrl.getProjectVersionId() +
@@ -55,7 +55,9 @@ public class StaticScanController extends ControllerBase {
             fragUrl += "&technologyStack=" + fc.bsiUrl.getTechnologyStack();
             fragUrl += "&entitlementId=" + assessment.getEntitlementId();
             fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
-            // ^^ This isn't actually working, it always puts 1 for the Frequency Type.
+            fragUrl += "&isBundledAssessment=" + assessment.isBundledAssessment();
+            if (assessment.getParentAssessmentTypeId() != 0 && assessment.isBundledAssessment())
+                fragUrl += "&parentAssessmentTypeId=" + assessment.getParentAssessmentTypeId();
             if (fc.bsiUrl.hasLanguageLevel())
                 fragUrl += "&languageLevel=" + fc.bsiUrl.getLanguageLevel();
             if (fc.hasScanPreferenceType())
@@ -65,9 +67,6 @@ public class StaticScanController extends ControllerBase {
             fragUrl += "&doSonatypeScan=" + fc.runSonatypeScan;
             fragUrl += "&isRemediationScan=" + fc.isRemediationScan;
             fragUrl += "&excludeThirdPartyLibs=" + fc.excludeThirdPartyLibs;
-            fragUrl += "&isBundledAssessment=" + fc.isBundledAssessment;
-            if (fc.hasParentAssessmentTypeId())
-            	fragUrl += "&parentAssessmentTypeId=" + fc.parentAssessmentTypeId;
 
             Gson gson = new Gson();
 
