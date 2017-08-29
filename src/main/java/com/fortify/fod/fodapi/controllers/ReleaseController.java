@@ -14,6 +14,7 @@ import org.apache.http.HttpStatus;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 
 public class ReleaseController extends ControllerBase {
     /**
@@ -80,6 +81,8 @@ public class ReleaseController extends ControllerBase {
             String filters = "frequencyTypeId:" + fc.entitlementPreference.getValue();
             if (fc.isBundledAssessment)
                 filters += "+isBundledAssessment:true";
+
+            filters = URLEncoder.encode(filters, "UTF-8");
 
             String url = String.format("%s/api/v3/releases/%s/assessment-types?scanType=1&filters=%s",
                     api.getBaseUrl(),
