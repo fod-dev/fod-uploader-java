@@ -19,6 +19,7 @@ import java.net.URLEncoder;
 public class ReleaseController extends ControllerBase {
     /**
      * Constructor
+     *
      * @param api api object with client info
      */
     public ReleaseController(FodApi api) {
@@ -27,8 +28,9 @@ public class ReleaseController extends ControllerBase {
 
     /**
      * GET specific release with given fields if applicable
+     *
      * @param releaseId release to get
-     * @param fields specific fields to return
+     * @param fields    specific fields to return
      * @return returns ReleaseDTO object containing specified fields or null
      */
     public ReleaseDTO getRelease(int releaseId, String fields) {
@@ -60,10 +62,11 @@ public class ReleaseController extends ControllerBase {
 
             Gson gson = new Gson();
             // Create a type of GenericList<ReleaseDTO> to play nice with gson.
-            Type t = new TypeToken<GenericListResponse<ReleaseDTO>>(){}.getType();
-            GenericListResponse<ReleaseDTO> results =  gson.fromJson(content, t);
+            Type t = new TypeToken<GenericListResponse<ReleaseDTO>>() {
+            }.getType();
+            GenericListResponse<ReleaseDTO> results = gson.fromJson(content, t);
             return results.getItems()[0];
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -71,6 +74,7 @@ public class ReleaseController extends ControllerBase {
 
     /**
      * Get Assessment Type from bsi url
+     *
      * @param fc FortifyCommands object
      * @return returns assessment type obj
      */
