@@ -64,7 +64,7 @@ public class FodApi {
     public void authenticate(String tenantCode, String username, String password, String grantType) {
         try {
             // Build the form body
-            FormBody.Builder formBodyBuilder = new FormBody.Builder().add("scope", "https://hpfod.com/tenant");
+            FormBody.Builder formBodyBuilder = new FormBody.Builder().add("scope", "api-tenant");
             // Has username/password stuff
             if (grantType.equals(GRANT_TYPE_PASSWORD)) {
                 formBodyBuilder.add("grant_type", GRANT_TYPE_PASSWORD)
