@@ -3,8 +3,10 @@ package com.fortify.fod.parser;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.List;
 
 public class BsiUrl {
@@ -19,6 +21,7 @@ public class BsiUrl {
 
     /**
      * Creates a bsi url object.
+     *
      * @param bsiUrl build server url
      */
     public BsiUrl(String bsiUrl) {
@@ -29,7 +32,7 @@ public class BsiUrl {
             List<NameValuePair> params = URLEncodedUtils.parse(uri, "UTF-8");
 
             createBsiUrl(params);
-        } catch(URISyntaxException e) {
+        } catch (URISyntaxException | UnsupportedEncodingException e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }
@@ -38,11 +41,12 @@ public class BsiUrl {
     /**
      * Map URL params to strongly-typed object.
      * Note: these param names could totally change in the future.
+     *
      * @param params list of params parsed from the given bsi url String
      */
-    private void createBsiUrl(List<NameValuePair> params) {
-        for(NameValuePair param : params) {
-            switch(param.getName()) {
+    private void createBsiUrl(List<NameValuePair> params) throws UnsupportedEncodingException {
+        for (NameValuePair param : params) {
+            switch (param.getName()) {
                 case "tid":
                     tenantId = Integer.parseInt(param.getValue());
                     break;
@@ -53,7 +57,7 @@ public class BsiUrl {
                     projectVersionId = Integer.parseInt(param.getValue());
                     break;
                 case "ts":
-                    technologyStack = param.getValue();
+                    technologyStack = URLEncoder.encode(param.getValue(), "UTF-8");
                     break;
                 case "ll":
                     languageLevel = param.getValue();
@@ -71,6 +75,7 @@ public class BsiUrl {
     public int getTenantId() {
         return tenantId;
     }
+
     public boolean hasTenantId() {
         return tenantId != 0;
     }
@@ -78,6 +83,7 @@ public class BsiUrl {
     public String getTenantCode() {
         return tenantCode;
     }
+
     public boolean hasTenantCode() {
         return tenantCode != null && !tenantCode.isEmpty();
     }
@@ -85,6 +91,7 @@ public class BsiUrl {
     public int getProjectVersionId() {
         return projectVersionId;
     }
+
     public boolean hasProjectVersionId() {
         return projectVersionId != 0;
     }
@@ -92,6 +99,7 @@ public class BsiUrl {
     public String getPayloadType() {
         return payloadType;
     }
+
     public boolean hasPayloadType() {
         return !payloadType.isEmpty();
     }
@@ -99,6 +107,7 @@ public class BsiUrl {
     public int getAssessmentTypeId() {
         return assessmentTypeId;
     }
+
     public boolean hasAssessmentTypeId() {
         return assessmentTypeId != 0;
     }
@@ -106,6 +115,7 @@ public class BsiUrl {
     public String getTechnologyStack() {
         return technologyStack;
     }
+
     public boolean hasTechnologyStack() {
         return technologyStack != null && !technologyStack.isEmpty();
     }
@@ -113,6 +123,7 @@ public class BsiUrl {
     public String getLanguageLevel() {
         return languageLevel;
     }
+
     public boolean hasLanguageLevel() {
         return !languageLevel.isEmpty();
     }
@@ -120,6 +131,7 @@ public class BsiUrl {
     public String getEndpoint() {
         return endpoint;
     }
+
     public boolean hasEndpoint() {
         return !endpoint.isEmpty();
     }
