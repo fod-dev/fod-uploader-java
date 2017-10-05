@@ -66,7 +66,7 @@ public class StaticScanController extends ControllerBase {
                 fragUrl += "&auditPreferenceType=" + fc.auditPreferenceType.toString();
             fragUrl += "&doSonatypeScan=" + fc.runSonatypeScan;
             fragUrl += "&isRemediationScan=" + fc.isRemediationScan;
-            fragUrl += "&excludeThirdPartyLibs=" + fc.excludeThirdPartyLibs;
+            fragUrl += "&excludeThirdPartyLibs=" + !fc.includeThirdPartyLibs;
 
             Gson gson = new Gson();
 
