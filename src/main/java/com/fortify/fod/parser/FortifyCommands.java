@@ -103,6 +103,12 @@ public class FortifyCommands {
             description = "whether to exclude third party libraries")
     public boolean excludeThirdPartyLibs = false;
 
+    private static final String INCLUDE_THIRD_PARTY_LIBS = "-includeThirdPartyApps";
+    private static final String INCLUDE_THIRD_PARTY_LIBS_SHORT = "-itp";
+    @Parameter(names = { INCLUDE_THIRD_PARTY_LIBS, INCLUDE_THIRD_PARTY_LIBS_SHORT },
+            description = "whether to include third party libraries")
+    public boolean includeThirdPartyLibs = false;
+
     private static final String IS_REMEDIATION_SCAN = "-isRemediationScan";
     private static final String IS_REMEDIATION_SCAN_SHORT = "--r";
     @Parameter(names = { IS_REMEDIATION_SCAN, IS_REMEDIATION_SCAN_SHORT },
@@ -140,7 +146,6 @@ public class FortifyCommands {
             arity = 5,
             variableArity = true)
     public List<String> proxy = new ArrayList<>();
-
 
     public void version() {
         Package p = getClass().getPackage();
