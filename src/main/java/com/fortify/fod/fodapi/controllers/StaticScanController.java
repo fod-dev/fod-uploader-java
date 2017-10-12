@@ -49,17 +49,17 @@ public class StaticScanController extends ControllerBase {
                     .getAssessmentType(fc);
 
             // Build 'static' portion of url
-            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiUrl.getProjectVersionId() +
+            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiToken.getProjectVersionId() +
                     "/static-scans/start-scan?";
-            fragUrl += "assessmentTypeId=" + fc.bsiUrl.getAssessmentTypeId();
-            fragUrl += "&technologyStack=" + fc.bsiUrl.getTechnologyStack();
+            fragUrl += "assessmentTypeId=" + fc.bsiToken.getAssessmentTypeId();
+            fragUrl += "&technologyStack=" + fc.bsiToken.getTechnologyStack();
             fragUrl += "&entitlementId=" + assessment.getEntitlementId();
             fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
             fragUrl += "&isBundledAssessment=" + assessment.isBundledAssessment();
             if (assessment.getParentAssessmentTypeId() != 0 && assessment.isBundledAssessment())
                 fragUrl += "&parentAssessmentTypeId=" + assessment.getParentAssessmentTypeId();
-            if (fc.bsiUrl.hasLanguageLevel())
-                fragUrl += "&languageLevel=" + fc.bsiUrl.getLanguageLevel();
+            if (fc.bsiToken.getLanguageLevel() != null)
+                fragUrl += "&languageLevel=" + fc.bsiToken.getLanguageLevel();
             if (fc.hasScanPreferenceType())
                 fragUrl += "&scanPreferenceType=" + fc.scanPreferenceType.toString();
             if (fc.hasAuditPreferenceType())

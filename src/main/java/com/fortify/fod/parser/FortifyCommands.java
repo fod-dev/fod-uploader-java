@@ -3,7 +3,7 @@ package com.fortify.fod.parser;
 import com.beust.jcommander.Parameter;
 import com.fortify.fod.fodapi.FodEnums;
 import com.fortify.fod.parser.converters.*;
-import com.fortify.fod.parser.validators.BsiUrlValidator;
+import com.fortify.fod.parser.validators.BsiTokenValidator;
 import com.fortify.fod.parser.validators.FileValidator;
 
 import java.io.File;
@@ -25,14 +25,16 @@ public class FortifyCommands {
             help = true)
     public boolean version = false;
 
+    private static final String BSI_TOKEN = "-bsiToken";
+    private static final String BSI_TOKEN_SHORT = "-bsi";
     private static final String BSI_URL = "-bsiUrl";
     private static final String BSI_URL_SHORT = "-u";
-    @Parameter(names = { BSI_URL, BSI_URL_SHORT },
+    @Parameter(names = { BSI_TOKEN, BSI_TOKEN_SHORT, BSI_URL, BSI_URL_SHORT },
             description = "build server url",
             required = true,
-            converter = BsiUrlConverter.class,
-            validateWith = BsiUrlValidator.class)
-    public BsiUrl bsiUrl;
+            converter = BsiTokenConverter.class,
+            validateWith = BsiTokenValidator.class)
+    public BsiToken bsiToken;
 
     private static final String ZIP_LOCATION = "-zipLocation";
     private static final String ZIP_LOCATION_SHORT = "-z";

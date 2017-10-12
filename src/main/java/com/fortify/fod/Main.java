@@ -41,7 +41,7 @@ public class Main {
         boolean uploadSucceeded;
         try {
             Proxy proxy = new Proxy(fc.proxy);
-            FodApi fodApi = new FodApi(fc.bsiUrl.getEndpoint(), proxy.getProxyUri() == null ? null : proxy);
+            FodApi fodApi = new FodApi(fc.bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy);
 
             System.out.println("Authenticating");
 
@@ -58,7 +58,7 @@ public class Main {
                 grantType = fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
             }
 
-            String tenantCode = fc.bsiUrl.getTenantCode();
+            String tenantCode = fc.bsiToken.getTenantCode();
             fodApi.authenticate(tenantCode, username, password, grantType);
 
             System.out.println("Beginning upload");
@@ -71,7 +71,7 @@ public class Main {
                 if (fc.pollingInterval > 0) {
                     PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
                     // Until status is complete or cancelled
-                    listener.releaseStatus(fc.bsiUrl.getProjectVersionId());
+                    listener.releaseStatus(fc.bsiToken.getProjectVersionId());
                 }
                 fodApi.retireToken();
                 System.exit(0);
