@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.Arrays;
 
 public class StaticScanController extends ControllerBase {
@@ -52,7 +53,7 @@ public class StaticScanController extends ControllerBase {
             String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiToken.getProjectVersionId() +
                     "/static-scans/start-scan?";
             fragUrl += "assessmentTypeId=" + fc.bsiToken.getAssessmentTypeId();
-            fragUrl += "&technologyStack=" + fc.bsiToken.getTechnologyStack();
+            fragUrl += "&technologyStack=" + URLEncoder.encode(fc.bsiToken.getTechnologyStack(), "UTF-8");
             fragUrl += "&entitlementId=" + assessment.getEntitlementId();
             fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
             fragUrl += "&isBundledAssessment=" + assessment.isBundledAssessment();
