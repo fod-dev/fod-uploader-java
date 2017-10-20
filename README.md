@@ -10,7 +10,7 @@ The command line arguments have been completely reworked for 2.x. Arguments are 
 ```
 FodUpload.jar -bsi <token> -z <file> -ac <key> <secret> | -uc <username> <password> -ep <1|SingleScan|2|Subscription>
 [-purchase] [-b] [-I <minutes>] [-p <1|Standard|2|Express>] [-a <1|Manual|2|Automated>] 
-[-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-itp] [-s] [-r] [-h] [-v]
+[-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-itp] [-os] [-r] [-h] [-v]
 ```
 
 Each option has a short and long name:
@@ -26,7 +26,7 @@ Short Name | Long Name              | Required? | Description
  -p        | -scanPreferenceId      | No        | Scan mode (1/Standard, 2/Express)                            
  -I        | -pollingInterval       | No        | Interval between checking scan status in minutes                 
  -P        | -proxy                 | No        | Credentials for accessing the proxy                   
- -s        | -runSonatypeScan       | No        | Whether to run a Sonatype Scan         
+ -os       | -runOpenSourceScan     | No        | Whether to run an Open Source Scan
  -h        | -help                  | No        | Print help dialog                                                
  -v        | -version               | No        | Print jar version   
  -itp      | -includeThirdPartyLibs | No        | Include Third Party Libraries from scan

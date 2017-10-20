@@ -4,7 +4,6 @@ import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.fodapi.models.PostStartScanResponse;
 import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
-import com.fortify.fod.parser.BsiToken;
 import com.fortify.fod.parser.FortifyCommands;
 import com.google.gson.Gson;
 import okhttp3.MediaType;
@@ -39,7 +38,6 @@ public class StaticScanController extends ControllerBase {
     public boolean StartStaticScan(final FortifyCommands fc) {
         PostStartScanResponse scanStartedResponse;
 
-
         try (FileInputStream fs = new FileInputStream(fc.payload)) {
 
             byte[] readByteArray = new byte[CHUNK_SIZE];
@@ -57,7 +55,7 @@ public class StaticScanController extends ControllerBase {
             String auditPreferenceType = fc.hasAuditPreferenceType() ? fc.auditPreferenceType.toString() : fc.bsiToken.getAuditPreference();
             String scanPreferenceType = fc.hasScanPreferenceType() ? fc.scanPreferenceType.toString() : fc.bsiToken.getScanPreference();
             boolean excludeThirdPartyLibs = !fc.includeThirdPartyLibs || !fc.bsiToken.getIncludeThirdParty();
-            boolean includeOpenSourceScan = fc.runSonatypeScan || fc.bsiToken.getIncludeOpenSourceAnalysis();
+            boolean includeOpenSourceScan = fc.runOpenSourceScan || fc.bsiToken.getIncludeOpenSourceAnalysis();
 
             // Build 'static' portion of url
             String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiToken.getProjectVersionId() +

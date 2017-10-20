@@ -51,11 +51,11 @@ public class FortifyCommands {
             description = "interval between checking scan status")
     public int pollingInterval = 0;
 
-    private static final String RUN_SONATYPE_SCAN = "-runSonatypeScan";
-    private static final String RUN_SONATYPE_SCAN_SHORT = "-s";
-    @Parameter(names = { RUN_SONATYPE_SCAN, RUN_SONATYPE_SCAN_SHORT},
-            description = "whether to run a Sonatype Scan")
-    public boolean runSonatypeScan = false;
+    private static final String RUN_OPEN_SOURCE_SCAN = "-runOpenSourceScan";
+    private static final String RUN_OPEN_SOURCE_SCAN_SHORT = "-os";
+    @Parameter(names = { RUN_OPEN_SOURCE_SCAN, RUN_OPEN_SOURCE_SCAN_SHORT},
+            description = "whether to run an Open Source Scan")
+    public boolean runOpenSourceScan = false;
 
     private static final String AUDIT_PREFERENCE_ID = "-auditPreferenceId";
     private static final String AUDIT_PREFERENCE_ID_SHORT = "-a";
