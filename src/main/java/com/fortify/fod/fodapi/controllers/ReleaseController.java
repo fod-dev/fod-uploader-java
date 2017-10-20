@@ -90,7 +90,7 @@ public class ReleaseController extends ControllerBase {
 
             String url = String.format("%s/api/v3/releases/%s/assessment-types?scanType=1&filters=%s",
                     api.getBaseUrl(),
-                    fc.bsiUrl.getProjectVersionId(),
+                    fc.bsiToken.getProjectVersionId(),
                     filters);
 
             if (api.getToken() == null)
@@ -120,7 +120,7 @@ public class ReleaseController extends ControllerBase {
 
             // Get entitlement based on available options
             for (ReleaseAssessmentTypeDTO assessment : results.getItems()) {
-                if (assessment.getAssessmentTypeId() == fc.bsiUrl.getAssessmentTypeId()) {
+                if (assessment.getAssessmentTypeId() == fc.bsiToken.getAssessmentTypeId()) {
                     if (fc.purchaseEntitlement || assessment.getEntitlementId() > 0)
                         return assessment;
                     return null;

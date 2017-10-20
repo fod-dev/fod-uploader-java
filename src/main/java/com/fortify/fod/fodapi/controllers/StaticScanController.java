@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.Arrays;
 
 public class StaticScanController extends ControllerBase {
@@ -30,6 +31,7 @@ public class StaticScanController extends ControllerBase {
 
     /**
      * Starts a scan based on the V3 API
+     *
      * @param fc fortify command object
      * @return true if scan successfully started
      */
@@ -48,25 +50,34 @@ public class StaticScanController extends ControllerBase {
             ReleaseAssessmentTypeDTO assessment = api.getReleaseController()
                     .getAssessmentType(fc);
 
+            // TODO: Fix this upload code to not be string concatenating
+
+            String auditPreferenceType = fc.hasAuditPreferenceType() ? fc.auditPreferenceType.toString() : fc.bsiToken.getAuditPreference();
+            String scanPreferenceType = fc.hasScanPreferenceType() ? fc.scanPreferenceType.toString() : fc.bsiToken.getScanPreference();
+            boolean excludeThirdPartyLibs = !fc.includeThirdPartyLibs || !fc.bsiToken.getIncludeThirdParty();
+            boolean includeOpenSourceScan = fc.runOpenSourceScan || fc.bsiToken.getIncludeOpenSourceAnalysis();
+
             // Build 'static' portion of url
-            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiUrl.getProjectVersionId() +
+            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiToken.getProjectVersionId() +
                     "/static-scans/start-scan?";
-            fragUrl += "assessmentTypeId=" + fc.bsiUrl.getAssessmentTypeId();
-            fragUrl += "&technologyStack=" + fc.bsiUrl.getTechnologyStack();
+            fragUrl += "assessmentTypeId=" + fc.bsiToken.getAssessmentTypeId();
+            fragUrl += "&technologyStack=" + URLEncoder.encode(fc.bsiToken.getTechnologyType(), "UTF-8");
             fragUrl += "&entitlementId=" + assessment.getEntitlementId();
             fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
             fragUrl += "&isBundledAssessment=" + assessment.isBundledAssessment();
+            fragUrl += "&scanPreferenceType=" + scanPreferenceType;
+
             if (assessment.getParentAssessmentTypeId() != 0 && assessment.isBundledAssessment())
                 fragUrl += "&parentAssessmentTypeId=" + assessment.getParentAssessmentTypeId();
-            if (fc.bsiUrl.hasLanguageLevel())
-                fragUrl += "&languageLevel=" + fc.bsiUrl.getLanguageLevel();
-            if (fc.hasScanPreferenceType())
-                fragUrl += "&scanPreferenceType=" + fc.scanPreferenceType.toString();
-            if (fc.hasAuditPreferenceType())
-                fragUrl += "&auditPreferenceType=" + fc.auditPreferenceType.toString();
-            fragUrl += "&doSonatypeScan=" + fc.runSonatypeScan;
+
+            if (fc.bsiToken.getLanguageLevel() != null)
+                fragUrl += "&languageLevel=" + fc.bsiToken.getLanguageLevel();
+
+            fragUrl += "&auditPreferenceType=" + auditPreferenceType;
+
+            fragUrl += "&doSonatypeScan=" + includeOpenSourceScan;
             fragUrl += "&isRemediationScan=" + fc.isRemediationScan;
-            fragUrl += "&excludeThirdPartyLibs=" + !fc.includeThirdPartyLibs;
+            fragUrl += "&excludeThirdPartyLibs=" + excludeThirdPartyLibs;
 
             Gson gson = new Gson();
 
@@ -117,7 +128,7 @@ public class StaticScanController extends ControllerBase {
                     } else if (!response.isSuccessful()) {
                         GenericErrorResponse errors = gson.fromJson(responseJsonStr, GenericErrorResponse.class);
                         System.out.println("Package upload failed for the following reasons: " +
-                        errors.toString());
+                                errors.toString());
                         return false;
                     }
                 }

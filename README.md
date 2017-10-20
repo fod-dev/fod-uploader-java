@@ -8,16 +8,16 @@ Java Utility for uploading packages to FoD
 The command line arguments have been completely reworked for 2.x. Arguments are now named and can be in any order: 
 
 ```
-FodUpload.jar -u <url> -z <file> -ac <key> <secret> | -uc <username> <password> -ep <1|SingleScan|2|Subscription>
+FodUpload.jar -bsi <token> -z <file> -ac <key> <secret> | -uc <username> <password> -ep <1|SingleScan|2|Subscription>
 [-purchase] [-b] [-I <minutes>] [-p <1|Standard|2|Express>] [-a <1|Manual|2|Automated>] 
-[-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-itp] [-s] [-r] [-h] [-v]
+[-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-itp] [-os] [-r] [-h] [-v]
 ```
 
 Each option has a short and long name:
 
 Short Name | Long Name              | Required? | Description                                                      
 ---------- | ---------------------- |:---------:| --------------------------------------------------------
- -u        | -bsiUrl                | Yes       | Build server url                                                 
+ -bsi      | -bsiToken              | Yes       | Build server token
  -z        | -zipLocation           | Yes       | Location of scan 
  -ep       | -entitlementPreference | Yes       | Whether to use a single scan or subscription assessment (if available) (1/Single, 2/Subscription)
  -ac       | -apiCredentials        | Yes*      | Api credentials ("key:" does not need to be appended to `<key>`)                                                  
@@ -26,7 +26,7 @@ Short Name | Long Name              | Required? | Description
  -p        | -scanPreferenceId      | No        | Scan mode (1/Standard, 2/Express)                            
  -I        | -pollingInterval       | No        | Interval between checking scan status in minutes                 
  -P        | -proxy                 | No        | Credentials for accessing the proxy                   
- -s        | -runSonatypeScan       | No        | Whether to run a Sonatype Scan         
+ -os       | -runOpenSourceScan     | No        | Whether to run an Open Source Scan
  -h        | -help                  | No        | Print help dialog                                                
  -v        | -version               | No        | Print jar version   
  -itp      | -includeThirdPartyLibs | No        | Include Third Party Libraries from scan
@@ -52,13 +52,13 @@ To compile, simply use the gradlew or gradlew.bat depending on your operating sy
 .\gradlew.bat
 ```
 
-For a better breakdown of the build proccess, compile gradle with the following:
+For a better breakdown of the build process, compile gradle with the following:
 
 ```
 .\gradlew.bat -I init.gradle build
 ```
 
-If you are behind a firewall, you will need to configure gradles's proxy settings in:
+If you are behind a firewall, you will need to configure gradle's proxy settings in:
 
 */\<user-directory>/.gradle/gradle.properties*
 

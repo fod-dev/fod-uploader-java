@@ -3,7 +3,7 @@ package com.fortify.fod.parser;
 import com.beust.jcommander.Parameter;
 import com.fortify.fod.fodapi.FodEnums;
 import com.fortify.fod.parser.converters.*;
-import com.fortify.fod.parser.validators.BsiUrlValidator;
+import com.fortify.fod.parser.validators.BsiTokenValidator;
 import com.fortify.fod.parser.validators.FileValidator;
 
 import java.io.File;
@@ -25,14 +25,16 @@ public class FortifyCommands {
             help = true)
     public boolean version = false;
 
+    private static final String BSI_TOKEN = "-bsiToken";
+    private static final String BSI_TOKEN_SHORT = "-bsi";
     private static final String BSI_URL = "-bsiUrl";
     private static final String BSI_URL_SHORT = "-u";
-    @Parameter(names = { BSI_URL, BSI_URL_SHORT },
+    @Parameter(names = { BSI_TOKEN, BSI_TOKEN_SHORT, BSI_URL, BSI_URL_SHORT },
             description = "build server url",
             required = true,
-            converter = BsiUrlConverter.class,
-            validateWith = BsiUrlValidator.class)
-    public BsiUrl bsiUrl;
+            converter = BsiTokenConverter.class,
+            validateWith = BsiTokenValidator.class)
+    public BsiToken bsiToken;
 
     private static final String ZIP_LOCATION = "-zipLocation";
     private static final String ZIP_LOCATION_SHORT = "-z";
@@ -49,11 +51,11 @@ public class FortifyCommands {
             description = "interval between checking scan status")
     public int pollingInterval = 0;
 
-    private static final String RUN_SONATYPE_SCAN = "-runSonatypeScan";
-    private static final String RUN_SONATYPE_SCAN_SHORT = "-s";
-    @Parameter(names = { RUN_SONATYPE_SCAN, RUN_SONATYPE_SCAN_SHORT},
-            description = "whether to run a Sonatype Scan")
-    public boolean runSonatypeScan = false;
+    private static final String RUN_OPEN_SOURCE_SCAN = "-runOpenSourceScan";
+    private static final String RUN_OPEN_SOURCE_SCAN_SHORT = "-os";
+    @Parameter(names = { RUN_OPEN_SOURCE_SCAN, RUN_OPEN_SOURCE_SCAN_SHORT},
+            description = "whether to run an Open Source Scan")
+    public boolean runOpenSourceScan = false;
 
     private static final String AUDIT_PREFERENCE_ID = "-auditPreferenceId";
     private static final String AUDIT_PREFERENCE_ID_SHORT = "-a";
