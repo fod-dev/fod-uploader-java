@@ -4,6 +4,7 @@ import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.fodapi.models.PostStartScanResponse;
 import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
+import com.fortify.fod.parser.BsiToken;
 import com.fortify.fod.parser.FortifyCommands;
 import com.google.gson.Gson;
 import okhttp3.MediaType;
@@ -31,11 +32,13 @@ public class StaticScanController extends ControllerBase {
 
     /**
      * Starts a scan based on the V3 API
+     *
      * @param fc fortify command object
      * @return true if scan successfully started
      */
     public boolean StartStaticScan(final FortifyCommands fc) {
         PostStartScanResponse scanStartedResponse;
+
 
         try (FileInputStream fs = new FileInputStream(fc.payload)) {
 
@@ -49,25 +52,34 @@ public class StaticScanController extends ControllerBase {
             ReleaseAssessmentTypeDTO assessment = api.getReleaseController()
                     .getAssessmentType(fc);
 
+            // TODO: Fix this upload code to not be string concatenating
+
+            String auditPreferenceType = fc.hasAuditPreferenceType() ? fc.auditPreferenceType.toString() : fc.bsiToken.getAuditPreference();
+            String scanPreferenceType = fc.hasScanPreferenceType() ? fc.scanPreferenceType.toString() : fc.bsiToken.getScanPreference();
+            boolean excludeThirdPartyLibs = !fc.includeThirdPartyLibs || !fc.bsiToken.getIncludeThirdParty();
+            boolean includeOpenSourceScan = fc.runSonatypeScan || fc.bsiToken.getIncludeOpenSourceAnalysis();
+
             // Build 'static' portion of url
             String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiToken.getProjectVersionId() +
                     "/static-scans/start-scan?";
             fragUrl += "assessmentTypeId=" + fc.bsiToken.getAssessmentTypeId();
-            fragUrl += "&technologyStack=" + URLEncoder.encode(fc.bsiToken.getTechnologyStack(), "UTF-8");
+            fragUrl += "&technologyStack=" + URLEncoder.encode(fc.bsiToken.getTechnologyType(), "UTF-8");
             fragUrl += "&entitlementId=" + assessment.getEntitlementId();
             fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
             fragUrl += "&isBundledAssessment=" + assessment.isBundledAssessment();
+            fragUrl += "&scanPreferenceType=" + scanPreferenceType;
+
             if (assessment.getParentAssessmentTypeId() != 0 && assessment.isBundledAssessment())
                 fragUrl += "&parentAssessmentTypeId=" + assessment.getParentAssessmentTypeId();
+
             if (fc.bsiToken.getLanguageLevel() != null)
                 fragUrl += "&languageLevel=" + fc.bsiToken.getLanguageLevel();
-            if (fc.hasScanPreferenceType())
-                fragUrl += "&scanPreferenceType=" + fc.scanPreferenceType.toString();
-            if (fc.hasAuditPreferenceType())
-                fragUrl += "&auditPreferenceType=" + fc.auditPreferenceType.toString();
-            fragUrl += "&doSonatypeScan=" + fc.runSonatypeScan;
+
+            fragUrl += "&auditPreferenceType=" + auditPreferenceType;
+
+            fragUrl += "&doSonatypeScan=" + includeOpenSourceScan;
             fragUrl += "&isRemediationScan=" + fc.isRemediationScan;
-            fragUrl += "&excludeThirdPartyLibs=" + !fc.includeThirdPartyLibs;
+            fragUrl += "&excludeThirdPartyLibs=" + excludeThirdPartyLibs;
 
             Gson gson = new Gson();
 
@@ -118,7 +130,7 @@ public class StaticScanController extends ControllerBase {
                     } else if (!response.isSuccessful()) {
                         GenericErrorResponse errors = gson.fromJson(responseJsonStr, GenericErrorResponse.class);
                         System.out.println("Package upload failed for the following reasons: " +
-                        errors.toString());
+                                errors.toString());
                         return false;
                     }
                 }
