@@ -79,7 +79,6 @@ public class StaticScanController extends ControllerBase {
             fragUrl += "&isRemediationScan=" + fc.isRemediationScan;
             fragUrl += "&excludeThirdPartyLibs=" + excludeThirdPartyLibs;
 
-            Gson gson = new Gson();
 
             // Loop through chunks
             while ((byteCount = fs.read(readByteArray)) != -1) {
@@ -118,6 +117,8 @@ public class StaticScanController extends ControllerBase {
 
                 if (response.code() != 202) {
                     String responseJsonStr = IOUtils.toString(response.body().byteStream(), "utf-8");
+
+                    Gson gson = new Gson();
 
                     if (response.code() == 200) {
                         scanStartedResponse = gson.fromJson(responseJsonStr, PostStartScanResponse.class);
