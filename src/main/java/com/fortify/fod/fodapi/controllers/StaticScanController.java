@@ -46,12 +46,10 @@ public class StaticScanController extends ControllerBase {
             // Get entitlement info
             ReleaseAssessmentTypeDTO assessmentType = api.getReleaseController().getAssessmentType(fc);
 
-
             String auditPreferenceType = fc.hasAuditPreferenceType() ? fc.auditPreferenceType.toString() : fc.bsiToken.getAuditPreference();
             String scanPreferenceType = fc.hasScanPreferenceType() ? fc.scanPreferenceType.toString() : fc.bsiToken.getScanPreference();
             boolean excludeThirdPartyLibs = !fc.includeThirdPartyLibs || !fc.bsiToken.getIncludeThirdParty();
             boolean includeOpenSourceScan = fc.runOpenSourceScan || fc.bsiToken.getIncludeOpenSourceAnalysis();
-
 
             HttpUrl.Builder builder = HttpUrl.parse(api.getBaseUrl()).newBuilder()
                     .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan", fc.bsiToken.getProjectVersionId()))
