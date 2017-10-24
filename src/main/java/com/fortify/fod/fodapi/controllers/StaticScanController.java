@@ -6,10 +6,7 @@ import com.fortify.fod.fodapi.models.PostStartScanResponse;
 import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
 import com.fortify.fod.parser.FortifyCommands;
 import com.google.gson.Gson;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
@@ -47,39 +44,36 @@ public class StaticScanController extends ControllerBase {
             long offset = 0;
 
             // Get entitlement info
-            ReleaseAssessmentTypeDTO assessment = api.getReleaseController()
-                    .getAssessmentType(fc);
-
-            // TODO: Fix this upload code to not be string concatenating
+            ReleaseAssessmentTypeDTO assessmentType = api.getReleaseController().getAssessmentType(fc);
 
             String auditPreferenceType = fc.hasAuditPreferenceType() ? fc.auditPreferenceType.toString() : fc.bsiToken.getAuditPreference();
             String scanPreferenceType = fc.hasScanPreferenceType() ? fc.scanPreferenceType.toString() : fc.bsiToken.getScanPreference();
             boolean excludeThirdPartyLibs = !fc.includeThirdPartyLibs || !fc.bsiToken.getIncludeThirdParty();
             boolean includeOpenSourceScan = fc.runOpenSourceScan || fc.bsiToken.getIncludeOpenSourceAnalysis();
 
-            // Build 'static' portion of url
-            String fragUrl = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiToken.getProjectVersionId() +
-                    "/static-scans/start-scan?";
-            fragUrl += "assessmentTypeId=" + fc.bsiToken.getAssessmentTypeId();
-            fragUrl += "&technologyStack=" + URLEncoder.encode(fc.bsiToken.getTechnologyType(), "UTF-8");
-            fragUrl += "&entitlementId=" + assessment.getEntitlementId();
-            fragUrl += "&entitlementFrequencyType=" + assessment.getFrequencyTypeId();
-            fragUrl += "&isBundledAssessment=" + assessment.isBundledAssessment();
-            fragUrl += "&scanPreferenceType=" + scanPreferenceType;
+            HttpUrl.Builder builder = HttpUrl.parse(api.getBaseUrl()).newBuilder()
+                    .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan", fc.bsiToken.getProjectVersionId()))
+                    .addQueryParameter("assessmentTypeId", Integer.toString(fc.bsiToken.getAssessmentTypeId()))
+                    .addQueryParameter("technologyStack", fc.bsiToken.getTechnologyType())
+                    .addQueryParameter("entitlementId", Integer.toString(assessmentType.getEntitlementId()))
+                    .addQueryParameter("entitlementFrequencyType", Integer.toString(assessmentType.getFrequencyTypeId()))
+                    .addQueryParameter("isBundledAssessment", Boolean.toString(assessmentType.isBundledAssessment()))
+                    .addQueryParameter("doSonatypeScan", Boolean.toString(includeOpenSourceScan))
+                    .addQueryParameter("excludeThirdPartyLibs", Boolean.toString(excludeThirdPartyLibs))
+                    .addQueryParameter("scanPreferenceType", scanPreferenceType)
+                    .addQueryParameter("auditPreferenceType", auditPreferenceType)
+                    .addQueryParameter("isRemediationScan", Boolean.toString(fc.isRemediationScan));
 
-            if (assessment.getParentAssessmentTypeId() != 0 && assessment.isBundledAssessment())
-                fragUrl += "&parentAssessmentTypeId=" + assessment.getParentAssessmentTypeId();
+            if (assessmentType.isBundledAssessment() && assessmentType.getParentAssessmentTypeId() > 0) {
+                builder = builder.addQueryParameter("parentAssessmentTypeId", Integer.toString(assessmentType.getParentAssessmentTypeId()));
+            }
 
-            if (fc.bsiToken.getLanguageLevel() != null)
-                fragUrl += "&languageLevel=" + fc.bsiToken.getLanguageLevel();
+            if (fc.bsiToken.getLanguageLevel() != null) {
+                builder = builder.addQueryParameter("languageLevel", fc.bsiToken.getTechnologyVersion());
+            }
 
-            fragUrl += "&auditPreferenceType=" + auditPreferenceType;
-
-            fragUrl += "&doSonatypeScan=" + includeOpenSourceScan;
-            fragUrl += "&isRemediationScan=" + fc.isRemediationScan;
-            fragUrl += "&excludeThirdPartyLibs=" + excludeThirdPartyLibs;
-
-            Gson gson = new Gson();
+            // TODO: Come back and fix the request to set fragNo and offset query parameters
+            String fragUrl = builder.build().toString();
 
             // Loop through chunks
             while ((byteCount = fs.read(readByteArray)) != -1) {
@@ -118,6 +112,8 @@ public class StaticScanController extends ControllerBase {
 
                 if (response.code() != 202) {
                     String responseJsonStr = IOUtils.toString(response.body().byteStream(), "utf-8");
+
+                    Gson gson = new Gson();
 
                     if (response.code() == 200) {
                         scanStartedResponse = gson.fromJson(responseJsonStr, PostStartScanResponse.class);
