@@ -153,4 +153,41 @@ public class FortifyCommands {
         Package p = getClass().getPackage();
         System.out.println("Version " + p.getImplementationVersion());
     }
+
+    /**
+     * Get method for coalescing Audit Preference flag and BSI Token value
+     * @return String representation of the Audit Preference Type
+     */
+    public String getAuditPreferenceType() {
+        return this.hasAuditPreferenceType() ? this.auditPreferenceType.toString() : this.bsiToken.getAuditPreference();
+    }
+
+    /**
+     * Get method for coalescing Scan Preference Flag and BSI Token value
+     * @return String representation of the Scan Preference Type
+     */
+    public String getScanPreferenceType() {
+        return this.hasScanPreferenceType() ? this.scanPreferenceType.toString() : this.bsiToken.getScanPreference();
+    }
+
+    /**
+     * Get method for coalescing Include Third Party Flag and BSI Token value
+     * @return True if Third party libs are going to be included, False otherwise
+     */
+    public boolean getIncludeThirdParty() {
+        return this.includeThirdPartyLibs || this.bsiToken.getIncludeThirdParty();
+    }
+
+    public boolean getExcludeThirdParty() {
+        return !this.getIncludeThirdParty();
+    }
+
+    /**
+     * Get method for coalescing Include Open Source Analysis and BSI Token value
+     * @return True if Open Source Analysis will be included, False otherwise
+     */
+    public boolean getIncludeOpenSourceAnalysis() {
+        return this.runOpenSourceScan || this.bsiToken.getIncludeOpenSourceAnalysis();
+    }
+
 }
