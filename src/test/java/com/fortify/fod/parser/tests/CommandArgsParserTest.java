@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class CommandArgsParserTest {
 
     @Test
-    void parseCommandArgs1() {
+    void testParseCommandArgs() {
         final String[] args = new String[]{
                 "-ac", "key", "secret",
                 "-z", "C:\\_Payloads_and_FPRs\\Static\\Payloads\\java\\10JavaDefects.zip",
@@ -23,7 +23,8 @@ class CommandArgsParserTest {
         JCommander jc = new JCommander(fc);
         jc.parse(args);
 
-        assertEquals(true, fc.includeThirdPartyLibs);
+        assertEquals(true, fc.getIncludeThirdParty());
+        assertEquals(false, fc.getExcludeThirdParty());
         assertEquals(FodEnums.EntitlementPreferenceType.SingleScan, fc.entitlementPreference);
         assertEquals(1, fc.bsiToken.getTenantId());
         assertEquals(5765, fc.bsiToken.getProjectVersionId());
@@ -33,5 +34,66 @@ class CommandArgsParserTest {
         assertEquals(2, fc.apiCredentials.size());
         assertEquals("key", fc.apiCredentials.get(0));
         assertEquals("secret", fc.apiCredentials.get(1));
+    }
+
+    @Test
+    void testValueOverrideArgsIncludeThirdPartyLibsFromCommandArg() {
+
+        final String[] args = new String[]{
+                "-ac", "key", "secret",
+                "-z", "C:\\_Payloads_and_FPRs\\Static\\Payloads\\java\\10JavaDefects.zip",
+                "-ep", "SingleScan",
+                "-bsiToken", "eyJ0ZW5hbnRJZCI6MSwidGVuYW50Q29kZSI6IlRlbmFudDEiLCJyZWxlYXNlSWQiOjMzMiwicGF5bG9hZFR5cGUiOiJBTkFMWVNJU19QQVlMT0FEIiwiYXNzZXNzbWVudFR5cGVJZCI6NSwidGVjaG5vbG9neVR5cGUiOiIuTkVUIiwidGVjaG5vbG9neVR5cGVJZCI6MSwidGVjaG5vbG9neVZlcnNpb24iOiI0LjciLCJ0ZWNobm9sb2d5VmVyc2lvbklkIjoxNiwiYXVkaXRQcmVmZXJlbmNlIjoiQXV0b21hdGVkIiwiYXVkaXRQcmVmZXJlbmNlSWQiOjIsImluY2x1ZGVUaGlyZFBhcnR5IjpmYWxzZSwiaW5jbHVkZU9wZW5Tb3VyY2VBbmFseXNpcyI6ZmFsc2UsInNjYW5QcmVmZXJlbmNlIjoiU3RhbmRhcmQiLCJzY2FuUHJlZmVyZW5jZUlkIjoxLCJwb3J0YWxVcmkiOiJodHRwOi8vZm9kLmxvY2FsaG9zdCIsImFwaVVyaSI6IiJ9",
+                "-itp"
+        };
+
+        FortifyCommands fc = new FortifyCommands();
+        JCommander jc = new JCommander(fc);
+        jc.parse(args);
+
+        assertEquals("Automated", fc.getAuditPreferenceType());
+        assertEquals("Standard", fc.getScanPreferenceType());
+        assertEquals(false, fc.getExcludeThirdParty());
+        assertEquals(false, fc.getIncludeOpenSourceAnalysis());
+    }
+
+    @Test
+    void testValueOverrideArgsIncludeThirdPartyLibsFromToken() {
+
+        final String[] args = new String[]{
+                "-ac", "key", "secret",
+                "-z", "C:\\_Payloads_and_FPRs\\Static\\Payloads\\java\\10JavaDefects.zip",
+                "-ep", "SingleScan",
+                "-bsiToken", "eyJ0ZW5hbnRJZCI6MSwidGVuYW50Q29kZSI6IlRlbmFudDEiLCJyZWxlYXNlSWQiOjMzMiwicGF5bG9hZFR5cGUiOiJBTkFMWVNJU19QQVlMT0FEIiwiYXNzZXNzbWVudFR5cGVJZCI6NSwidGVjaG5vbG9neVR5cGUiOiIuTkVUIiwidGVjaG5vbG9neVR5cGVJZCI6MSwidGVjaG5vbG9neVZlcnNpb24iOiI0LjciLCJ0ZWNobm9sb2d5VmVyc2lvbklkIjoxNiwiYXVkaXRQcmVmZXJlbmNlIjoiQXV0b21hdGVkIiwiYXVkaXRQcmVmZXJlbmNlSWQiOjIsImluY2x1ZGVUaGlyZFBhcnR5Ijp0cnVlLCJpbmNsdWRlT3BlblNvdXJjZUFuYWx5c2lzIjpmYWxzZSwic2NhblByZWZlcmVuY2UiOiJTdGFuZGFyZCIsInNjYW5QcmVmZXJlbmNlSWQiOjEsInBvcnRhbFVyaSI6Imh0dHA6Ly9mb2QubG9jYWxob3N0IiwiYXBpVXJpIjoiIn0"
+        };
+
+        FortifyCommands fc = new FortifyCommands();
+        JCommander jc = new JCommander(fc);
+        jc.parse(args);
+
+        assertEquals("Automated", fc.getAuditPreferenceType());
+        assertEquals("Standard", fc.getScanPreferenceType());
+        assertEquals(false, fc.getExcludeThirdParty());
+        assertEquals(false, fc.getIncludeOpenSourceAnalysis());
+    }
+
+    @Test
+    void testValueOverrideArgsDoNotIncludeThirdPartyLibs() {
+
+        final String[] args = new String[]{
+                "-ac", "key", "secret",
+                "-z", "C:\\_Payloads_and_FPRs\\Static\\Payloads\\java\\10JavaDefects.zip",
+                "-ep", "SingleScan",
+                "-bsiToken", "eyJ0ZW5hbnRJZCI6MSwidGVuYW50Q29kZSI6IlRlbmFudDEiLCJyZWxlYXNlSWQiOjMzMiwicGF5bG9hZFR5cGUiOiJBTkFMWVNJU19QQVlMT0FEIiwiYXNzZXNzbWVudFR5cGVJZCI6NSwidGVjaG5vbG9neVR5cGUiOiIuTkVUIiwidGVjaG5vbG9neVR5cGVJZCI6MSwidGVjaG5vbG9neVZlcnNpb24iOiI0LjciLCJ0ZWNobm9sb2d5VmVyc2lvbklkIjoxNiwiYXVkaXRQcmVmZXJlbmNlIjoiQXV0b21hdGVkIiwiYXVkaXRQcmVmZXJlbmNlSWQiOjIsImluY2x1ZGVUaGlyZFBhcnR5IjpmYWxzZSwiaW5jbHVkZU9wZW5Tb3VyY2VBbmFseXNpcyI6ZmFsc2UsInNjYW5QcmVmZXJlbmNlIjoiU3RhbmRhcmQiLCJzY2FuUHJlZmVyZW5jZUlkIjoxLCJwb3J0YWxVcmkiOiJodHRwOi8vZm9kLmxvY2FsaG9zdCIsImFwaVVyaSI6IiJ9"
+        };
+
+        FortifyCommands fc = new FortifyCommands();
+        JCommander jc = new JCommander(fc);
+        jc.parse(args);
+
+        assertEquals("Automated", fc.getAuditPreferenceType());
+        assertEquals("Standard", fc.getScanPreferenceType());
+        assertEquals(true, fc.getExcludeThirdParty());
+        assertEquals(false, fc.getIncludeOpenSourceAnalysis());
     }
 }
