@@ -52,4 +52,4 @@ task logError {
     logging.captureStandardOutput LogLevel.ERROR
 }
 
-defaultTasks 'shadowJar'
+defaultTasks 'test', 'shadowJar'
