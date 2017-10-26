@@ -46,11 +46,6 @@ public class StaticScanController extends ControllerBase {
             // Get entitlement info
             ReleaseAssessmentTypeDTO assessmentType = api.getReleaseController().getAssessmentType(fc);
 
-            String auditPreferenceType = fc.hasAuditPreferenceType() ? fc.auditPreferenceType.toString() : fc.bsiToken.getAuditPreference();
-            String scanPreferenceType = fc.hasScanPreferenceType() ? fc.scanPreferenceType.toString() : fc.bsiToken.getScanPreference();
-            boolean excludeThirdPartyLibs = !fc.includeThirdPartyLibs || !fc.bsiToken.getIncludeThirdParty();
-            boolean includeOpenSourceScan = fc.runOpenSourceScan || fc.bsiToken.getIncludeOpenSourceAnalysis();
-
             HttpUrl.Builder builder = HttpUrl.parse(api.getBaseUrl()).newBuilder()
                     .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan", fc.bsiToken.getProjectVersionId()))
                     .addQueryParameter("assessmentTypeId", Integer.toString(fc.bsiToken.getAssessmentTypeId()))
@@ -58,10 +53,10 @@ public class StaticScanController extends ControllerBase {
                     .addQueryParameter("entitlementId", Integer.toString(assessmentType.getEntitlementId()))
                     .addQueryParameter("entitlementFrequencyType", Integer.toString(assessmentType.getFrequencyTypeId()))
                     .addQueryParameter("isBundledAssessment", Boolean.toString(assessmentType.isBundledAssessment()))
-                    .addQueryParameter("doSonatypeScan", Boolean.toString(includeOpenSourceScan))
-                    .addQueryParameter("excludeThirdPartyLibs", Boolean.toString(excludeThirdPartyLibs))
-                    .addQueryParameter("scanPreferenceType", scanPreferenceType)
-                    .addQueryParameter("auditPreferenceType", auditPreferenceType)
+                    .addQueryParameter("doSonatypeScan", Boolean.toString(fc.getIncludeOpenSourceAnalysis()))
+                    .addQueryParameter("excludeThirdPartyLibs", Boolean.toString(fc.getExcludeThirdParty()))
+                    .addQueryParameter("scanPreferenceType", fc.getScanPreferenceType())
+                    .addQueryParameter("auditPreferenceType", fc.getAuditPreferenceType())
                     .addQueryParameter("isRemediationScan", Boolean.toString(fc.isRemediationScan));
 
             if (assessmentType.isBundledAssessment() && assessmentType.getParentAssessmentTypeId() > 0) {
