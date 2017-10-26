@@ -99,12 +99,6 @@ public class FortifyCommands {
             description = "whether to purchase an entitlement if available")
     public boolean purchaseEntitlement = false;
 
-    private static final String EXCLUDE_THIRD_PARTY_LIBS = "-excludeThirdPartyApps";
-    private static final String EXCLUDE_THIRD_PARTY_LIBS_SHORT = "-x";
-    @Parameter(names = { EXCLUDE_THIRD_PARTY_LIBS, EXCLUDE_THIRD_PARTY_LIBS_SHORT },
-            description = "whether to exclude third party libraries")
-    public boolean excludeThirdPartyLibs = false;
-
     private static final String INCLUDE_THIRD_PARTY_LIBS = "-includeThirdPartyApps";
     private static final String INCLUDE_THIRD_PARTY_LIBS_SHORT = "-itp";
     @Parameter(names = { INCLUDE_THIRD_PARTY_LIBS, INCLUDE_THIRD_PARTY_LIBS_SHORT },
