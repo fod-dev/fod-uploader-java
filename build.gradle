@@ -7,12 +7,14 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
     }
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'org.junit.platform.gradle.plugin'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -29,6 +31,8 @@ dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
     compile 'com.fortify.fod:BSITokenParser:1.0.3'
     compile 'com.beust:jcommander:1.48'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0'
 }
 
 shadowJar {
