@@ -136,7 +136,7 @@ public class FortifyCommands {
     }
 
     private static final String PROXY = "-proxy";
-    private static final String PROXY_SHORT = "P";
+    private static final String PROXY_SHORT = "-P";
     @Parameter(names= { PROXY, PROXY_SHORT },
             description = "credentials for accessing the proxy",
             arity = 5,
