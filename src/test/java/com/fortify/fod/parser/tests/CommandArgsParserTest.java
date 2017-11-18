@@ -96,4 +96,24 @@ class CommandArgsParserTest {
         assertEquals(true, fc.getExcludeThirdParty());
         assertEquals(false, fc.getIncludeOpenSourceAnalysis());
     }
+
+    @Test
+    void testParseProxy() {
+        final String[] args = new String[] {
+                "-ac", "key", "secret",
+                "-z", "C:\\_Payloads_and_FPRs\\Static\\Payloads\\java\\10JavaDefects.zip",
+                "-ep", "SingleScan",
+                "-bsiToken", "eyJ0ZW5hbnRJZCI6MSwidGVuYW50Q29kZSI6IlRlbmFudDEiLCJyZWxlYXNlSWQiOjMzMiwicGF5bG9hZFR5cGUiOiJBTkFMWVNJU19QQVlMT0FEIiwiYXNzZXNzbWVudFR5cGVJZCI6NSwidGVjaG5vbG9neVR5cGUiOiIuTkVUIiwidGVjaG5vbG9neVR5cGVJZCI6MSwidGVjaG5vbG9neVZlcnNpb24iOiI0LjciLCJ0ZWNobm9sb2d5VmVyc2lvbklkIjoxNiwiYXVkaXRQcmVmZXJlbmNlIjoiQXV0b21hdGVkIiwiYXVkaXRQcmVmZXJlbmNlSWQiOjIsImluY2x1ZGVUaGlyZFBhcnR5IjpmYWxzZSwiaW5jbHVkZU9wZW5Tb3VyY2VBbmFseXNpcyI6ZmFsc2UsInNjYW5QcmVmZXJlbmNlIjoiU3RhbmRhcmQiLCJzY2FuUHJlZmVyZW5jZUlkIjoxLCJwb3J0YWxVcmkiOiJodHRwOi8vZm9kLmxvY2FsaG9zdCIsImFwaVVyaSI6IiJ9",
+                "-P", "location", "username", "password"
+        };
+
+        FortifyCommands fc = new FortifyCommands();
+        JCommander jc = new JCommander(fc);
+        jc.parse(args);
+        Proxy proxy = new Proxy(fc.proxy);
+
+        assertEquals("location", proxy.getLocation());
+        assertEquals("username", proxy.getUsername());
+        assertEquals("password", proxy.getPassword());
+    }
 }
