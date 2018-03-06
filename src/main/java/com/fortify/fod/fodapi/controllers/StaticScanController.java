@@ -46,6 +46,10 @@ public class StaticScanController extends ControllerBase {
             // Get entitlement info
             ReleaseAssessmentTypeDTO assessmentType = api.getReleaseController().getAssessmentType(fc);
 
+            if (assessmentType == null) {
+                throw new Exception("Invalid entitlement/assessment type");
+            }
+
             HttpUrl.Builder builder = HttpUrl.parse(api.getBaseUrl()).newBuilder()
                     .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan", fc.bsiToken.getProjectVersionId()))
                     .addQueryParameter("assessmentTypeId", Integer.toString(fc.bsiToken.getAssessmentTypeId()))
