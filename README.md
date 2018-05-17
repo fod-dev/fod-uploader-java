@@ -33,6 +33,7 @@ Short Name | Long Name              | Required? | Description
  -r        | -isRemediationScan     | No        | Whether the scan is in remediation 
  -b        | -isBundledAssessment   | No        | Whether the scan is a bundled assessment
  -purchase | -purchaseEntitlement   | No		| Whether to purchase an entitlement (if available)
+ -n        | -notes                 | No        | The notes about the scan.
 
 *One of either apiCredentials or userCredentials is required.
 

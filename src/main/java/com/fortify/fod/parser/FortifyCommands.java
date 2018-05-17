@@ -143,6 +143,12 @@ public class FortifyCommands {
             variableArity = true)
     public List<String> proxy = new ArrayList<>();
 
+    private static final String NOTES = "-notes";
+    private static final String NOTES_SHORT = "-n";
+    @Parameter(names = { NOTES, NOTES_SHORT },
+            description = "the notes about the scan.")
+    public String notes ="";
+
     public void version() {
         Package p = getClass().getPackage();
         System.out.println("Version " + p.getImplementationVersion());
