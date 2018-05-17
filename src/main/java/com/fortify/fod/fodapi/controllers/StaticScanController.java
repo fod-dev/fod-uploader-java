@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 public class StaticScanController extends ControllerBase {
     private final int CHUNK_SIZE = 1024 * 1024;
-
+    private final int MAX_NOTES_LENGTH = 250;
     /**
      * Constructor
      *
@@ -66,7 +66,10 @@ public class StaticScanController extends ControllerBase {
             if (assessmentType.isBundledAssessment() && assessmentType.getParentAssessmentTypeId() > 0) {
                 builder = builder.addQueryParameter("parentAssessmentTypeId", Integer.toString(assessmentType.getParentAssessmentTypeId()));
             }
-
+            if ( fc.notes != null && !fc.notes.isEmpty()) {
+                String truncatedNotes = abbreviateString(fc.notes.trim(),MAX_NOTES_LENGTH);
+                builder = builder.addQueryParameter("notes", truncatedNotes);
+            }
             if (fc.bsiToken.getLanguageLevel() != null) {
                 builder = builder.addQueryParameter("languageLevel", fc.bsiToken.getTechnologyVersion());
             }
@@ -135,5 +138,11 @@ public class StaticScanController extends ControllerBase {
             return false;
         }
         return false;
+    }
+    private static String abbreviateString(String input, int maxLength) {
+        if (input.length() <= maxLength)
+            return input;
+        else
+            return input.substring(0, maxLength);
     }
 }
