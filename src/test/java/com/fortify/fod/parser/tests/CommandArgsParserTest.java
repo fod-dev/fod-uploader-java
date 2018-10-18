@@ -1,12 +1,12 @@
 package com.fortify.fod.parser.tests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.beust.jcommander.JCommander;
 import com.fortify.fod.fodapi.FodEnums;
 import com.fortify.fod.parser.FortifyCommands;
 import com.fortify.fod.parser.Proxy;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class CommandArgsParserTest {
 
@@ -24,8 +24,8 @@ class CommandArgsParserTest {
         JCommander jc = new JCommander(fc);
         jc.parse(args);
 
-        assertEquals(true, fc.getIncludeThirdParty());
-        assertEquals(false, fc.getExcludeThirdParty());
+        assertTrue(fc.getIncludeThirdParty());
+        assertFalse(fc.getExcludeThirdParty());
         assertEquals(FodEnums.EntitlementPreferenceType.SingleScan, fc.entitlementPreference);
         assertEquals(1, fc.bsiToken.getTenantId());
         assertEquals(5765, fc.bsiToken.getProjectVersionId());
@@ -54,8 +54,9 @@ class CommandArgsParserTest {
 
         assertEquals("Automated", fc.getAuditPreferenceType());
         assertEquals("Standard", fc.getScanPreferenceType());
-        assertEquals(false, fc.getExcludeThirdParty());
-        assertEquals(false, fc.getIncludeOpenSourceAnalysis());
+        assertTrue(fc.getIncludeThirdParty());
+        assertFalse(fc.getExcludeThirdParty());
+        assertFalse(fc.getIncludeOpenSourceAnalysis());
     }
 
     @Test
@@ -74,8 +75,9 @@ class CommandArgsParserTest {
 
         assertEquals("Automated", fc.getAuditPreferenceType());
         assertEquals("Standard", fc.getScanPreferenceType());
-        assertEquals(false, fc.getExcludeThirdParty());
-        assertEquals(false, fc.getIncludeOpenSourceAnalysis());
+        assertTrue(fc.getIncludeThirdParty());
+        assertFalse(fc.getExcludeThirdParty());
+        assertFalse(fc.getIncludeOpenSourceAnalysis());
     }
 
     @Test
@@ -94,8 +96,9 @@ class CommandArgsParserTest {
 
         assertEquals("Automated", fc.getAuditPreferenceType());
         assertEquals("Standard", fc.getScanPreferenceType());
-        assertEquals(true, fc.getExcludeThirdParty());
-        assertEquals(false, fc.getIncludeOpenSourceAnalysis());
+        assertFalse(fc.getIncludeThirdParty());
+        assertTrue(fc.getExcludeThirdParty());
+        assertFalse(fc.getIncludeOpenSourceAnalysis());
     }
 
     @Test
