@@ -61,7 +61,11 @@ public class StaticScanController extends ControllerBase {
                     .addQueryParameter("excludeThirdPartyLibs", Boolean.toString(fc.getExcludeThirdParty()))
                     .addQueryParameter("scanPreferenceType", fc.getScanPreferenceType())
                     .addQueryParameter("auditPreferenceType", fc.getAuditPreferenceType())
-                    .addQueryParameter("isRemediationScan", Boolean.toString(fc.isRemediationScan));
+                    .addQueryParameter("isRemediationScan", Boolean.toString(fc.isRemediationScan))
+                    .addQueryParameter("scanTool", fc.scanTool)
+                    .addQueryParameter("scanToolVersion", fc.getImplementedVersion())
+                    .addQueryParameter("scanMethodType", fc.scanMethodType);
+
 
             if (assessmentType.isBundledAssessment() && assessmentType.getParentAssessmentTypeId() > 0) {
                 builder = builder.addQueryParameter("parentAssessmentTypeId", Integer.toString(assessmentType.getParentAssessmentTypeId()));
