@@ -110,6 +110,8 @@ public class FortifyCommands {
     @Parameter(names = { IS_REMEDIATION_SCAN, IS_REMEDIATION_SCAN_SHORT },
             description = "whether the scan is in remediation")
     public boolean isRemediationScan = false;
+    public String scanTool = "FODUploader Plugin";
+    public String  scanMethodType ="CICD";
 
     private static final String API_CREDENTIALS = "-apiCredentials";
     private static final String API_CREDENTIALS_SHORT = "-ac";
@@ -152,6 +154,10 @@ public class FortifyCommands {
     public void version() {
         Package p = getClass().getPackage();
         System.out.println("Version " + p.getImplementationVersion());
+    }
+
+    public String getImplementedVersion(){
+        return getClass().getPackage().getImplementationVersion();
     }
 
     /**
