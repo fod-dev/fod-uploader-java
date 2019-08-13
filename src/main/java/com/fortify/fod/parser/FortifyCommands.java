@@ -110,7 +110,7 @@ public class FortifyCommands {
     @Parameter(names = { IS_REMEDIATION_SCAN, IS_REMEDIATION_SCAN_SHORT },
             description = "whether the scan is in remediation")
     public boolean isRemediationScan = false;
-    public String scanTool = "FODUploader Plugin";
+    public String scanTool = "FoDUploader";
     public String  scanMethodType ="CICD";
 
     private static final String API_CREDENTIALS = "-apiCredentials";
