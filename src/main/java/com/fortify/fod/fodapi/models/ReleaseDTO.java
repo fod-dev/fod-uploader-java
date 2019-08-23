@@ -34,6 +34,7 @@ public class ReleaseDTO {
     private String passFailReasonType;
     private int sdlcStatusTypeId;
     private String sdlcStatusType;
+    private String statusReason;
 
     public int getReleaseId() {return releaseId;}
     public String getReleaseName() {return releaseName;}
@@ -66,4 +67,5 @@ public class ReleaseDTO {
     public String getPassFailReasonType() {return passFailReasonType;}
     public int getSdlcStatusTypeId() {return sdlcStatusTypeId;}
     public String getSdlcStatusType() {return sdlcStatusType;}
+    public String getStatusReason() {return statusReason;}
 }

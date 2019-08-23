@@ -43,7 +43,7 @@ class PollStatus {
                 Thread.sleep(pollingInterval*60*1000);
                 // Get the status of the release
                 ReleaseDTO release = fodApi.getReleaseController().getRelease(releaseId,
-                            "currentAnalysisStatusTypeId,isPassed,passFailReasonId,critical,high,medium,low");
+                            "currentAnalysisStatusTypeId,isPassed,passFailReasonId,critical,high,medium,low,statusReason");
                 if (release == null) {
                     failCount++;
                     continue;
@@ -79,6 +79,9 @@ class PollStatus {
                         }
                     }
                     System.out.println("Status: " + statusString);
+                    if (statusString.equals("Canceled") || statusString.equals("Waiting") ) {
+                        System.out.println("Status Reason: " + release.getStatusReason());
+                    }
                     if(finished)
                     {
                         printPassFail(release);
