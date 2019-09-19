@@ -17,6 +17,7 @@ import java.util.Arrays;
 public class StaticScanController extends ControllerBase {
     private final int CHUNK_SIZE = 1024 * 1024;
     private final int MAX_NOTES_LENGTH = 250;
+    private int triggeredScanId = -1;
     /**
      * Constructor
      *
@@ -125,7 +126,7 @@ public class StaticScanController extends ControllerBase {
                         scanStartedResponse = gson.fromJson(responseJsonStr, PostStartScanResponse.class);
                         System.out.println("Scan " + scanStartedResponse.getScanId() +
                                 " uploaded successfully. Total bytes sent: " + offset);
-
+                        triggeredScanId = scanStartedResponse.getScanId();
                         return true;
                     } else if (!response.isSuccessful()) {
                         GenericErrorResponse errors = gson.fromJson(responseJsonStr, GenericErrorResponse.class);
@@ -148,5 +149,9 @@ public class StaticScanController extends ControllerBase {
             return input;
         else
             return input.substring(0, maxLength);
+    }
+
+    public int getTriggeredScanId() {
+        return triggeredScanId;
     }
 }

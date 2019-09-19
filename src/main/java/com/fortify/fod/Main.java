@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.parser.FortifyCommands;
 import com.fortify.fod.parser.Proxy;
+import com.fortify.fod.fodapi.controllers.*;
 
 public class Main {
 
@@ -39,6 +40,7 @@ public class Main {
         }
 
         boolean uploadSucceeded;
+        int triggeredscanId;
         try {
             Proxy proxy = new Proxy(fc.proxy);
             FodApi fodApi = new FodApi(fc.bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy);
@@ -63,15 +65,16 @@ public class Main {
 
             System.out.println("Beginning upload");
 
-            uploadSucceeded = fodApi.getStaticScanController().StartStaticScan(fc);
-
+             StaticScanController s = fodApi.getStaticScanController();
+             uploadSucceeded = s.StartStaticScan(fc);
+            triggeredscanId = s.getTriggeredScanId();
             //check success status exit appropriately
             if (uploadSucceeded) {
                 // Why do we need to poll for this?
                 if (fc.pollingInterval > 0) {
                     PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
                     // Until status is complete or cancelled
-                    listener.releaseStatus(fc.bsiToken.getProjectVersionId());
+                    listener.releaseStatus(fc.bsiToken.getProjectVersionId(),triggeredscanId);
                 }
                 fodApi.retireToken();
                 System.exit(0);

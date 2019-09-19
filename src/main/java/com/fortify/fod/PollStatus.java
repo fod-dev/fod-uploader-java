@@ -4,6 +4,8 @@ import com.fortify.fod.fodapi.FodEnums.APILookupItemTypes;
 import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.LookupItemsModel;
 import com.fortify.fod.fodapi.models.ReleaseDTO;
+import com.fortify.fod.fodapi.models.ScanSummaryDTO;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +35,7 @@ class PollStatus {
      * @param releaseId release to poll
      * @return true if status is completed | cancelled.
      */
-    boolean releaseStatus(final int releaseId) {
+    boolean releaseStatus(final int releaseId, final int triggeredScanId) {
         boolean finished = false; // default is failure
 
         try
@@ -80,7 +82,19 @@ class PollStatus {
                     }
                     System.out.println("Status: " + statusString);
                     if (statusString.equals("Canceled") || statusString.equals("Waiting") ) {
-                        System.out.println("Status Reason: " + release.getStatusReason());
+                        ScanSummaryDTO scanSummary = fodApi.getScanSummaryController().getScanSummary(releaseId,triggeredScanId);
+                        String message = statusString.equals("Canceled") ? "-------Scan Cancelled-------" : "-------Scan Paused-------";
+                        String reason = statusString.equals("Canceled") ? "Cancel reason:        %s" : "Pause reason:        %s";
+                        String reasonNotes = statusString.equals("Canceled") ? "Cancel reason notes:  %s" : "Pause reason notes:  %s";
+                        if (scanSummary == null) {
+                            System.out.println("Unable to retrieve scan summary data");
+                        } else {
+                            System.out.println(message);
+                            System.out.println(String.format(reason, statusString.equals("Canceled") ? scanSummary.getCancelReason() : scanSummary.getPauseDetails()[0].getReason()));
+                            System.out.println(String.format(reasonNotes, statusString.equals("Canceled") ? scanSummary.getAnalysisStatusReasonNotes() : scanSummary.getPauseDetails()[0].getNotes()));
+                            System.out.println();
+                        }
+
                     }
                     if(finished)
                     {
