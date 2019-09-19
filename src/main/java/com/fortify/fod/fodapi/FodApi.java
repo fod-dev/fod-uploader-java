@@ -36,6 +36,9 @@ public class FodApi {
     public StaticScanController getStaticScanController() { return staticScanController; }
     private ReleaseController releaseController;
     public ReleaseController getReleaseController() { return releaseController; }
+    private ScanSummaryController scanSummaryController;
+    public ScanSummaryController getScanSummaryController() {  return scanSummaryController;  }
+
     private LookupItemsController lookupItemsController;
     public LookupItemsController getLookupController() { return lookupItemsController; }
 
@@ -52,6 +55,7 @@ public class FodApi {
         staticScanController = new StaticScanController(this);
         releaseController = new ReleaseController(this);
         lookupItemsController = new LookupItemsController(this);
+        scanSummaryController = new ScanSummaryController(this);
     }
 
     /**
