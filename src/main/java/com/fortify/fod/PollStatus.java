@@ -45,7 +45,7 @@ class PollStatus {
                 Thread.sleep(pollingInterval*60*1000);
                 // Get the status of the release
                 ReleaseDTO release = fodApi.getReleaseController().getRelease(releaseId,
-                            "currentAnalysisStatusTypeId,isPassed,passFailReasonId,critical,high,medium,low");
+                        "currentAnalysisStatusTypeId,isPassed,passFailReasonId,critical,high,medium,low");
                 if (release == null) {
                     failCount++;
                     continue;
@@ -64,7 +64,7 @@ class PollStatus {
                     // Create a list of values that will be used to break the loop if found
                     // This way if any of this changes we don't need to redo the keys or something
                     List<String> complete = analysisStatusTypes.stream()
-                            .filter(p -> p.getText().equals("Completed") || p.getText().equals("Canceled"))
+                            .filter(p -> p.getText().equals("Completed") || p.getText().equals("Canceled") || p.getText().equals("Waiting"))
                             .map(l -> l.getValue())
                             .collect(Collectors.toCollection(ArrayList::new));
 
@@ -90,13 +90,16 @@ class PollStatus {
                             System.out.println("Unable to retrieve scan summary data");
                         } else {
                             System.out.println(message);
-                            System.out.println(String.format(reason, statusString.equals("Canceled") ? scanSummary.getCancelReason() : scanSummary.getPauseDetails()[0].getReason()));
-                            System.out.println(String.format(reasonNotes, statusString.equals("Canceled") ? scanSummary.getAnalysisStatusReasonNotes() : scanSummary.getPauseDetails()[0].getNotes()));
+                            int pauseDetailsLength = scanSummary.getPauseDetails().length > 0 ? scanSummary.getPauseDetails().length : 0;
+                            System.out.println(String.format(reason, statusString.equals("Canceled") ? scanSummary.getCancelReason()
+                                    :  ((pauseDetailsLength > 0 ) ? scanSummary.getPauseDetails()[pauseDetailsLength-1].getReason() : null)));
+                            System.out.println(String.format(reasonNotes, statusString.equals("Canceled") ? scanSummary.getAnalysisStatusReasonNotes()
+                                    :  ((pauseDetailsLength > 0 ) ? scanSummary.getPauseDetails()[pauseDetailsLength-1].getNotes() : null)));
                             System.out.println();
                         }
 
                     }
-                    if(finished)
+                    if(statusString.equals("Completed"))
                     {
                         printPassFail(release);
                     }
