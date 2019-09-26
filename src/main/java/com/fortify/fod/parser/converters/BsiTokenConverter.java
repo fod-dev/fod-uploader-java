@@ -13,7 +13,6 @@ public class BsiTokenConverter implements IStringConverter<BsiToken> {
 
     @Override
     public BsiToken convert(String value) {
-
         try {
             return parser.parse(value);
         } catch (URISyntaxException | UnsupportedEncodingException e) {

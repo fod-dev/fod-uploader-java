@@ -5,6 +5,8 @@ import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.parser.FortifyCommands;
 import com.fortify.fod.parser.Proxy;
 import com.fortify.fod.fodapi.controllers.*;
+import com.fortify.fod.parser.converters.BsiTokenConverter;
+import com.fortify.fod.parser.BsiToken;
 
 public class Main {
 
@@ -43,48 +45,55 @@ public class Main {
         int triggeredscanId;
         try {
             Proxy proxy = new Proxy(fc.proxy);
-            FodApi fodApi = new FodApi(fc.bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy);
+            BsiToken bsiToken = new BsiTokenConverter().convert(fc.bsiToken);
+            if(bsiToken!= null) {
+                FodApi fodApi = new FodApi(bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy);
 
-            System.out.println("Authenticating");
+                System.out.println("Authenticating");
 
-            // Has username/password
-            String username, password, grantType;
-            if (fc.hasUserCredentials()) {
-                username = fc.userCredentials.get(0);
-                password = fc.userCredentials.get(1);
-                grantType = fodApi.GRANT_TYPE_PASSWORD;
-            // Has key/secret
-            } else {
-                username = fc.apiCredentials.get(0);
-                password = fc.apiCredentials.get(1);
-                grantType = fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
-            }
-
-            String tenantCode = fc.bsiToken.getTenantCode();
-            fodApi.authenticate(tenantCode, username, password, grantType);
-
-            System.out.println("Beginning upload");
-
-             StaticScanController s = fodApi.getStaticScanController();
-             uploadSucceeded = s.StartStaticScan(fc);
-            triggeredscanId = s.getTriggeredScanId();
-            //check success status exit appropriately
-            if (uploadSucceeded) {
-                // Why do we need to poll for this?
-                if (fc.pollingInterval > 0) {
-                    PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
-                    // Until status is complete or cancelled
-                    listener.releaseStatus(fc.bsiToken.getProjectVersionId(),triggeredscanId);
+                // Has username/password
+                String username, password, grantType;
+                if (fc.hasUserCredentials()) {
+                    username = fc.userCredentials.get(0);
+                    password = fc.userCredentials.get(1);
+                    grantType = fodApi.GRANT_TYPE_PASSWORD;
+                    // Has key/secret
+                } else {
+                    username = fc.apiCredentials.get(0);
+                    password = fc.apiCredentials.get(1);
+                    grantType = fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
                 }
-                fodApi.retireToken();
-                System.exit(0);
-            } else {
-                fodApi.retireToken();
-                System.exit(1);
+
+                String tenantCode = bsiToken.getTenantCode();
+                fodApi.authenticate(tenantCode, username, password, grantType);
+
+                System.out.println("Beginning upload");
+
+                StaticScanController s = fodApi.getStaticScanController();
+                uploadSucceeded = s.StartStaticScan(fc);
+                triggeredscanId = s.getTriggeredScanId();
+                //check success status exit appropriately
+                if (uploadSucceeded) {
+                    // Why do we need to poll for this?
+                    if (fc.pollingInterval > 0) {
+                        PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
+                        // Until status is complete or cancelled
+                        listener.releaseStatus(bsiToken.getProjectVersionId(), triggeredscanId);
+                    }
+                    fodApi.retireToken();
+                    System.exit(0);
+                } else {
+                    fodApi.retireToken();
+                    System.exit(1);
+                }
+            }
+            else{
+                throw new Exception("The Bsi Token given is Invalid and cannot be parsed");
             }
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
+
 	}
 }

@@ -36,13 +36,14 @@ public class FodEnums {
         DynamicScanWebServiceTypes
     }
 
-    public enum ScanPreferenceType {
-        Standard(1),
-        Express(2);
+    public enum RemediationScanPreferenceType {
+        RemediationScanIfAvailable(0),
+        RemediationScanOnly(1),
+        NonRemediationScanOnly(2);
 
         private final int _val;
 
-        ScanPreferenceType(int val) {
+        RemediationScanPreferenceType(int val) {
             this._val = val;
         }
 
@@ -52,65 +53,35 @@ public class FodEnums {
 
         public String toString() {
             switch (this._val) {
-                case 2:
-                    return "Express";
+                case 0:
+                    return "RemediationScanIfAvailable";
                 case 1:
+                    return "RemediationScanOnly";
+                case 2:
                 default:
-                    return "Standard";
+                    return "NonRemediationScanOnly";
             }
         }
 
-        public static ScanPreferenceType fromInt(int val) {
+        public static RemediationScanPreferenceType fromInt(int val) {
             switch (val) {
-                case 2:
-                    return Express;
+
                 case 1:
-                    return Standard;
-                default:
-                    return null;
-            }
-        }
-    }
-
-    public enum AuditPreferenceType {
-        Manual(1),
-        Automated(2);
-
-        private final int _val;
-
-        AuditPreferenceType(int val) {
-            this._val = val;
-        }
-
-        public int getValue() {
-            return this._val;
-        }
-
-        public String toString() {
-            switch (this._val) {
+                    return RemediationScanOnly;
+                case 0:
+                    return RemediationScanIfAvailable;
                 case 2:
-                    return "Automated";
-                case 1:
                 default:
-                    return "Manual";
-            }
-        }
-
-        public static AuditPreferenceType fromInt(int val) {
-            switch (val) {
-                case 2:
-                    return Automated;
-                case 1:
-                    return Manual;
-                default:
-                    return null;
+                    return NonRemediationScanOnly;
             }
         }
     }
 
     public enum EntitlementPreferenceType {
-        SingleScan(1),
-        Subscription(2);
+        SingleScanOnly(0),
+        SubscriptionOnly(1),
+        SingleScanFirstThenSubscription(2),
+        SubscriptionFirstThenSingleScan(3) ;
 
         private final int _val;
 
@@ -124,20 +95,64 @@ public class FodEnums {
 
         public String toString() {
             switch (this._val) {
+                case 3:
+                    return "SubscriptionFirstThenSingleScan";
                 case 2:
-                    return "Subscription";
+                    return "SingleScanFirstThenSubscription";
                 case 1:
+                    return "SubscriptionOnly";
+                case 0:
                 default:
-                    return "Single Scan";
+                    return "SingleScanOnly";
             }
         }
 
         public static EntitlementPreferenceType fromInt(int val) {
             switch (val) {
+                case 3:
+                    return SubscriptionFirstThenSingleScan;
                 case 2:
-                    return Subscription;
+                    return SingleScanFirstThenSubscription ;
                 case 1:
-                    return SingleScan;
+                    return SubscriptionOnly;
+                case 0:
+                    return SingleScanOnly;
+                default:
+                    return null;
+            }
+        }
+    }
+
+    public enum InProgressScanActionType {
+        DoNotStartScan(0),
+        CancelScanInProgress(1);
+
+        private final int _val;
+
+        InProgressScanActionType(int val) {
+            this._val = val;
+        }
+
+        public int getValue() {
+            return this._val;
+        }
+
+        public String toString() {
+            switch (this._val) {
+                 case 1:
+                    return "CancelInProgressScan";
+                case 0:
+                default:
+                    return "DoNotStartScan";
+            }
+        }
+
+        public static InProgressScanActionType fromInt(int val) {
+            switch (val) {
+                case 1:
+                    return CancelScanInProgress;
+                case 0:
+                    return DoNotStartScan;
                 default:
                     return null;
             }

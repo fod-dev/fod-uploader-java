@@ -11,6 +11,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
+import com.fortify.fod.parser.BsiToken;
+import com.fortify.fod.parser.converters.BsiTokenConverter;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -80,51 +82,58 @@ public class ReleaseController extends ControllerBase {
      */
     public ReleaseAssessmentTypeDTO getAssessmentType(final FortifyCommands fc) {
         try {
-            //String url = api.getBaseUrl() + "/api/v3/releases/" + fc.bsiUrl.getProjectVersionId() + "/assessment-types";
 
-            String filters = "frequencyTypeId:" + fc.entitlementPreference.getValue();
-            if (fc.isBundledAssessment)
-                filters += "+isBundledAssessment:true";
-
-            filters = URLEncoder.encode(filters, "UTF-8");
-
-            String url = String.format("%s/api/v3/releases/%s/assessment-types?scanType=1&filters=%s",
-                    api.getBaseUrl(),
-                    fc.bsiToken.getProjectVersionId(),
-                    filters);
-
-            if (api.getToken() == null)
-                api.authenticate();
-
-            Request request = new Request.Builder()
-                    .url(url)
-                    .addHeader("Authorization", "Bearer " + api.getToken())
-                    .get()
-                    .build();
-            Response response = api.getClient().newCall(request).execute();
-
-            if (response.code() == HttpStatus.SC_FORBIDDEN) {  // got logged out during polling so log back in
-                // Re-authenticate
-                api.authenticate();
-            }
-
-            // Read the results and close the response
-            String content = IOUtils.toString(response.body().byteStream(), "utf-8");
-            response.body().close();
-
-            Gson gson = new Gson();
-            // Create a type of GenericList<ApplicationDTO> to play nice with gson.
-            Type t = new TypeToken<GenericListResponse<ReleaseAssessmentTypeDTO>>() {
-            }.getType();
-            GenericListResponse<ReleaseAssessmentTypeDTO> results = gson.fromJson(content, t);
-
-            // Get entitlement based on available options
-            for (ReleaseAssessmentTypeDTO assessment : results.getItems()) {
-                if (assessment.getAssessmentTypeId() == fc.bsiToken.getAssessmentTypeId()) {
-                    if (fc.purchaseEntitlement || assessment.getEntitlementId() > 0)
-                        return assessment;
-                    return null;
+            try {
+                BsiToken parsedbsiToken = new BsiTokenConverter().convert(fc.bsiToken);
+                if (parsedbsiToken == null) {
+                    throw new Exception("Bsi token given is invalid and cannot be parsed");
                 }
+
+                String filters = "frequencyTypeId:" + fc.entitlementPreference.getValue();
+
+                filters = URLEncoder.encode(filters, "UTF-8");
+
+                String url = String.format("%s/api/v3/releases/%s/assessment-types?scanType=1&filters=%s",
+                        api.getBaseUrl(),
+                        parsedbsiToken.getProjectVersionId(),
+                        filters);
+
+                if (api.getToken() == null)
+                    api.authenticate();
+
+                Request request = new Request.Builder()
+                        .url(url)
+                        .addHeader("Authorization", "Bearer " + api.getToken())
+                        .get()
+                        .build();
+                Response response = api.getClient().newCall(request).execute();
+
+                if (response.code() == HttpStatus.SC_FORBIDDEN) {  // got logged out during polling so log back in
+                    // Re-authenticate
+                    api.authenticate();
+                }
+
+                // Read the results and close the response
+                String content = IOUtils.toString(response.body().byteStream(), "utf-8");
+                response.body().close();
+
+                Gson gson = new Gson();
+                // Create a type of GenericList<ApplicationDTO> to play nice with gson.
+                Type t = new TypeToken<GenericListResponse<ReleaseAssessmentTypeDTO>>() {
+                }.getType();
+                GenericListResponse<ReleaseAssessmentTypeDTO> results = gson.fromJson(content, t);
+
+                // Get entitlement based on available options
+                for (ReleaseAssessmentTypeDTO assessment : results.getItems()) {
+                    if (assessment.getAssessmentTypeId() == parsedbsiToken.getAssessmentTypeId()) {
+                        if (fc.purchaseEntitlement || assessment.getEntitlementId() > 0)
+                            return assessment;
+                        return null;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Bsi Token cannot be parsed , please check and upload valid bsi Token");
+                return null;
             }
             return null;
         } catch (Exception e) {

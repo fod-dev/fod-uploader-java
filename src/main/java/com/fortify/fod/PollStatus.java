@@ -80,10 +80,10 @@ class PollStatus {
                             }
                         }
                     }
-                    System.out.println("Status: " + statusString);
+                    System.out.println("Poll Status: " + statusString);
                     if (statusString.equals("Canceled") || statusString.equals("Waiting") ) {
                         ScanSummaryDTO scanSummary = fodApi.getScanSummaryController().getScanSummary(releaseId,triggeredScanId);
-                        String message = statusString.equals("Canceled") ? "-------Scan Cancelled-------" : "-------Scan Paused-------";
+                        String message = statusString.equals("Canceled") ? "-------Scan Canceled-------" : "-------Scan Paused-------";
                         String reason = statusString.equals("Canceled") ? "Cancel reason:        %s" : "Pause reason:        %s";
                         String reasonNotes = statusString.equals("Canceled") ? "Cancel reason notes:  %s" : "Pause reason notes:  %s";
                         if (scanSummary == null) {
@@ -130,6 +130,12 @@ class PollStatus {
                 this.failCount++;
                 return;
             }
+            System.out.println("Number of criticals: " +  release.getCritical());
+            System.out.println("Number of highs: " +  release.getHigh());
+            System.out.println("Number of mediums: " +  release.getMedium());
+            System.out.println("Number of lows: " +  release.getLow());
+            System.out.println("For application status details see the customer portal: ");
+            System.out.println(String.format("%s/Redirect/Releases/%d", fodApi.getBaseUrl(), release.getReleaseId()));
             boolean isPassed = release.isPassed();
             System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );
             if (!isPassed)
@@ -139,10 +145,7 @@ class PollStatus {
                         release.getPassFailReasonType();
 
                 System.out.println("Failure Reason: " + passFailReason);
-                System.out.println("Number of criticals: " +  release.getCritical());
-                System.out.println("Number of highs: " +  release.getHigh());
-                System.out.println("Number of mediums: " +  release.getMedium());
-                System.out.println("Number of lows: " +  release.getLow());
+
 
             }
         } catch (Exception e) {
