@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 import okhttp3.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
+import com.fortify.fod.parser.converters.BsiTokenConverter;
+import com.fortify.fod.parser.BsiToken;
 
 import java.io.FileInputStream;
 import java.net.URLEncoder;
@@ -18,6 +20,9 @@ public class StaticScanController extends ControllerBase {
     private final int CHUNK_SIZE = 1024 * 1024;
     private final int MAX_NOTES_LENGTH = 250;
     private int triggeredScanId = -1;
+    private BsiToken parsedbsiToken = null;
+    private static BsiTokenConverter parser = new BsiTokenConverter();
+
     /**
      * Constructor
      *
@@ -44,45 +49,29 @@ public class StaticScanController extends ControllerBase {
             int byteCount;
             long offset = 0;
 
-            // Get entitlement info
-            ReleaseAssessmentTypeDTO assessmentType = api.getReleaseController().getAssessmentType(fc);
-
-            if (assessmentType == null) {
-                throw new Exception("Invalid entitlement/assessment type");
+            parsedbsiToken = parser.convert(fc.bsiToken);
+            if (parsedbsiToken == null) {
+                throw new Exception("Bsi Token given is invalid and cannot be parsed");
             }
-
             HttpUrl.Builder builder = HttpUrl.parse(api.getBaseUrl()).newBuilder()
-                    .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan", fc.bsiToken.getProjectVersionId()))
-                    .addQueryParameter("assessmentTypeId", Integer.toString(fc.bsiToken.getAssessmentTypeId()))
-                    .addQueryParameter("technologyStack", fc.bsiToken.getTechnologyType())
-                    .addQueryParameter("entitlementId", Integer.toString(assessmentType.getEntitlementId()))
-                    .addQueryParameter("entitlementFrequencyType", Integer.toString(assessmentType.getFrequencyTypeId()))
-                    .addQueryParameter("isBundledAssessment", Boolean.toString(assessmentType.isBundledAssessment()))
-                    .addQueryParameter("doSonatypeScan", Boolean.toString(fc.getIncludeOpenSourceAnalysis()))
-                    .addQueryParameter("excludeThirdPartyLibs", Boolean.toString(fc.getExcludeThirdParty()))
-                    .addQueryParameter("scanPreferenceType", fc.getScanPreferenceType())
-                    .addQueryParameter("auditPreferenceType", fc.getAuditPreferenceType())
-                    .addQueryParameter("isRemediationScan", Boolean.toString(fc.isRemediationScan))
+                    .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan-advanced", parsedbsiToken.getProjectVersionId()))
+                    .addQueryParameter("releaseId", Integer.toString(parsedbsiToken.getProjectVersionId()))
+                    .addQueryParameter("bsiToken", fc.bsiToken.toString())
+                    .addQueryParameter("entitlementPreferenceType", fc.entitlementPreference.toString())
+                    .addQueryParameter("purchaseEntitlement", Boolean.toString(fc.purchaseEntitlement))
+                    .addQueryParameter("remdiationScanPreferenceType", fc.remediationScanPreference.toString())
+                    .addQueryParameter("inProgressScanActionType", fc.inProgressScanPreferenceType.toString())
                     .addQueryParameter("scanTool", fc.scanTool)
                     .addQueryParameter("scanToolVersion", fc.getImplementedVersion())
                     .addQueryParameter("scanMethodType", fc.scanMethodType);
-
-
-            if (assessmentType.isBundledAssessment() && assessmentType.getParentAssessmentTypeId() > 0) {
-                builder = builder.addQueryParameter("parentAssessmentTypeId", Integer.toString(assessmentType.getParentAssessmentTypeId()));
-            }
-            if ( fc.notes != null && !fc.notes.isEmpty()) {
-                String truncatedNotes = abbreviateString(fc.notes.trim(),MAX_NOTES_LENGTH);
+            if (fc.notes != null && !fc.notes.isEmpty()) {
+                String truncatedNotes = abbreviateString(fc.notes.trim(), MAX_NOTES_LENGTH);
                 builder = builder.addQueryParameter("notes", truncatedNotes);
             }
-            if (fc.bsiToken.getLanguageLevel() != null) {
-                builder = builder.addQueryParameter("languageLevel", fc.bsiToken.getTechnologyVersion());
-            }
-
             // TODO: Come back and fix the request to set fragNo and offset query parameters
             String fragUrl = builder.build().toString();
 
-            // Loop through chunks
+            // Loop through chunk
             while ((byteCount = fs.read(readByteArray)) != -1) {
 
                 if (byteCount < CHUNK_SIZE) {
@@ -102,7 +91,6 @@ public class StaticScanController extends ControllerBase {
                         .build();
                 // Get the response
                 Response response = api.getClient().newCall(request).execute();
-
                 if (response.code() == HttpStatus.SC_FORBIDDEN) {  // got logged out during polling so log back in
                     // Re-authenticate
                     api.authenticate();
@@ -121,7 +109,6 @@ public class StaticScanController extends ControllerBase {
                     String responseJsonStr = IOUtils.toString(response.body().byteStream(), "utf-8");
 
                     Gson gson = new Gson();
-
                     if (response.code() == 200) {
                         scanStartedResponse = gson.fromJson(responseJsonStr, PostStartScanResponse.class);
                         System.out.println("Scan " + scanStartedResponse.getScanId() +
@@ -144,6 +131,7 @@ public class StaticScanController extends ControllerBase {
         }
         return false;
     }
+
     private static String abbreviateString(String input, int maxLength) {
         if (input.length() <= maxLength)
             return input;
