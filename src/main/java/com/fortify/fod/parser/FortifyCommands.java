@@ -17,7 +17,7 @@ public class FortifyCommands {
             description = "print this message",
             help = true)
     public boolean help = false;
-    public int pollingInterval = 0;
+
 
     private static final String VERSION = "-version";
     private static final String VERSION_SHORT = "-v";
@@ -48,7 +48,7 @@ public class FortifyCommands {
     private static final String POLLING_INTERVAL_SHORT = "-I";
     @Parameter(names = {POLLING_INTERVAL, POLLING_INTERVAL_SHORT},
             description = "interval between checking scan status")
-
+    public int pollingInterval = 0;
 
     private static final String IN_PROGRESS_SCAN_ACTION_TYPE = "-inProgressScanActionType";
     private static final String IN_PROGRESS_SCAN_ACTION_TYPE_SHORT = "-pp";
