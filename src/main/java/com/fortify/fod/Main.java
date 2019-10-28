@@ -47,7 +47,7 @@ public class Main {
             Proxy proxy = new Proxy(fc.proxy);
             BsiToken bsiToken = new BsiTokenConverter().convert(fc.bsiToken);
             if(bsiToken!= null) {
-                FodApi fodApi = new FodApi(bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy);
+                FodApi fodApi = new FodApi(bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy, bsiToken.getPortalUri());
 
                 System.out.println("Authenticating");
 

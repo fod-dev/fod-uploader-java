@@ -101,7 +101,7 @@ class PollStatus {
                     }
                     if(statusString.equals("Completed"))
                     {
-                        printPassFail(release);
+                        printPassFail(release, releaseId);
                     }
                 }
                 else
@@ -122,7 +122,7 @@ class PollStatus {
      * Prints some info about the release including a vuln breakdown and pass/fail reason
      * @param release release to print info on
      */
-    private void printPassFail(ReleaseDTO release) {
+    private void printPassFail(ReleaseDTO release,int releaseId) {
         try
         {
             // Break if release is null
@@ -135,7 +135,7 @@ class PollStatus {
             System.out.println("Number of mediums: " +  release.getMedium());
             System.out.println("Number of lows: " +  release.getLow());
             System.out.println("For application status details see the customer portal: ");
-            System.out.println(String.format("%s/Redirect/Releases/%d", fodApi.getBaseUrl(), release.getReleaseId()));
+            System.out.println(String.format("%s/Redirect/Releases/%d", fodApi.getPortalUri(), releaseId));
             boolean isPassed = release.isPassed();
             System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );
             if (!isPassed)

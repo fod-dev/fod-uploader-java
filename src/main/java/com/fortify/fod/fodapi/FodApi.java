@@ -19,6 +19,7 @@ public class FodApi {
     public final String GRANT_TYPE_CLIENT_CREDENTIALS = "client_credentials";
 
     private String baseUrl;
+    private String portalUrl;
     private OkHttpClient client;
     private String token;
 
@@ -47,8 +48,9 @@ public class FodApi {
      * @param url baseUrl for the api (derived from the bsiUrl
      * @param clProxy Proxy for the api calls to use
      */
-    public FodApi(String url, Proxy clProxy) {
+    public FodApi(String url, Proxy clProxy, String portalUri) {
         baseUrl = url;
+        portalUrl = portalUri;
         client = Create(clProxy);
 
         // Creates the various api controllers
@@ -191,4 +193,5 @@ public class FodApi {
     public String getToken() { return token; }
     public OkHttpClient getClient() { return client; }
     public String getBaseUrl() { return baseUrl; }
+    public String getPortalUri() { return portalUrl; }
 }
