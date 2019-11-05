@@ -92,9 +92,9 @@ class PollStatus {
                             System.out.println(message);
                             int pauseDetailsLength = scanSummary.getPauseDetails().length > 0 ? scanSummary.getPauseDetails().length : 0;
                             System.out.println(String.format(reason, statusString.equals("Canceled") ? scanSummary.getCancelReason()
-                                    :  ((pauseDetailsLength > 0 ) ? scanSummary.getPauseDetails()[pauseDetailsLength-1].getReason() : null)));
+                                    :  ((pauseDetailsLength > 0 ) ? (scanSummary.getPauseDetails()[pauseDetailsLength-1].getReason() == null) ?"" : scanSummary.getPauseDetails()[pauseDetailsLength-1].getReason(): "")));
                             System.out.println(String.format(reasonNotes, statusString.equals("Canceled") ? scanSummary.getAnalysisStatusReasonNotes()
-                                    :  ((pauseDetailsLength > 0 ) ? scanSummary.getPauseDetails()[pauseDetailsLength-1].getNotes() : null)));
+                                    :  ((pauseDetailsLength > 0 ) ? (scanSummary.getPauseDetails()[pauseDetailsLength-1].getNotes() == null) ? "" : scanSummary.getPauseDetails()[pauseDetailsLength-1].getNotes()  : "")));
                             System.out.println();
                         }
 
