@@ -95,15 +95,15 @@ public class FodEnums {
 
         public String toString() {
             switch (this._val) {
-                case 3:
-                    return "SubscriptionFirstThenSingleScan";
                 case 2:
                     return "SingleScanFirstThenSubscription";
                 case 1:
                     return "SubscriptionOnly";
                 case 0:
-                default:
                     return "SingleScanOnly";
+                case 3:
+                default:
+                    return "SubscriptionFirstThenSingleScan";
             }
         }
 
@@ -116,9 +116,8 @@ public class FodEnums {
                 case 1:
                     return SubscriptionOnly;
                 case 0:
-                    return SingleScanOnly;
                 default:
-                    return null;
+                    return SingleScanOnly;
             }
         }
     }
@@ -139,7 +138,7 @@ public class FodEnums {
 
         public String toString() {
             switch (this._val) {
-                 case 1:
+                case 1:
                     return "CancelInProgressScan";
                 case 0:
                 default:
@@ -152,9 +151,8 @@ public class FodEnums {
                 case 1:
                     return CancelScanInProgress;
                 case 0:
-                    return DoNotStartScan;
                 default:
-                    return null;
+                    return DoNotStartScan;
             }
         }
     }

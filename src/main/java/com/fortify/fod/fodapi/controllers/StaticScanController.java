@@ -57,10 +57,10 @@ public class StaticScanController extends ControllerBase {
                     .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan-advanced", parsedbsiToken.getProjectVersionId()))
                     .addQueryParameter("releaseId", Integer.toString(parsedbsiToken.getProjectVersionId()))
                     .addQueryParameter("bsiToken", fc.bsiToken.toString())
-                    .addQueryParameter("entitlementPreferenceType", fc.entitlementPreference.toString())
+                    .addQueryParameter("entitlementPreferenceType", (fc.entitlementPreference != null) ? fc.entitlementPreference.toString() : "3")
                     .addQueryParameter("purchaseEntitlement", Boolean.toString(fc.purchaseEntitlement))
-                    .addQueryParameter("remdiationScanPreferenceType", fc.remediationScanPreference.toString())
-                    .addQueryParameter("inProgressScanActionType", fc.inProgressScanPreferenceType.toString())
+                    .addQueryParameter("remdiationScanPreferenceType", (fc.remediationScanPreference != null) ? fc.remediationScanPreference.toString() : "2")
+                    .addQueryParameter("inProgressScanActionType", (fc.inProgressScanPreferenceType != null) ? fc.inProgressScanPreferenceType.toString() : "0")
                     .addQueryParameter("scanTool", fc.scanTool)
                     .addQueryParameter("scanToolVersion", fc.getImplementedVersion())
                     .addQueryParameter("scanMethodType", fc.scanMethodType);
