@@ -54,24 +54,21 @@ public class FortifyCommands {
     private static final String IN_PROGRESS_SCAN_ACTION_TYPE_SHORT = "-pp";
     @Parameter(names = {IN_PROGRESS_SCAN_ACTION_TYPE, IN_PROGRESS_SCAN_ACTION_TYPE_SHORT},
             description = "in progress scan type (Do not start scan or Cancel In Progress Scan )",
-            converter = InProgressScanActionTypeConverter.class,
-            required = true)
+            converter = InProgressScanActionTypeConverter.class)
     public FodEnums.InProgressScanActionType inProgressScanPreferenceType = null;
 
     private static final String REMEDIATION_SCAN_PREFERENCE = "-remdiationScanPreferenceType";
     private static final String REMEDIATION_SCAN_PREFERENCE_SHORT = "-rp";
     @Parameter(names = {REMEDIATION_SCAN_PREFERENCE, REMEDIATION_SCAN_PREFERENCE_SHORT},
             description = "preferred remediation scan type (Remediation Scan if Available or Remediation Scan Only or Non Remediation Scan Only)",
-            converter = RemediationScanPreferenceTypeConverter.class,
-            required = true)
+            converter = RemediationScanPreferenceTypeConverter.class)
     public FodEnums.RemediationScanPreferenceType remediationScanPreference = null;
 
     private static final String ENTITLEMENT_PREFERENCE = "-entitlementPreferenceType";
     private static final String ENTITLEMENT_PREFERENCE_SHORT = "-ep";
     @Parameter(names = {ENTITLEMENT_PREFERENCE, ENTITLEMENT_PREFERENCE_SHORT},
             description = "preferred entitlement type (SingleScan , Subscription , First Single Scan Then Subscription Or First Subscription Then Single Scan)",
-            converter = EntitlementPreferenceTypeConverter.class,
-            required = true)
+            converter = EntitlementPreferenceTypeConverter.class)
     public FodEnums.EntitlementPreferenceType entitlementPreference = null;
 
     private static final String PURCHASE_ENTITLEMENT = "-purchaseEntitlement";
