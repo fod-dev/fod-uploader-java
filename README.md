@@ -19,12 +19,12 @@ Each argument has a short and long name:
 Short Name | Long Name                     | Required? | Description                                                      
 ---------- | ----------------------        |:---------:| --------------------------------------------------------
  -bsi      | -bsiToken                     | Yes       | Build server token
- -z        | -zipLocation                  | Yes       | Location of scan 
+ -z        | -zipLocation                  | Yes       | Location of scan
+  -ac       | -apiCredentials               | Yes*      | Api credentials ("key:" does not need to be appended to `<key>`)                                                  
+ -uc       | -userCredentials              | Yes*      | User login credentials (wrap each in quotations to avoid escaping characters in the CLI)  
  -ep       | -entitlementPreferenceType    | No       | Whether to use a single scan or subscription assessment: 0/SingleScanOnly, 1/SubscriptionOnly, 2/SingleScanFirstThenSubscription, 3/SubscriptionFirstThenSingleScan (default)
  -rp       | -remediationScanPreferenceType| No       | Whether to run a remediation scan: 0/RemediationScanIfAvailable, 1/RemediationScanOnly, 2/NonRemediationScanOnly (default)
- -pp       | -inProgressScanActionType     | No      | Whether to cancel an in-progress scan and start a new scan or not start a scan: 0/DoNotStartScan (default), 1/CancelScanInProgress
- -ac       | -apiCredentials               | Yes*      | Api credentials ("key:" does not need to be appended to `<key>`)                                                  
- -uc       | -userCredentials              | Yes*      | User login credentials (wrap each in quotations to avoid escaping characters in the CLI)                           
+ -pp       | -inProgressScanActionType     | No      | Whether to cancel an in-progress scan and start a new scan or not start a scan: 0/DoNotStartScan (default), 1/CancelScanInProgress                    
  -I        | -pollingInterval              | No        | Interval between checking scan status in minutes                 
  -P        | -proxy                        | No        | Credentials for accessing the proxy                   
  -h        | -help                         | No        | Print help dialog                                                
