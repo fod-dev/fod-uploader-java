@@ -47,7 +47,7 @@ public class Main {
             System.exit(1);
         }
 
-        if(fc.auditPreferenceType != null || fc.includeThirdPartyLibs != null || fc.runOpenSourceScan != null || fc.scanPreferenceType != null){
+        if(fc.isBundledAssessment!= null || fc.auditPreferenceType != null || fc.includeThirdPartyLibs != null || fc.runOpenSourceScan != null || fc.scanPreferenceType != null){
             System.out.println("The following parameters are deprecated and will be ignored:   -auditPreferenceId -a, -runOpenSourceScan -os, -scanPreferenceId -p, -includeThirdPartyApps -itp, -isBundledAssessment -b");
         }
 
