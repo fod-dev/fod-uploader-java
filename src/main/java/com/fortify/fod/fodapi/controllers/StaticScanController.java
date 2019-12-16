@@ -1,6 +1,7 @@
 package com.fortify.fod.fodapi.controllers;
 
 import com.fortify.fod.fodapi.FodApi;
+import com.fortify.fod.fodapi.FodEnums;
 import com.fortify.fod.fodapi.models.GenericErrorResponse;
 import com.fortify.fod.fodapi.models.PostStartScanResponse;
 import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
@@ -53,6 +54,8 @@ public class StaticScanController extends ControllerBase {
             if (parsedbsiToken == null) {
                 throw new Exception("Bsi Token given is invalid and cannot be parsed");
             }
+            fc.remediationScanPreference = (fc.isRemediationScan) ? FodEnums.RemediationScanPreferenceType.RemediationScanOnly
+               : fc.remediationScanPreference.toString() != null ? fc.remediationScanPreference : FodEnums.RemediationScanPreferenceType.NonRemediationScanOnly ;
             HttpUrl.Builder builder = HttpUrl.parse(api.getBaseUrl()).newBuilder()
                     .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan-advanced", parsedbsiToken.getProjectVersionId()))
                     .addQueryParameter("releaseId", Integer.toString(parsedbsiToken.getProjectVersionId()))
