@@ -78,30 +78,29 @@ public class FodEnums {
     }
 
     public enum EntitlementPreferenceType {
-        SingleScanOnly(0),
-        SubscriptionOnly(1),
-        SingleScanFirstThenSubscription(2),
-        SubscriptionFirstThenSingleScan(3) ;
+        SingleScanOnly(1),
+        SubscriptionOnly(2),
+        SingleScanFirstThenSubscription(3),
+        SubscriptionFirstThenSingleScan(4) ;
 
         private final int _val;
 
         EntitlementPreferenceType(int val) {
             this._val = val;
         }
-
         public int getValue() {
             return this._val;
         }
 
         public String toString() {
             switch (this._val) {
-                case 2:
-                    return "SingleScanFirstThenSubscription";
                 case 1:
-                    return "SubscriptionOnly";
-                case 0:
                     return "SingleScanOnly";
+                case 2:
+                    return "SubscriptionOnly";
                 case 3:
+                    return "SingleScanFirstThenSubscription";
+                case 4:
                 default:
                     return "SubscriptionFirstThenSingleScan";
             }
@@ -109,15 +108,16 @@ public class FodEnums {
 
         public static EntitlementPreferenceType fromInt(int val) {
             switch (val) {
-                case 3:
-                    return SubscriptionFirstThenSingleScan;
-                case 2:
-                    return SingleScanFirstThenSubscription ;
                 case 1:
-                    return SubscriptionOnly;
-                case 0:
-                default:
                     return SingleScanOnly;
+                case 2:
+                    return SubscriptionOnly;
+                case 3:
+                    return SingleScanFirstThenSubscription ;
+                case 4:
+                    return SubscriptionFirstThenSingleScan;
+                default:
+                    return null;
             }
         }
     }

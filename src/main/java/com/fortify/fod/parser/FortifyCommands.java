@@ -68,7 +68,8 @@ public class FortifyCommands {
     private static final String ENTITLEMENT_PREFERENCE_SHORT = "-ep";
     @Parameter(names = {ENTITLEMENT_PREFERENCE, ENTITLEMENT_PREFERENCE_SHORT},
             description = "preferred entitlement type (SingleScan , Subscription , First Single Scan Then Subscription Or First Subscription Then Single Scan)",
-            converter = EntitlementPreferenceTypeConverter.class)
+            converter = EntitlementPreferenceTypeConverter.class,
+            required = true)
     public FodEnums.EntitlementPreferenceType entitlementPreference = null;
 
     private static final String PURCHASE_ENTITLEMENT = "-purchaseEntitlement";
@@ -119,6 +120,43 @@ public class FortifyCommands {
     @Parameter(names = {NOTES, NOTES_SHORT},
             description = "the notes about the scan.")
     public String notes = "";
+
+    // Deprecated Options
+    private static final String AUDIT_PREFERENCE_ID = "-auditPreferenceId";
+    private static final String AUDIT_PREFERENCE_ID_SHORT = "-a";
+    @Parameter(names = { AUDIT_PREFERENCE_ID, AUDIT_PREFERENCE_ID_SHORT },
+            description = "false positive audit type (Manual or Automated)")
+    public String auditPreferenceType = null;
+
+    private static final String RUN_OPEN_SOURCE_SCAN = "-runOpenSourceScan";
+    private static final String RUN_OPEN_SOURCE_SCAN_SHORT = "-os";
+    @Parameter(names = { RUN_OPEN_SOURCE_SCAN, RUN_OPEN_SOURCE_SCAN_SHORT},
+            description = "whether to run an Open Source Scan")
+    public String runOpenSourceScan = null;
+
+    private static final String SCAN_PREFERENCE_ID = "-scanPreferenceId";
+    private static final String SCAN_PREFERENCE_ID_SHORT = "-p";
+    @Parameter(names = { SCAN_PREFERENCE_ID, SCAN_PREFERENCE_ID_SHORT },
+            description = "scan mode (Standard or Express)")
+    public String scanPreferenceType = null;
+
+    private static final String INCLUDE_THIRD_PARTY_LIBS = "-includeThirdPartyApps";
+    private static final String INCLUDE_THIRD_PARTY_LIBS_SHORT = "-itp";
+    @Parameter(names = { INCLUDE_THIRD_PARTY_LIBS, INCLUDE_THIRD_PARTY_LIBS_SHORT },
+            description = "whether to include third party libraries")
+    public String includeThirdPartyLibs = null;
+
+    private static final String IS_REMEDIATION_SCAN = "-isRemediationScan";
+    private static final String IS_REMEDIATION_SCAN_SHORT = "--r";
+    @Parameter(names = { IS_REMEDIATION_SCAN, IS_REMEDIATION_SCAN_SHORT },
+            description = "whether the scan is in remediation")
+    public boolean isRemediationScan = false;
+
+    private static final String IS_BUNDLED_ASSESSMENT = "-isBundledAssessment";
+    private static final String IS_BUNDLED_ASSESSMENT_SHORT = "-b";
+    @Parameter(names = { IS_BUNDLED_ASSESSMENT, IS_BUNDLED_ASSESSMENT_SHORT },
+            description = "whether the scan is a bundled assessment")
+    public String isBundledAssessment = null;
 
     public void version() {
         Package p = getClass().getPackage();
