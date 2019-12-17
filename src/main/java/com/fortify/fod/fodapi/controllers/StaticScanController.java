@@ -55,7 +55,7 @@ public class StaticScanController extends ControllerBase {
                 throw new Exception("Bsi Token given is invalid and cannot be parsed");
             }
             fc.remediationScanPreference = (fc.isRemediationScan) ? FodEnums.RemediationScanPreferenceType.RemediationScanOnly
-               : fc.remediationScanPreference.toString() != null ? fc.remediationScanPreference : FodEnums.RemediationScanPreferenceType.NonRemediationScanOnly ;
+               : fc.remediationScanPreference != null ? fc.remediationScanPreference : FodEnums.RemediationScanPreferenceType.NonRemediationScanOnly ;
             HttpUrl.Builder builder = HttpUrl.parse(api.getBaseUrl()).newBuilder()
                     .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan-advanced", parsedbsiToken.getProjectVersionId()))
                     .addQueryParameter("releaseId", Integer.toString(parsedbsiToken.getProjectVersionId()))
