@@ -132,7 +132,7 @@ public class FortifyCommands {
     private static final String RUN_OPEN_SOURCE_SCAN_SHORT = "-os";
     @Parameter(names = { RUN_OPEN_SOURCE_SCAN, RUN_OPEN_SOURCE_SCAN_SHORT},
             description = "whether to run an Open Source Scan")
-    public String runOpenSourceScan = null;
+    public boolean runOpenSourceScan = false;
 
     private static final String SCAN_PREFERENCE_ID = "-scanPreferenceId";
     private static final String SCAN_PREFERENCE_ID_SHORT = "-p";
@@ -144,7 +144,7 @@ public class FortifyCommands {
     private static final String INCLUDE_THIRD_PARTY_LIBS_SHORT = "-itp";
     @Parameter(names = { INCLUDE_THIRD_PARTY_LIBS, INCLUDE_THIRD_PARTY_LIBS_SHORT },
             description = "whether to include third party libraries")
-    public String includeThirdPartyLibs = null;
+    public boolean includeThirdPartyLibs = false;
 
     private static final String IS_REMEDIATION_SCAN = "-isRemediationScan";
     private static final String IS_REMEDIATION_SCAN_SHORT = "--r";
@@ -156,7 +156,7 @@ public class FortifyCommands {
     private static final String IS_BUNDLED_ASSESSMENT_SHORT = "-b";
     @Parameter(names = { IS_BUNDLED_ASSESSMENT, IS_BUNDLED_ASSESSMENT_SHORT },
             description = "whether the scan is a bundled assessment")
-    public String isBundledAssessment = null;
+    public boolean isBundledAssessment = false;
 
     public void version() {
         Package p = getClass().getPackage();
