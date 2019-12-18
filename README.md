@@ -22,7 +22,7 @@ Short Name | Long Name                     | Required? | Description
  -z        | -zipLocation                  | Yes       | Location of scan
   -ac       | -apiCredentials               | Yes*      | Api credentials ("key:" does not need to be appended to `<key>`)                                                  
  -uc       | -userCredentials              | Yes*      | User login credentials (wrap each in quotations to avoid escaping characters in the CLI)  
- -ep       | -entitlementPreferenceType    | Yes       | Whether to use a single scan or subscription assessment: 0/SingleScanOnly, 1/SubscriptionOnly, 2/SingleScanFirstThenSubscription, 3/SubscriptionFirstThenSingleScan
+ -ep       | -entitlementPreferenceType    | Yes       | Whether to use a single scan or subscription assessment: 1/SingleScanOnly, 2/SubscriptionOnly, 3/SingleScanFirstThenSubscription, 4/SubscriptionFirstThenSingleScan
  -rp       | -remediationScanPreferenceType| No       | Whether to run a remediation scan: 0/RemediationScanIfAvailable, 1/RemediationScanOnly, 2/NonRemediationScanOnly (default)
  -pp       | -inProgressScanActionType     | No      | Whether to cancel an in-progress scan and start a new scan or not start a scan: 0/DoNotStartScan (default), 1/CancelScanInProgress                    
  -I        | -pollingInterval              | No        | Interval between checking scan status in minutes                 
