@@ -36,8 +36,8 @@ class PollStatus {
      * @return true if status is completed | cancelled.
      */
     boolean releaseStatus(final int releaseId, final int triggeredScanId) {
-        boolean finished = false; // default is failure
-
+        boolean finished = false;  // default is failure
+        boolean policyPass = true;
         try
         {
             while(!finished)
@@ -101,7 +101,7 @@ class PollStatus {
                     }
                     if(statusString.equals("Completed"))
                     {
-                        printPassFail(release, releaseId);
+                        policyPass = printPassFail(release, releaseId);
                     }
                 }
                 else
@@ -115,20 +115,20 @@ class PollStatus {
         {
             e.printStackTrace();
         }
-        return finished;
+        return policyPass;
     }
 
     /**
      * Prints some info about the release including a vuln breakdown and pass/fail reason
      * @param release release to print info on
      */
-    private void printPassFail(ReleaseDTO release,int releaseId) {
+    private boolean printPassFail(ReleaseDTO release,int releaseId) {
         try
         {
             // Break if release is null
             if (release == null) {
                 this.failCount++;
-                return;
+                return false;
             }
             System.out.println("Number of criticals: " +  release.getCritical());
             System.out.println("Number of highs: " +  release.getHigh());
@@ -145,11 +145,12 @@ class PollStatus {
                         release.getPassFailReasonType();
 
                 System.out.println("Failure Reason: " + passFailReason);
-
-
+                return false;
             }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
 }

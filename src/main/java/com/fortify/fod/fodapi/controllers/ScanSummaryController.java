@@ -36,9 +36,7 @@ public class ScanSummaryController extends ControllerBase {
      */
     public ScanSummaryDTO getScanSummary(final int releaseId,final int scanId) {
         try {
-            /*HttpUrl.Builder builder = HttpUrl.parse(api.getBaseUrl()).newBuilder()
-                    .addPathSegments(String.format("api/v3/releases/%d/scans/%d", releaseId, scanId));
-            String url = builder.build().toString();*/
+
             String url = api.getBaseUrl() + "/api/v3/scan/" + scanId + "/summary";
 
             String statusUrl = api.getBaseUrl() + "/api/v3/releases/" + releaseId + "/scans/"+ scanId;
@@ -78,9 +76,6 @@ public class ScanSummaryController extends ControllerBase {
                 return null;
             }
 
-             //   GenericListResponse<ScanSummaryDTO> results = gson.fromJson(content, t);
-         //   System.out.println("Results from Scan Summary Api: " + results);
-          //  return results.getItems()[0];
         } catch (Exception e) {
             e.printStackTrace();
             return null;
