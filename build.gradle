@@ -17,7 +17,7 @@ apply plugin: 'maven'
 apply plugin: 'org.junit.platform.gradle.plugin'
 
 sourceCompatibility = 1.8
-targetCompatibility = 1.8git 
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
