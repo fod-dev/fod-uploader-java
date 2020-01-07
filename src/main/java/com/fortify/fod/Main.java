@@ -57,6 +57,7 @@ public class Main {
         }
 
         boolean uploadSucceeded;
+        boolean passFailPolicy= true;
         int triggeredscanId;
         try {
             Proxy proxy = new Proxy(fc.proxy);
@@ -93,10 +94,14 @@ public class Main {
                     if (fc.pollingInterval > 0) {
                         PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
                         // Until status is complete or cancelled
-                        listener.releaseStatus(bsiToken.getProjectVersionId(), triggeredscanId);
+                        passFailPolicy = listener.releaseStatus(bsiToken.getProjectVersionId(), triggeredscanId);
                     }
                     fodApi.retireToken();
-                    System.exit(0);
+                   if(passFailPolicy){
+                       System.exit(0);
+                   } else {
+                       System.exit(1);
+                   }
                 } else {
                     fodApi.retireToken();
                     System.exit(1);
