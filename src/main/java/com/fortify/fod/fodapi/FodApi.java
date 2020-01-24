@@ -30,8 +30,8 @@ public class FodApi {
     private String grantType = "";
 
     private final int CONNECTION_TIMEOUT = 10;
-    private final int WRITE_TIMEOUT = 30;
-    private final int READ_TIMEOUT = 90;
+    private final int WRITE_TIMEOUT = 600;
+    private final int READ_TIMEOUT = 600;
 
     private StaticScanController staticScanController;
     public StaticScanController getStaticScanController() { return staticScanController; }
