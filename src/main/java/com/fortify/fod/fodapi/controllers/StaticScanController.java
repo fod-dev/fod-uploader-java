@@ -50,16 +50,13 @@ public class StaticScanController extends ControllerBase {
             int byteCount;
             long offset = 0;
 
-            parsedbsiToken = parser.convert(fc.bsiToken);
-            if (parsedbsiToken == null) {
-                throw new Exception("Bsi Token given is invalid and cannot be parsed");
-            }
+            parsedbsiToken = (fc.bsiToken == null) ? null :parser.convert(fc.bsiToken);
+
             fc.remediationScanPreference = (fc.isRemediationScan) ? FodEnums.RemediationScanPreferenceType.RemediationScanOnly
-               : fc.remediationScanPreference != null ? fc.remediationScanPreference : FodEnums.RemediationScanPreferenceType.NonRemediationScanOnly ;
+                    : fc.remediationScanPreference != null ? fc.remediationScanPreference : FodEnums.RemediationScanPreferenceType.NonRemediationScanOnly ;
             HttpUrl.Builder builder = HttpUrl.parse(api.getBaseUrl()).newBuilder()
-                    .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan-advanced", parsedbsiToken.getProjectVersionId()))
-                    .addQueryParameter("releaseId", Integer.toString(parsedbsiToken.getProjectVersionId()))
-                    .addQueryParameter("bsiToken", fc.bsiToken.toString())
+                    .addPathSegments(String.format("/api/v3/releases/%d/static-scans/start-scan-advanced",(fc.releaseId != 0)? fc.releaseId :  parsedbsiToken.getProjectVersionId()))
+                    .addQueryParameter("releaseId", Integer.toString((fc.releaseId != 0)? fc.releaseId : parsedbsiToken.getProjectVersionId()))
                     .addQueryParameter("entitlementPreferenceType", (fc.entitlementPreference != null) ? fc.entitlementPreference.toString() : "3")
                     .addQueryParameter("purchaseEntitlement", Boolean.toString(fc.purchaseEntitlement))
                     .addQueryParameter("remdiationScanPreferenceType", (fc.remediationScanPreference != null) ? fc.remediationScanPreference.toString() : "2")
@@ -67,6 +64,10 @@ public class StaticScanController extends ControllerBase {
                     .addQueryParameter("scanTool", fc.scanTool)
                     .addQueryParameter("scanToolVersion", fc.getImplementedVersion())
                     .addQueryParameter("scanMethodType", fc.scanMethodType);
+
+            if(fc.releaseId == 0){
+                builder = builder.addQueryParameter("bsiToken", fc.bsiToken.toString());
+            }
             if (fc.notes != null && !fc.notes.isEmpty()) {
                 String truncatedNotes = abbreviateString(fc.notes.trim(), MAX_NOTES_LENGTH);
                 builder = builder.addQueryParameter("notes", truncatedNotes);
@@ -83,7 +84,7 @@ public class StaticScanController extends ControllerBase {
                 } else {
                     sendByteArray = readByteArray;
                 }
-
+                System.out.println(fragUrl);
                 MediaType byteArray = MediaType.parse("application/octet-stream");
                 Request request = new Request.Builder()
                         .addHeader("Authorization", "Bearer " + api.getToken())
