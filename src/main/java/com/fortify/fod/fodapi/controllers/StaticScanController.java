@@ -84,7 +84,6 @@ public class StaticScanController extends ControllerBase {
                 } else {
                     sendByteArray = readByteArray;
                 }
-                System.out.println(fragUrl);
                 MediaType byteArray = MediaType.parse("application/octet-stream");
                 Request request = new Request.Builder()
                         .addHeader("Authorization", "Bearer " + api.getToken())
