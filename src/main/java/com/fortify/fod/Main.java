@@ -35,10 +35,19 @@ public class Main {
             System.exit(1);
         }
 
-        if (fc.bsiToken == null && (fc.url == null && ((fc.url.contains("http://") || fc.url.contains("https://"))))) {
-            System.err.println("Please provide Valid Fortify Url Parameter ( Example : https://ams.fotify.com/");
-            System.exit(1);
+        if (fc.bsiToken == null)
+        {
+            if(fc.portalUri == null || (!(fc.portalUri.contains("http://") || !(fc.portalUri.contains("https://")))))
+            {
+                System.err.println("Please provide Valid Fortify Portal Url Parameter ( Example : https://ams.fotify.com/");
+            }
+            if(fc.apiUri == null || (!(fc.apiUri.contains("http://") || !(fc.apiUri.contains("https://")))))
+            {
+                System.err.println("Please provide Valid Fortify Api Url Parameter ( Example : https://api.ams.fotify.com/");
+            }
+           System.exit(1);
         }
+
 
         if (!fc.hasApiCredentials() && !fc.hasUserCredentials()) {
             System.err.println("The following options are required: -apiCredentials, -ac or -userCredentials, -uc");
@@ -82,35 +91,13 @@ public class Main {
         boolean uploadSucceeded;
         boolean passFailPolicy = true;
         int triggeredscanId;
-        String portalUrl = null;
-        String apiUrl = null;
-        FodApi fodApi;
+
         try {
             Proxy proxy = new Proxy(fc.proxy);
             BsiToken bsiToken = fc.bsiToken != null ? new BsiTokenConverter().convert(fc.bsiToken) : null;
-            if (fc.bsiToken != null) {
-                fodApi = new FodApi(bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy, bsiToken.getPortalUri());
-                apiUrl = bsiToken.getApiUri();
-                portalUrl = bsiToken.getPortalUri();
-            } else {
-                // If user provides Api Uri
-                if (fc.url.contains("api")) {
-                    apiUrl = fc.url;
-                    portalUrl = fc.url.replaceFirst("api.", "");
-                } else {
-                    portalUrl = fc.url;
-                    apiUrl = fc.url.contains("http:")
-                            ? fc.url.replaceFirst("http://", "http://api.")
-                            : fc.url.replaceFirst("https://", "https://api.");
-                }
-                //Removing trail slash
-                apiUrl = apiUrl.endsWith("/") ? apiUrl.substring(0, apiUrl.length() - 1) : apiUrl;
-            }
-
-            fodApi = new FodApi(apiUrl, proxy.getProxyUri() == null ? null : proxy, portalUrl);
+            FodApi fodApi = new FodApi(fc.apiUri != null ? fc.apiUri : bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy, fc.portalUri != null ? fc.portalUri : bsiToken.getPortalUri());
 
             System.out.println("Authenticating");
-
             // Has username/password
             String username, password, grantType;
             if (fc.hasUserCredentials()) {

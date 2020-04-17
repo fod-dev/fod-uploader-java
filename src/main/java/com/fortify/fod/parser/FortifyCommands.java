@@ -163,11 +163,19 @@ public class FortifyCommands {
             description = "Release id provides scan details that are used for the scan")
     public int releaseId = 0;
 
-    private static final String URL = "-url";
-    @Parameter(names = {URL},
+    private static final String PORTALURI = "-portalurl";
+    private static final String PORTAL_URI_SHORT = "-purl";
+    @Parameter(names = {PORTALURI,PORTAL_URI_SHORT},
             description = "URL provides an environment URL for which API to call",
             required = false)
-    public String url;
+    public String portalUri;
+
+    private static final String APIURI = "-apiurl";
+    private static final String API_URI_SHORT = "-aurl";
+    @Parameter(names = {APIURI,API_URI_SHORT},
+            description = "URL provides an environment URL for which API to call",
+            required = false)
+    public String apiUri;
 
     private static final String TENANT_CODE = "-tenantCode";
     private static final String TENANT_CODE_SHORT = "-tc";
