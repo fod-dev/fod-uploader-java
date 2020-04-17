@@ -31,7 +31,8 @@ public class FortifyCommands {
     private static final String BSI_URL = "-bsiUrl";
     private static final String BSI_URL_SHORT = "-u";
     @Parameter(names = {BSI_TOKEN, BSI_TOKEN_SHORT, BSI_URL, BSI_URL_SHORT},
-            description = "build server url")
+            description = "build server url",
+            required = true)
     public String bsiToken;
 
     private static final String ZIP_LOCATION = "-zipLocation";
@@ -156,33 +157,6 @@ public class FortifyCommands {
     @Parameter(names = { IS_BUNDLED_ASSESSMENT, IS_BUNDLED_ASSESSMENT_SHORT },
             description = "whether the scan is a bundled assessment")
     public boolean isBundledAssessment = false;
-
-    private static final String RELEASE_ID = "-releaseId";
-    private static final String RELEASE_ID_SHORT = "-rid";
-    @Parameter(names = {RELEASE_ID, RELEASE_ID_SHORT},
-            description = "Release id provides scan details that are used for the scan")
-    public int releaseId = 0;
-
-    private static final String PORTALURI = "-portalurl";
-    private static final String PORTAL_URI_SHORT = "-purl";
-    @Parameter(names = {PORTALURI,PORTAL_URI_SHORT},
-            description = "URL provides an environment URL for which API to call",
-            required = false)
-    public String portalUri;
-
-    private static final String APIURI = "-apiurl";
-    private static final String API_URI_SHORT = "-aurl";
-    @Parameter(names = {APIURI,API_URI_SHORT},
-            description = "URL provides an environment URL for which API to call",
-            required = false)
-    public String apiUri;
-
-    private static final String TENANT_CODE = "-tenantCode";
-    private static final String TENANT_CODE_SHORT = "-tc";
-    @Parameter(names = {TENANT_CODE,TENANT_CODE_SHORT},
-            description = "Tenant Id",
-            required = false)
-    public String tenantCode;
 
     public void version() {
         Package p = getClass().getPackage();

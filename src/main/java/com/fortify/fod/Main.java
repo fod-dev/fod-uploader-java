@@ -11,9 +11,9 @@ import com.fortify.fod.parser.BsiToken;
 public class Main {
 
     /**
-     * @param args Required: zip location, bsi url, username/password or api key/secret
-     */
-    public static void main(String[] args) {
+	 * @param args Required: zip location, bsi url, username/password or api key/secret
+	 */
+	public static void main(String[] args) {
         FortifyCommands fc = new FortifyCommands();
         JCommander jc = new JCommander(fc);
 
@@ -35,113 +35,85 @@ public class Main {
             System.exit(1);
         }
 
-        if (fc.bsiToken == null)
-        {
-            if(fc.portalUri == null || (!(fc.portalUri.contains("http://") || !(fc.portalUri.contains("https://")))))
-            {
-                System.err.println("Please provide Valid Fortify Portal Url Parameter ( Example : https://ams.fotify.com/");
-            }
-            if(fc.apiUri == null || (!(fc.apiUri.contains("http://") || !(fc.apiUri.contains("https://")))))
-            {
-                System.err.println("Please provide Valid Fortify Api Url Parameter ( Example : https://api.ams.fotify.com/");
-            }
-           System.exit(1);
-        }
-
-
         if (!fc.hasApiCredentials() && !fc.hasUserCredentials()) {
-            System.err.println("The following options are required: -apiCredentials, -ac or -userCredentials, -uc");
+            System.out.println("The following options are required: -apiCredentials, -ac or -userCredentials, -uc");
             jc.usage();
             System.exit(1);
         }
 
-        if (fc.hasUserCredentials() && fc.bsiToken == null && fc.tenantCode == null) {
-            System.err.println("The following options are required: -tenantCode -tc if using -userCredentials -uc for API Authentication");
+        if(fc.entitlementPreference == null) {
+            System.out.println("The entitlement preference option needs to be have the following values");
             jc.usage();
             System.exit(1);
         }
 
-        if (fc.entitlementPreference == null) {
-            System.err.println("The entitlement preference option needs to be have the following values");
-            jc.usage();
-            System.exit(1);
-        }
-
-        if (fc.isBundledAssessment || fc.auditPreferenceType != null || fc.includeThirdPartyLibs || fc.runOpenSourceScan || fc.scanPreferenceType != null) {
+        if(fc.isBundledAssessment || fc.auditPreferenceType != null || fc.includeThirdPartyLibs || fc.runOpenSourceScan || fc.scanPreferenceType != null){
             System.out.println("The following parameters are deprecated and will be ignored:   -auditPreferenceId -a, -runOpenSourceScan -os, -scanPreferenceId -p, -includeThirdPartyApps -itp, -isBundledAssessment -b");
         }
 
-        if (fc.isRemediationScan && fc.remediationScanPreference != null) {
-            System.err.println("Both --r and -rp cannot be used at the same time , --r is deprecated instead we would prefer you to use -rp for selecting Remediation Scan Preference ");
+        if(fc.isRemediationScan  && fc.remediationScanPreference != null){
+            System.out.println("Both --r and -rp cannot be used at the same time , --r is deprecated instead we would prefer you to use -rp for selecting Remediation Scan Preference ");
             System.exit(1);
-        }
-
-        // Both bsiToken and ReleaseId are not provided - Exit
-        if (fc.bsiToken == null && fc.releaseId == 0) {
-            System.out.print(com.sun.prism.paint.Color.RED);
-            System.err.println("Release ID or BSI token should be required. The Release ID is HIGHLY recommended for CI usage as the BSI token is being sunset in 2020");
-            System.exit(1);
-        }
-
-        //Both BsiToken and ReleaseId ar provided , call is executed but with a warning message
-        if (fc.bsiToken != null && fc.releaseId != 0) {
-            System.out.println("The BsiToken provided will be ignored and the Scan Settings from the entered Release Id will be used for triggering the current scan.");
         }
 
         boolean uploadSucceeded;
-        boolean passFailPolicy = true;
+        boolean passFailPolicy= true;
         int triggeredscanId;
-
         try {
             Proxy proxy = new Proxy(fc.proxy);
-            BsiToken bsiToken = fc.bsiToken != null ? new BsiTokenConverter().convert(fc.bsiToken) : null;
-            FodApi fodApi = new FodApi(fc.apiUri != null ? fc.apiUri : bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy, fc.portalUri != null ? fc.portalUri : bsiToken.getPortalUri());
+            BsiToken bsiToken = new BsiTokenConverter().convert(fc.bsiToken);
+            if(bsiToken!= null) {
+                FodApi fodApi = new FodApi(bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy, bsiToken.getPortalUri());
 
-            System.out.println("Authenticating");
-            // Has username/password
-            String username, password, grantType;
-            if (fc.hasUserCredentials()) {
-                username = fc.userCredentials.get(0);
-                password = fc.userCredentials.get(1);
-                grantType = fodApi.GRANT_TYPE_PASSWORD;
-                // Has key/secret
-            } else {
-                username = fc.apiCredentials.get(0);
-                password = fc.apiCredentials.get(1);
-                grantType = fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
-            }
+                System.out.println("Authenticating");
 
-            String tenantCode = bsiToken != null ? bsiToken.getTenantCode() : fc.tenantCode;
-            fodApi.authenticate(tenantCode, username, password, grantType);
-
-            System.out.println("Beginning upload");
-
-            StaticScanController s = fodApi.getStaticScanController();
-            uploadSucceeded = s.StartStaticScan(fc);
-            triggeredscanId = s.getTriggeredScanId();
-            //check success status exit appropriately
-            if (uploadSucceeded) {
-                // Why do we need to poll for this?
-                if (fc.pollingInterval > 0) {
-                    PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
-                    // Until status is complete or cancelled
-                    passFailPolicy = listener.releaseStatus((fc.bsiToken != null) ? bsiToken.getProjectVersionId() : fc.releaseId, triggeredscanId);
-                }
-                fodApi.retireToken();
-                if (passFailPolicy) {
-                    System.exit(0);
+                // Has username/password
+                String username, password, grantType;
+                if (fc.hasUserCredentials()) {
+                    username = fc.userCredentials.get(0);
+                    password = fc.userCredentials.get(1);
+                    grantType = fodApi.GRANT_TYPE_PASSWORD;
+                    // Has key/secret
                 } else {
+                    username = fc.apiCredentials.get(0);
+                    password = fc.apiCredentials.get(1);
+                    grantType = fodApi.GRANT_TYPE_CLIENT_CREDENTIALS;
+                }
+
+                String tenantCode = bsiToken.getTenantCode();
+                fodApi.authenticate(tenantCode, username, password, grantType);
+
+                System.out.println("Beginning upload");
+
+                StaticScanController s = fodApi.getStaticScanController();
+                uploadSucceeded = s.StartStaticScan(fc);
+                triggeredscanId = s.getTriggeredScanId();
+                //check success status exit appropriately
+                if (uploadSucceeded) {
+                    // Why do we need to poll for this?
+                    if (fc.pollingInterval > 0) {
+                        PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
+                        // Until status is complete or cancelled
+                        passFailPolicy = listener.releaseStatus(bsiToken.getProjectVersionId(), triggeredscanId);
+                    }
+                    fodApi.retireToken();
+                   if(passFailPolicy){
+                       System.exit(0);
+                   } else {
+                       System.exit(1);
+                   }
+                } else {
+                    fodApi.retireToken();
                     System.exit(1);
                 }
-            } else {
-                fodApi.retireToken();
-                System.exit(1);
             }
-
+            else{
+                throw new Exception("The Bsi Token given is Invalid and cannot be parsed");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
 
-    }
+	}
 }
