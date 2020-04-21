@@ -74,7 +74,6 @@ public class StaticScanController extends ControllerBase {
             }
             // TODO: Come back and fix the request to set fragNo and offset query parameters
             String fragUrl = builder.build().toString();
-
             // Loop through chunk
             while ((byteCount = fs.read(readByteArray)) != -1) {
 
