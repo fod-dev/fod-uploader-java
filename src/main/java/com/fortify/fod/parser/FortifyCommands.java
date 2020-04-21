@@ -166,21 +166,21 @@ public class FortifyCommands {
     private static final String PORTALURI = "-portalurl";
     private static final String PORTAL_URI_SHORT = "-purl";
     @Parameter(names = {PORTALURI,PORTAL_URI_SHORT},
-            description = "URL provides an environment URL for which API to call",
+            description = "URL provides an environment URL.",
             required = false)
-    public String portalUri;
+    public String portalUrl;
 
     private static final String APIURI = "-apiurl";
     private static final String API_URI_SHORT = "-aurl";
     @Parameter(names = {APIURI,API_URI_SHORT},
             description = "URL provides an environment URL for which API to call",
             required = false)
-    public String apiUri;
+    public String apiUrl;
 
     private static final String TENANT_CODE = "-tenantCode";
     private static final String TENANT_CODE_SHORT = "-tc";
     @Parameter(names = {TENANT_CODE,TENANT_CODE_SHORT},
-            description = "Tenant Id",
+            description = "Tenant identifier ",
             required = false)
     public String tenantCode;
 
@@ -191,5 +191,13 @@ public class FortifyCommands {
 
     public String getImplementedVersion() {
         return getClass().getPackage().getImplementationVersion();
+    }
+
+    public boolean isEmptyParameter(String param){
+        return param == null || param.isEmpty();
+    }
+
+    public boolean isValidUrl(String url) {
+        return (url.contains("http://") || url.contains("https://"));
     }
 }

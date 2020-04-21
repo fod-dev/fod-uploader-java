@@ -35,27 +35,24 @@ public class Main {
             System.exit(1);
         }
 
-        if (fc.bsiToken == null)
+        if (fc.bsiToken == null && (fc.isEmptyParameter(fc.portalUrl) || !fc.isValidUrl(fc.portalUrl)))
         {
-            if(fc.portalUri == null || (!(fc.portalUri.contains("http://") || !(fc.portalUri.contains("https://")))))
-            {
-                System.err.println("Please provide Valid Fortify Portal Url Parameter ( Example : https://ams.fotify.com/");
-            }
-            if(fc.apiUri == null || (!(fc.apiUri.contains("http://") || !(fc.apiUri.contains("https://")))))
-            {
-                System.err.println("Please provide Valid Fortify Api Url Parameter ( Example : https://api.ams.fotify.com/");
-            }
-           System.exit(1);
-        }
-
-
-        if (!fc.hasApiCredentials() && !fc.hasUserCredentials()) {
-            System.err.println("The following options are required: -apiCredentials, -ac or -userCredentials, -uc");
-            jc.usage();
+            System.err.println("Please provide Valid Fortify Portal Url Parameter ( Example : -portalurl https://ams.fotify.com/ )");
             System.exit(1);
         }
 
-        if (fc.hasUserCredentials() && fc.bsiToken == null && fc.tenantCode == null) {
+        if(fc.bsiToken == null && (fc.isEmptyParameter(fc.apiUrl) || !fc.isValidUrl(fc.apiUrl)))
+        {
+            System.err.println("Please provide Valid Fortify Api Url Parameter ( Example : -apiurl https://api.ams.fotify.com/ )");
+            System.exit(1);
+        }
+
+        if (!fc.hasApiCredentials() && !fc.hasUserCredentials()) {
+            System.err.println("The following options are required: -apiCredentials, -ac or -userCredentials, -uc");
+            System.exit(1);
+        }
+
+        if (fc.hasUserCredentials() && fc.bsiToken == null && fc.isEmptyParameter(fc.tenantCode)) {
             System.err.println("The following options are required: -tenantCode -tc if using -userCredentials -uc for API Authentication");
             jc.usage();
             System.exit(1);
@@ -78,14 +75,13 @@ public class Main {
 
         // Both bsiToken and ReleaseId are not provided - Exit
         if (fc.bsiToken == null && fc.releaseId == 0) {
-            System.out.print(com.sun.prism.paint.Color.RED);
-            System.err.println("Release ID or BSI token should be required. The Release ID is HIGHLY recommended for CI usage as the BSI token is being sunset in 2020");
+            System.out.println("Release ID or BSI token should be required. The Release ID is HIGHLY recommended for CI usage as the BSI token is being sunset in 2020");
             System.exit(1);
         }
 
         //Both BsiToken and ReleaseId ar provided , call is executed but with a warning message
         if (fc.bsiToken != null && fc.releaseId != 0) {
-            System.out.println("The BsiToken provided will be ignored and the Scan Settings from the entered Release Id will be used for triggering the current scan.");
+            System.out.println("Warning: Both the BSI and Release ID Token were provided; The BSI Token is being ignored.");
         }
 
         boolean uploadSucceeded;
@@ -95,8 +91,7 @@ public class Main {
         try {
             Proxy proxy = new Proxy(fc.proxy);
             BsiToken bsiToken = fc.bsiToken != null ? new BsiTokenConverter().convert(fc.bsiToken) : null;
-            FodApi fodApi = new FodApi(fc.apiUri != null ? fc.apiUri : bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy, fc.portalUri != null ? fc.portalUri : bsiToken.getPortalUri());
-
+            FodApi fodApi = new FodApi(fc.apiUrl != null ? fc.apiUrl : bsiToken.getApiUri(), proxy.getProxyUri() == null ? null : proxy, fc.portalUrl != null ? fc.portalUrl : bsiToken.getPortalUri());
             System.out.println("Authenticating");
             // Has username/password
             String username, password, grantType;
@@ -144,4 +139,6 @@ public class Main {
         }
 
     }
+
+
 }
