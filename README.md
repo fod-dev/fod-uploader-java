@@ -35,8 +35,8 @@ Short Name | Long Name                     | Required? | Description
  -purchase | -purchaseEntitlement          | No		              | Whether to purchase an entitlement (if available)
  -n        | -notes                        | No                | The notes about the scan
 
-<sup>1</sup>One of either apiCredentials or userCredentials is required.
-<sup>2</sup>Use either release ID or BSI token. If both are provided, then the scan settings that are retrieved from the release ID will be used.
+<sup>1</sup>One of either apiCredentials or userCredentials is required.  
+<sup>2</sup>Use either release ID or BSI token. If both are provided, then the scan settings that are retrieved from the release ID will be used.  
 <sup>3</sup>Required if BSI token is not provided.
 
 ### Previous
