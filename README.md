@@ -10,7 +10,7 @@ Java utility for uploading packages to FoD
 Arguments are named and can be in any order: 
 
 ```
-FodUpload.jar -ac <key> <secret> | -uc <username> <password> -rid <relID>|-bsi <token> -purl <purl> -aurl <aurl> -tc <tcode> -z <file> -ep <0|SingleScanOnly|1|SubscriptionOnly|2|SingleScanFirstThenSubscription|3|SubscriptionFirstThenSingleScan> -rp <0|RemediationScanIfAvailable|1|RemediationScanOnly|2|NonRemediationScanOnly> -pp <0|DoNotStartScan|1|CancelScanInProgress> [-purchase] [-b] [-I <minutes>] [-p <1|Standard|2|Express>] [-a <1|Manual|2|Automated>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-itp] [-os] [-n] [-h] [-v]
+FodUpload.jar -ac <key> <secret> | -uc <username> <password> -rid <relID>|-bsi <token> -purl <purl> -aurl <aurl> -tc <tcode> -z <file> -ep <1|SingleScanOnly|2|SubscriptionOnly|3|SingleScanFirstThenSubscription|4|SubscriptionFirstThenSingleScan> -rp <0|RemediationScanIfAvailable|1|RemediationScanOnly|2|NonRemediationScanOnly> -pp <0|DoNotStartScan|1|CancelScanInProgress> [-purchase] [-b] [-I <minutes>] [-p <1|Standard|2|Express>] [-a <1|Manual|2|Automated>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-itp] [-os] [-n] [-h] [-v]
 ```
 
 Each argument has a short and long name:
