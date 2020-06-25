@@ -10,29 +10,34 @@ Java utility for uploading packages to FoD
 Arguments are named and can be in any order: 
 
 ```
-FodUpload.jar -bsi <token> -z <file> -ac <key> <secret> | -uc <username> <password> -ep <0|SingleScanOnly|1|SubscriptionOnly|2|SingleScanFirstThenSubscription|3|SubscriptionFirstThenSingleScan> -rp <0|RemediationScanIfAvailable|1|        RemediationScanOnly|2|NonRemediationScanOnly> -pp <0|DoNotStartScan|1|CancelScanInProgress> [-purchase] [-b] [-I <minutes>] [-p <1|Standard|2|Express>] [-a <1|Manual|2|Automated>] 
-[-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-itp] [-os] [-n] [-h] [-v]
+FodUpload.jar -ac <key> <secret> | -uc <username> <password> -rid <relID> | -bsi <token> -purl <purl> -aurl <aurl> -tc <tcode> -z <file> -ep <1|SingleScanOnly|2|SubscriptionOnly|3|SingleScanFirstThenSubscription|4|SubscriptionFirstThenSingleScan> -rp <0|RemediationScanIfAvailable|1|RemediationScanOnly|2|NonRemediationScanOnly> -pp <0|DoNotStartScan|1|CancelScanInProgress> [-purchase] [-b] [-I <minutes>] [-p <1|Standard|2|Express>] [-a <1|Manual|2|Automated>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-itp] [-os] [-n] [-h] [-v]
 ```
 
 Each argument has a short and long name:
 
 Short Name | Long Name                     | Required? | Description                                                      
 ---------- | ----------------------        |:---------:| --------------------------------------------------------
- -bsi      | -bsiToken                     | Yes       | Build server token
- -z        | -zipLocation                  | Yes       | Location of scan
-  -ac       | -apiCredentials               | Yes*      | Api credentials ("key:" does not need to be appended to `<key>`)                                                  
- -uc       | -userCredentials              | Yes*      | User login credentials (wrap each in quotations to avoid escaping characters in the CLI)  
- -ep       | -entitlementPreferenceType    | Yes       | Whether to use a single scan or subscription assessment: 1/SingleScanOnly, 2/SubscriptionOnly, 3/SingleScanFirstThenSubscription, 4/SubscriptionFirstThenSingleScan
- -rp       | -remediationScanPreferenceType| No       | Whether to run a remediation scan: 0/RemediationScanIfAvailable, 1/RemediationScanOnly, 2/NonRemediationScanOnly (default)
- -pp       | -inProgressScanActionType     | No      | Whether to cancel an in-progress scan and start a new scan or not start a scan: 0/DoNotStartScan (default), 1/CancelScanInProgress                    
- -I        | -pollingInterval              | No        | Interval between checking scan status in minutes                 
- -P        | -proxy                        | No        | Credentials for accessing the proxy                   
- -h        | -help                         | No        | Print help dialog                                                
- -v        | -version                      | No        | Print jar version   
- -purchase | -purchaseEntitlement          | No		   | Whether to purchase an entitlement (if available)
- -n        | -notes                        | No        | The notes about the scan
+ -ac       | -apiCredentials               | Yes<sup>1</sup>   | API credentials ("key:" does not need to be appended to `<key>`)                                                  
+ -uc       | -userCredentials              | Yes<sup>1</sup>   | User credentials (wrap each in quotations to avoid escaping characters in the CLI) 
+ -bsi      | -bsiToken                     | Yes<sup>2</sup>   | Build server token
+ -rid      | -releaseId                    | Yes<sup>2</sup>   | Release ID
+ -purl     | -portalurl                    | Yes<sup>3</sup>   | Domain URL
+ -aurl     | -apiurl                       | Yes<sup>3</sup>   | API root URL
+ -tc       | -tenantCode                   | Yes<sup>3</sup>   | Tenant ID if using user credentials 
+ -z        | -zipLocation                  | Yes               | Location of scan
+ -ep       | -entitlementPreferenceType    | Yes               | Whether to use a single scan or subscription assessment: 1/SingleScanOnly, 2/SubscriptionOnly, 3/SingleScanFirstThenSubscription, 4/SubscriptionFirstThenSingleScan
+ -rp       | -remediationScanPreferenceType| No                | Whether to run a remediation scan: 0/RemediationScanIfAvailable, 1/RemediationScanOnly, 2/NonRemediationScanOnly (default)
+ -pp       | -inProgressScanActionType     | No                | Whether to cancel an in-progress scan and start a new scan or not start a scan: 0/DoNotStartScan (default), 1/CancelScanInProgress                    
+ -I        | -pollingInterval              | No                | Interval between checking scan status in minutes                 
+ -P        | -proxy                        | No                | Credentials for accessing the proxy                   
+ -h        | -help                         | No                | Print help dialog                                                
+ -v        | -version                      | No                | Print jar version   
+ -purchase | -purchaseEntitlement          | No		              | Whether to purchase an entitlement (if available)
+ -n        | -notes                        | No                | The notes about the scan
 
-*One of either apiCredentials or userCredentials is required.
+<sup>1</sup>One of either apiCredentials or userCredentials is required.  
+<sup>2</sup>Use either release ID or BSI token. If both are provided, then the scan settings that are retrieved from the release ID will be used.  
+<sup>3</sup>Required if BSI token is not provided.
 
 ### Previous
 
