@@ -42,7 +42,7 @@ FodUpload.jar {-ac <key> <secret> | -uc <username> <password>} {-rid <relID> | -
 
 ### Previous
 
-If you are using 3.1.0, the arguments are:
+The following table describes the FoDUploader arguments for 3.1.0:
 
 Short Name | Long Name              | Required? | Description                                                      
 ---------- | ---------------------- |---------  | --------------------------------------------------------
