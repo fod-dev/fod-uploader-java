@@ -3,10 +3,7 @@ package com.fortify.fod;
 import com.fortify.fod.fodapi.FodEnums.APILookupItemTypes;
 import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.models.LookupItemsModel;
-import com.fortify.fod.fodapi.models.ReleaseDTO;
-import com.fortify.fod.fodapi.models.ScanSummaryDTO;
-
-
+import com.fortify.fod.fodapi.models.PollingScanSummaryDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,30 +28,69 @@ class PollStatus {
     }
 
     /**
+     * Prints some info about the release including a vuln breakdown and pass/fail reason
+     * @param pollingSummary release to print info on
+     */
+    private boolean printPassFail(PollingScanSummaryDTO pollingSummary,int releaseId) {
+        try
+        {
+            // Break if release is null
+            if (pollingSummary == null) {
+                this.failCount++;
+                return false;
+            }
+            System.out.println("Number of criticals: " +  pollingSummary.IssueCountCritical());
+            System.out.println("Number of highs: " +  pollingSummary.IssueCountHigh());
+            System.out.println("Number of mediums: " +  pollingSummary.IssueCountMedium());
+            System.out.println("Number of lows: " +  pollingSummary.IssueCountLow());
+            System.out.println("For application status details see the customer portal: ");
+            System.out.println(String.format("%s/Redirect/Releases/%d", fodApi.getPortalUri(), releaseId));
+            boolean isPassed = pollingSummary.PassFailStatus();
+            System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );
+            if (!isPassed)
+            {
+                String passFailReason = pollingSummary.PassFailReasonType() == null ?
+                        "Pass/Fail Policy requirements not met " :
+                        pollingSummary.PassFailReasonType();
+
+                System.out.println("Failure Reason: " + passFailReason);
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+
+    /**
      * Polls the release status
      * @param releaseId release to poll
+     * @param triggeredScanId scan to poll
      * @return true if status is completed | cancelled.
      */
+
+
     boolean releaseStatus(final int releaseId, final int triggeredScanId) {
         boolean finished = false;  // default is failure
         boolean policyPass = true;
         try
         {
-            while(!finished)
-            {
-                Thread.sleep(pollingInterval*60*1000);
+            while(!finished) {
+                Thread.sleep(pollingInterval * 60 * 1000);
                 // Get the status of the release
-                ReleaseDTO release = fodApi.getReleaseController().getRelease(releaseId,
-                        "currentAnalysisStatusTypeId,isPassed,passFailReasonId,critical,high,medium,low");
-                if (release == null) {
+                PollingScanSummaryDTO pollingsummary = fodApi.getReleaseController().getReleaseScanForPolling(releaseId, triggeredScanId);
+
+                if (pollingsummary == null) {
                     failCount++;
                     continue;
                 }
 
-                int status = release.getCurrentAnalysisStatusTypeId();
+                int status = pollingsummary.getAnalysisStatusId();
 
                 // Get the possible statuses only once
-                if(analysisStatusTypes == null)
+                if (analysisStatusTypes == null)
                     analysisStatusTypes = Arrays.asList(fodApi.getLookupController().getLookupItems(APILookupItemTypes.AnalysisStatusTypes));
 
                 if(failCount < MAX_FAILS)
@@ -82,26 +118,23 @@ class PollStatus {
                     }
                     System.out.println("Poll Status: " + statusString);
                     if (statusString.equals("Canceled") || statusString.equals("Waiting") ) {
-                        ScanSummaryDTO scanSummary = fodApi.getScanSummaryController().getScanSummary(releaseId,triggeredScanId);
                         String message = statusString.equals("Canceled") ? "-------Scan Canceled-------" : "-------Scan Paused-------";
                         String reason = statusString.equals("Canceled") ? "Cancel reason:        %s" : "Pause reason:        %s";
                         String reasonNotes = statusString.equals("Canceled") ? "Cancel reason notes:  %s" : "Pause reason notes:  %s";
-                        if (scanSummary == null) {
-                            System.out.println("Unable to retrieve scan summary data");
-                        } else {
-                            System.out.println(message);
-                            int pauseDetailsLength = scanSummary.getPauseDetails().length > 0 ? scanSummary.getPauseDetails().length : 0;
-                            System.out.println(String.format(reason, statusString.equals("Canceled") ? scanSummary.getCancelReason()
-                                    :  ((pauseDetailsLength > 0 ) ? (scanSummary.getPauseDetails()[pauseDetailsLength-1].getReason() == null) ?"" : scanSummary.getPauseDetails()[pauseDetailsLength-1].getReason(): "")));
-                            System.out.println(String.format(reasonNotes, statusString.equals("Canceled") ? scanSummary.getAnalysisStatusReasonNotes()
-                                    :  ((pauseDetailsLength > 0 ) ? (scanSummary.getPauseDetails()[pauseDetailsLength-1].getNotes() == null) ? "" : scanSummary.getPauseDetails()[pauseDetailsLength-1].getNotes()  : "")));
-                            System.out.println();
-                        }
+
+                        System.out.println(message);
+                        int pauseDetailsLength = pollingsummary.getPauseDetails().length > 0 ? pollingsummary.getPauseDetails().length : 0;
+                        System.out.println(String.format(reason, statusString.equals("Canceled") ? pollingsummary.getAnalysisStatusReason()
+                                :  ((pauseDetailsLength > 0 ) ? (pollingsummary.getPauseDetails()[pauseDetailsLength-1].getReason() == null) ?"" : pollingsummary.getPauseDetails()[pauseDetailsLength-1].getReason(): "")));
+                        System.out.println(String.format(reasonNotes, statusString.equals("Canceled") ? pollingsummary.getAnalysisStatusReasonNotes()
+                                :  ((pauseDetailsLength > 0 ) ? (pollingsummary.getPauseDetails()[pauseDetailsLength-1].getNotes() == null) ? "" : pollingsummary.getPauseDetails()[pauseDetailsLength-1].getNotes()  : "")));
+                        System.out.println();
+
 
                     }
                     if(statusString.equals("Completed"))
                     {
-                        policyPass = printPassFail(release, releaseId);
+                        policyPass = printPassFail(pollingsummary, releaseId);
                     }
                 }
                 else
@@ -116,41 +149,5 @@ class PollStatus {
             e.printStackTrace();
         }
         return policyPass;
-    }
-
-    /**
-     * Prints some info about the release including a vuln breakdown and pass/fail reason
-     * @param release release to print info on
-     */
-    private boolean printPassFail(ReleaseDTO release,int releaseId) {
-        try
-        {
-            // Break if release is null
-            if (release == null) {
-                this.failCount++;
-                return false;
-            }
-            System.out.println("Number of criticals: " +  release.getCritical());
-            System.out.println("Number of highs: " +  release.getHigh());
-            System.out.println("Number of mediums: " +  release.getMedium());
-            System.out.println("Number of lows: " +  release.getLow());
-            System.out.println("For application status details see the customer portal: ");
-            System.out.println(String.format("%s/Redirect/Releases/%d", fodApi.getPortalUri(), releaseId));
-            boolean isPassed = release.isPassed();
-            System.out.println("Pass/Fail status: " + (isPassed ? "Passed" : "Failed") );
-            if (!isPassed)
-            {
-                String passFailReason = release.getPassFailReasonType() == null ?
-                        "Pass/Fail Policy requirements not met " :
-                        release.getPassFailReasonType();
-
-                System.out.println("Failure Reason: " + passFailReason);
-                return false;
-            }
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
     }
 }
