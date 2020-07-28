@@ -94,7 +94,6 @@ public class ReleaseController extends ControllerBase {
             response.body().close();
             Gson gson = new Gson();
             PollingScanSummaryDTO summaryResults = gson.fromJson(content, PollingScanSummaryDTO.class);
-            System.out.println(summaryResults);
             return summaryResults;
         } catch (Exception e) {
             e.printStackTrace();
