@@ -123,7 +123,11 @@ class PollStatus {
                         String reasonNotes = statusString.equals("Canceled") ? "Cancel reason notes:  %s" : "Pause reason notes:  %s";
 
                         System.out.println(message);
-                        int pauseDetailsLength = pollingsummary.getPauseDetails().length > 0 ? pollingsummary.getPauseDetails().length : 0;
+                        int pauseDetailsLength = 0;
+
+                        if(statusString.equals("Waiting")){
+                            pauseDetailsLength = pollingsummary.getPauseDetails().length > 0 ? pollingsummary.getPauseDetails().length : 0;
+                        }
                         System.out.println(String.format(reason, statusString.equals("Canceled") ? pollingsummary.getAnalysisStatusReason()
                                 :  ((pauseDetailsLength > 0 ) ? (pollingsummary.getPauseDetails()[pauseDetailsLength-1].getReason() == null) ?"" : pollingsummary.getPauseDetails()[pauseDetailsLength-1].getReason(): "")));
                         System.out.println(String.format(reasonNotes, statusString.equals("Canceled") ? pollingsummary.getAnalysisStatusReasonNotes()
