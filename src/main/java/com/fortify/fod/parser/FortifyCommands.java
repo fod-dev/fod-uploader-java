@@ -52,7 +52,7 @@ public class FortifyCommands {
     private static final String IN_PROGRESS_SCAN_ACTION_TYPE = "-inProgressScanActionType";
     private static final String IN_PROGRESS_SCAN_ACTION_TYPE_SHORT = "-pp";
     @Parameter(names = {IN_PROGRESS_SCAN_ACTION_TYPE, IN_PROGRESS_SCAN_ACTION_TYPE_SHORT},
-            description = "in progress scan type (Do not start scan or Cancel In Progress Scan )",
+            description = "in progress scan type (Do not start scan , Cancel In Progress Scan or Queue)",
             converter = InProgressScanActionTypeConverter.class)
     public FodEnums.InProgressScanActionType inProgressScanPreferenceType = null;
 
