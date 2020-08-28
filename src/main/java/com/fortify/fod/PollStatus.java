@@ -128,9 +128,9 @@ class PollStatus {
                         if(statusString.equals("Waiting")){
                             pauseDetailsLength = pollingsummary.getPauseDetails().length > 0 ? pollingsummary.getPauseDetails().length : 0;
                         }
-                        System.out.println(String.format(reason, statusString.equals("Canceled") ? pollingsummary.getAnalysisStatusReason()
+                        System.out.println(String.format(reason, statusString.equals("Canceled") ? (pollingsummary.getAnalysisStatusReason() == null ? "" : pollingsummary.getAnalysisStatusReason())
                                 :  ((pauseDetailsLength > 0 ) ? (pollingsummary.getPauseDetails()[pauseDetailsLength-1].getReason() == null) ?"" : pollingsummary.getPauseDetails()[pauseDetailsLength-1].getReason(): "")));
-                        System.out.println(String.format(reasonNotes, statusString.equals("Canceled") ? pollingsummary.getAnalysisStatusReasonNotes()
+                        System.out.println(String.format(reasonNotes, statusString.equals("Canceled") ? (pollingsummary.getAnalysisStatusReasonNotes() == null ? "" : pollingsummary.getAnalysisStatusReasonNotes())
                                 :  ((pauseDetailsLength > 0 ) ? (pollingsummary.getPauseDetails()[pauseDetailsLength-1].getNotes() == null) ? "" : pollingsummary.getPauseDetails()[pauseDetailsLength-1].getNotes()  : "")));
                         System.out.println();
 
