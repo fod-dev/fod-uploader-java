@@ -31,13 +31,13 @@ class PollStatus {
      * Prints some info about the release including a vuln breakdown and pass/fail reason
      * @param pollingSummary release to print info on
      */
-    private boolean printPassFail(PollingScanSummaryDTO pollingSummary,int releaseId) {
+    private int printPassFail(PollingScanSummaryDTO pollingSummary,int releaseId) {
         try
         {
             // Break if release is null
             if (pollingSummary == null) {
                 this.failCount++;
-                return false;
+                return 1;
             }
             System.out.println("Number of criticals: " +  pollingSummary.IssueCountCritical());
             System.out.println("Number of highs: " +  pollingSummary.IssueCountHigh());
@@ -54,9 +54,9 @@ class PollStatus {
                         pollingSummary.PassFailReasonType();
 
                 System.out.println("Failure Reason: " + passFailReason);
-                return false;
+                return 1;
             }
-            return true;
+            return 0;
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -72,9 +72,9 @@ class PollStatus {
      */
 
 
-    boolean releaseStatus(final int releaseId, final int triggeredScanId) {
+    int releaseStatus(final int releaseId, final int triggeredScanId) {
         boolean finished = false;  // default is failure
-        boolean policyPass = true;
+        int policyPass = 0;
         try
         {
             while(!finished) {
@@ -118,6 +118,7 @@ class PollStatus {
                     }
                     System.out.println("Poll Status: " + statusString);
                     if (statusString.equals("Canceled") || statusString.equals("Waiting") ) {
+                        policyPass = status;
                         String message = statusString.equals("Canceled") ? "-------Scan Canceled-------" : "-------Scan Paused-------";
                         String reason = statusString.equals("Canceled") ? "Cancel reason:        %s" : "Pause reason:        %s";
                         String reasonNotes = statusString.equals("Canceled") ? "Cancel reason notes:  %s" : "Pause reason notes:  %s";

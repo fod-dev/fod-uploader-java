@@ -85,7 +85,7 @@ public class Main {
         }
 
         boolean uploadSucceeded;
-        boolean passFailPolicy = true;
+        int pollExitCode = 0;
         int triggeredscanId;
 
         try {
@@ -120,13 +120,18 @@ public class Main {
                 if (fc.pollingInterval > 0) {
                     PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
                     // Until status is complete or cancelled
-                    passFailPolicy = listener.releaseStatus((fc.bsiToken != null) ? bsiToken.getProjectVersionId() : fc.releaseId, triggeredscanId);
+                    pollExitCode = listener.releaseStatus((fc.bsiToken != null) ? bsiToken.getProjectVersionId() : fc.releaseId, triggeredscanId);
                 }
                 fodApi.retireToken();
-                if (passFailPolicy) {
-                    System.exit(0);
-                } else {
-                    System.exit(1);
+                switch (pollExitCode){
+                    case 0: System.exit(0); break;
+                    case 4: System.exit(4); break; // On Scan Paused
+                    case 3: System.exit(3); break; // On Scan Cancelled
+                    case 1:
+                        System.exit(fc.allowPolicyFail ? 0 : 1);
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + pollExitCode);
                 }
             } else {
                 fodApi.retireToken();
