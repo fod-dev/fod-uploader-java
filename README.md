@@ -21,9 +21,10 @@ Short Name | Long Name                     | Required?         | Description
  -z        | -zipLocation                  | Yes               | Location of scan
  -ep       | -entitlementPreferenceType    | Yes               | Whether to use a single scan or subscription assessment: 1/SingleScanOnly, 2/SubscriptionOnly, 3/SingleScanFirstThenSubscription, 4/SubscriptionFirstThenSingleScan
  -rp       | -remediationScanPreferenceType| No                | Whether to run a remediation scan: 0/RemediationScanIfAvailable, 1/RemediationScanOnly, 2/NonRemediationScanOnly (default)
- -pp       | -inProgressScanActionType     | No                | If in-progress scan exists, whether to not start a scan, cancel in-progress scan and start a scan, or queue a scan: 0/DoNotStartScan (default), 1/CancelScanInProgress, 2/Queue                     
+ -pp       | -inProgressScanActionType     | No                | If in-progress scan exists, whether to not start a scan, cancel in-progress scan and start a scan, or queue a scan: 0/DoNotStartScan (default), 1/CancelScanInProgress, 2/Queue
+ -apf      | -allowPolicyFail              | No                | Whether to return exit(0) instead of exit(1) if the scan fails the security policy specified in Fortify on Demand
  -n        | -notes                        | No                | The notes about the scan 
- -purchase | -purchaseEntitlement          | No		           | Whether to purchase an entitlement (if available)
+ -purchase | -purchaseEntitlement          | No		              | Whether to purchase an entitlement (if available)
  -I        | -pollingInterval              | No                | Interval between checking scan status in minutes                 
  -P        | -proxy                        | No                | Credentials for accessing the proxy                   
  -h        | -help                         | No                | Print help dialog                                                
@@ -37,7 +38,7 @@ Short Name | Long Name                     | Required?         | Description
 
 Usage:
 ```
-FodUpload.jar {-ac <key> <secret> | -uc <username> <password>} {-rid <relID> | -bsi <token>} -purl <purl> -aurl <aurl> -tc <tcode> -z <zip_file_path> -ep {1|SingleScanOnly|2|SubscriptionOnly|3|SingleScanFirstThenSubscription|4|SubscriptionFirstThenSingleScan} [-rp {0|RemediationScanIfAvailable|1|RemediationScanOnly|2|NonRemediationScanOnly}] [-pp {0|DoNotStartScan|1|CancelScanInProgress|2|Queue}] [-purchase] [-n] [-I <minutes>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-h] [-v]
+FodUpload.jar {-ac <key> <secret> | -uc <username> <password>} {-rid <relID> | -bsi <token>} -purl <purl> -aurl <aurl> -tc <tcode> -z <zip_file_path> -ep {1|SingleScanOnly|2|SubscriptionOnly|3|SingleScanFirstThenSubscription|4|SubscriptionFirstThenSingleScan} [-rp {0|RemediationScanIfAvailable|1|RemediationScanOnly|2|NonRemediationScanOnly}] [-pp {0|DoNotStartScan|1|CancelScanInProgress|2|Queue}] [-apf] [-purchase] [-n] [-I <minutes>] [-P <proxyUrl> <username> <password> <ntDomain> <ntWorkstation>] [-h] [-v]
 ```
 
 ### Previous
