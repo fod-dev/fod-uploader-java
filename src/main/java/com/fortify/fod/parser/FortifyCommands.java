@@ -184,6 +184,12 @@ public class FortifyCommands {
             required = false)
     public String tenantCode;
 
+    private static final String IS_POLICY_FAILURE = "-allowPolicyFail";
+    private static final String IS_POLICY_FAILURE_SHORT = "-apf";
+    @Parameter(names = {IS_POLICY_FAILURE, IS_POLICY_FAILURE_SHORT },
+            description = "whether the scan is a bundled assessment")
+    public boolean allowPolicyFail = false;
+
     public void version() {
         Package p = getClass().getPackage();
         System.out.println("Version " + p.getImplementationVersion());
