@@ -187,7 +187,7 @@ public class FortifyCommands {
     private static final String IS_POLICY_FAILURE = "-allowPolicyFail";
     private static final String IS_POLICY_FAILURE_SHORT = "-apf";
     @Parameter(names = {IS_POLICY_FAILURE, IS_POLICY_FAILURE_SHORT },
-            description = "whether the scan is a bundled assessment")
+            description = "Flag allows to exit with 0 code even if policy fails")
     public boolean allowPolicyFail = false;
 
     public void version() {
