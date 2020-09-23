@@ -180,7 +180,7 @@ public class FortifyCommands {
     private static final String TENANT_CODE = "-tenantCode";
     private static final String TENANT_CODE_SHORT = "-tc";
     @Parameter(names = {TENANT_CODE,TENANT_CODE_SHORT},
-            description = "Tenant identifier ",
+            description = "Tenant identifier",
             required = false)
     public String tenantCode;
 
