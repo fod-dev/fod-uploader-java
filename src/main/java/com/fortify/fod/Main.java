@@ -37,13 +37,13 @@ public class Main {
 
         if (fc.bsiToken == null && (fc.isEmptyParameter(fc.portalUrl) || !fc.isValidUrl(fc.portalUrl)))
         {
-            System.err.println("Please provide Valid Fortify Portal Url Parameter ( Example : -portalurl https://ams.fotify.com/ )");
+            System.err.println("Please provide Valid Fortify Portal Url Parameter ( Example : -portalurl https://ams.fortify.com/ )");
             System.exit(1);
         }
 
         if(fc.bsiToken == null && (fc.isEmptyParameter(fc.apiUrl) || !fc.isValidUrl(fc.apiUrl)))
         {
-            System.err.println("Please provide Valid Fortify Api Url Parameter ( Example : -apiurl https://api.ams.fotify.com/ )");
+            System.err.println("Please provide Valid Fortify Api Url Parameter ( Example : -apiurl https://api.ams.fortify.com/ )");
             System.exit(1);
         }
 
