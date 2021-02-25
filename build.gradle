@@ -33,10 +33,10 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.0.0'
 }
 
+configurations.implementation.setCanBeResolved(true)
+
 shadowJar {
-    classifier = null
-    configurations = [project.configurations.compile]
-    archiveName = "${baseName}.${extension}"
+    archiveVersion.set('')
 }
 
 jar {
