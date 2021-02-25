@@ -6,8 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.3'
     }
 }
 
@@ -44,8 +43,12 @@ shadowJar {
 jar {
     manifest {
         attributes("Main-Class": "com.fortify.fod.Main",
-                "Implementation-Version": version)
+                "Implementation-Version": archiveVersion)
     }
+}
+
+test {
+    useJUnitPlatform()
 }
 
 task logError {
