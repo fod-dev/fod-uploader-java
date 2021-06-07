@@ -77,6 +77,42 @@ public class FodEnums {
         }
     }
 
+    public enum AuditPreferenceTypes {
+        Manual(1),
+        Automated(2);
+
+        private final int _val;
+
+        AuditPreferenceTypes(int val) {
+            this._val = val;
+        }
+
+        public int getValue() {
+            return this._val;
+        }
+
+        public String toString() {
+            switch (this._val) {
+                case 1:
+                    return "Manual";
+                case 2:
+                default:
+                    return "Automated";
+            }
+        }
+
+        public static AuditPreferenceTypes fromInt(int val) {
+            switch (val) {
+
+                case 1:
+                    return Manual;
+                case 2:
+                default:
+                    return Automated;
+            }
+        }
+    }
+
     public enum EntitlementPreferenceType {
         SingleScanOnly(1),
         SubscriptionOnly(2),
@@ -158,6 +194,42 @@ public class FodEnums {
                 case 0:
                 default:
                     return DoNotStartScan;
+            }
+        }
+    }
+
+    public enum EntitlementFrequencyTypes {
+        SingleScan(1),
+        Subscription(2);
+
+        private final int _val;
+
+        EntitlementFrequencyTypes(int val) {
+            this._val = val;
+        }
+
+        public int getValue() {
+            return this._val;
+        }
+
+        public String toString() {
+            switch (this._val) {
+                case 1:
+                    return "SingleScan";
+                case 2:
+                default:
+                    return "Subscription";
+            }
+        }
+
+        public static EntitlementFrequencyTypes fromInt(int val) {
+            switch (val) {
+
+                case 1:
+                    return SingleScan;
+                case 2:
+                default:
+                    return Subscription;
             }
         }
     }
