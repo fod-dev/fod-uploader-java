@@ -202,7 +202,7 @@ public class ReleaseController extends ControllerBase {
             }
             if (fc.technologyStack != 0) {
                 if ((fc.technologyStack == 1 || fc.technologyStack == 23 || fc.technologyStack == 7 || fc.technologyStack == 10) && fc.languageLevel == 0) {
-                    System.err.println("Language Id is required for following TechnologyTypes 1(.NET) , 23 (.NET Core) , 7(Java/J2EE) , 10(Python)");
+                    System.err.println("Language Id is required for following TechnologyTypes 1(.NET) , 23 (.NET Core) , 7 (Java/J2EE) , 10 (Python)");
                     return false;
                 }
             }
