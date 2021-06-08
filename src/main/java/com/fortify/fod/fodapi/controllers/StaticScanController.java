@@ -2,9 +2,7 @@ package com.fortify.fod.fodapi.controllers;
 
 import com.fortify.fod.fodapi.FodApi;
 import com.fortify.fod.fodapi.FodEnums;
-import com.fortify.fod.fodapi.models.GenericErrorResponse;
-import com.fortify.fod.fodapi.models.PostStartScanResponse;
-import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
+import com.fortify.fod.fodapi.models.*;
 import com.fortify.fod.parser.FortifyCommands;
 import com.google.gson.Gson;
 import okhttp3.*;
@@ -14,7 +12,6 @@ import com.fortify.fod.parser.converters.BsiTokenConverter;
 import com.fortify.fod.parser.BsiToken;
 
 import java.io.FileInputStream;
-import java.net.URLEncoder;
 import java.util.Arrays;
 
 public class StaticScanController extends ControllerBase {
@@ -64,6 +61,9 @@ public class StaticScanController extends ControllerBase {
                     .addQueryParameter("scanTool", fc.scanTool)
                     .addQueryParameter("scanToolVersion", fc.getImplementedVersion())
                     .addQueryParameter("scanMethodType", fc.scanMethodType);
+            if(fc.entitlementId > 0){
+                builder = builder.addQueryParameter("entitlementId", Integer.toString(fc.entitlementId));
+            }
 
             if(fc.releaseId == 0){
                 builder = builder.addQueryParameter("bsiToken", fc.bsiToken.toString());

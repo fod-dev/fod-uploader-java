@@ -57,15 +57,13 @@ public class Main {
             jc.usage();
             System.exit(1);
         }
-
         if (fc.entitlementPreference == null) {
             System.err.println("The entitlement preference option needs to be have the following values");
             jc.usage();
             System.exit(1);
         }
-
         if (fc.isBundledAssessment || fc.auditPreferenceType != null || fc.includeThirdPartyLibs || fc.runOpenSourceScan || fc.scanPreferenceType != null) {
-            System.out.println("The following parameters are deprecated and will be ignored:   -auditPreferenceId -a, -runOpenSourceScan -os, -scanPreferenceId -p, -includeThirdPartyApps -itp, -isBundledAssessment -b");
+            System.out.println("The following parameters are deprecated and will be ignored: -runOpenSourceScan -os, -scanPreferenceId -p, -includeThirdPartyApps -itp, -isBundledAssessment -b");
         }
 
         if (fc.isRemediationScan && fc.remediationScanPreference != null) {
@@ -108,36 +106,46 @@ public class Main {
 
             String tenantCode = bsiToken != null ? bsiToken.getTenantCode() : fc.tenantCode;
             fodApi.authenticate(tenantCode, username, password, grantType);
-
-            System.out.println("Beginning upload");
-
-            StaticScanController s = fodApi.getStaticScanController();
-            uploadSucceeded = s.StartStaticScan(fc);
-            triggeredscanId = s.getTriggeredScanId();
-            //check success status exit appropriately
-            if (uploadSucceeded) {
-                // Why do we need to poll for this?
-                if (fc.pollingInterval > 0) {
-                    PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
-                    // Until status is complete or cancelled
-                    pollExitCode = listener.releaseStatus((fc.bsiToken != null) ? bsiToken.getProjectVersionId() : fc.releaseId, triggeredscanId);
+            ReleaseController r = fodApi.getReleaseController();
+            boolean proccedWithScan = r.UpdateScanSettings(r.getReleaseScanSettings(fc.releaseId),fc);
+            if(proccedWithScan) {
+                System.out.println("Beginning upload");
+                StaticScanController s = fodApi.getStaticScanController();
+                uploadSucceeded = s.StartStaticScan(fc);
+                triggeredscanId = s.getTriggeredScanId();
+                //check success status exit appropriately
+                if (uploadSucceeded) {
+                    // Why do we need to poll for this?
+                    if (fc.pollingInterval > 0) {
+                        PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
+                        // Until status is complete or cancelled
+                        pollExitCode = listener.releaseStatus((fc.bsiToken != null) ? bsiToken.getProjectVersionId() : fc.releaseId, triggeredscanId);
+                    }
+                    fodApi.retireToken();
+                    switch (pollExitCode) {
+                        case 0:
+                            System.exit(0);
+                            break;
+                        case 4:
+                            System.exit(4);
+                            break; // On Scan Paused
+                        case 3:
+                            System.exit(3);
+                            break; // On Scan Cancelled
+                        case 1:
+                            System.exit(fc.allowPolicyFail ? 0 : 1);
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + pollExitCode);
+                    }
+                } else {
+                    fodApi.retireToken();
+                    System.exit(1);
                 }
-                fodApi.retireToken();
-                switch (pollExitCode){
-                    case 0: System.exit(0); break;
-                    case 4: System.exit(4); break; // On Scan Paused
-                    case 3: System.exit(3); break; // On Scan Cancelled
-                    case 1:
-                        System.exit(fc.allowPolicyFail ? 0 : 1);
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected value: " + pollExitCode);
-                }
-            } else {
-                fodApi.retireToken();
-                System.exit(1);
             }
 
+            fodApi.retireToken();
+            System.exit(proccedWithScan ? 0 : 1) ;
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
