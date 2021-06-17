@@ -64,8 +64,8 @@ public class Main {
             System.exit(1);
         }
 
-        if (fc.isBundledAssessment || fc.auditPreferenceType != null || fc.includeThirdPartyLibs || fc.runOpenSourceScan || fc.scanPreferenceType != null) {
-            System.out.println("The following parameters are deprecated and will be ignored:   -auditPreferenceId -a, -runOpenSourceScan -os, -scanPreferenceId -p, -includeThirdPartyApps -itp, -isBundledAssessment -b");
+        if (fc.isBundledAssessment || fc.includeThirdPartyLibs || fc.scanPreferenceType != null) {
+            System.out.println("The following parameters are deprecated and will be ignored: -scanPreferenceId -p, -includeThirdPartyApps -itp, -isBundledAssessment -b");
         }
 
         if (fc.isRemediationScan && fc.remediationScanPreference != null) {
