@@ -57,7 +57,7 @@ public class Main {
             jc.usage();
             System.exit(1);
         }
-        
+
         if (fc.isBundledAssessment || fc.includeThirdPartyLibs || fc.scanPreferenceType != null) {
             System.out.println("The following parameters are deprecated and will be ignored: -scanPreferenceId -p, -includeThirdPartyApps -itp, -isBundledAssessment -b");
         }
