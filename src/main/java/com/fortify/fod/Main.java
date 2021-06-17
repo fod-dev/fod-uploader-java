@@ -57,15 +57,15 @@ public class Main {
             jc.usage();
             System.exit(1);
         }
+        
+        if (fc.isBundledAssessment || fc.includeThirdPartyLibs || fc.scanPreferenceType != null) {
+            System.out.println("The following parameters are deprecated and will be ignored: -scanPreferenceId -p, -includeThirdPartyApps -itp, -isBundledAssessment -b");
+        }
 
         if (fc.entitlementPreference == null) {
             System.err.println("The entitlement preference option needs to be have the following values");
             jc.usage();
             System.exit(1);
-        }
-
-        if (fc.isBundledAssessment || fc.includeThirdPartyLibs || fc.scanPreferenceType != null) {
-            System.out.println("The following parameters are deprecated and will be ignored: -scanPreferenceId -p, -includeThirdPartyApps -itp, -isBundledAssessment -b");
         }
 
         if (fc.isRemediationScan && fc.remediationScanPreference != null) {
