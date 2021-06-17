@@ -1,21 +1,16 @@
 package com.fortify.fod.fodapi.controllers;
 
 import com.fortify.fod.fodapi.FodApi;
-import com.fortify.fod.fodapi.models.GenericListResponse;
-import com.fortify.fod.fodapi.models.ReleaseAssessmentTypeDTO;
 import com.fortify.fod.fodapi.models.ScanSummaryDTO;
-import com.fortify.fod.parser.FortifyCommands;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.URLEncoder;
+
 
 public class ScanSummaryController extends ControllerBase {
     /**
@@ -31,7 +26,7 @@ public class ScanSummaryController extends ControllerBase {
      * GET specific release with given fields if applicable
      *
      * @param releaseId release to get
-     * @param fields    specific fields to return
+     * @param scanId    specific fields to return
      * @return returns ScanSummaryDTO object containing specified fields or null
      */
     public ScanSummaryDTO getScanSummary(final int releaseId,final int scanId) {

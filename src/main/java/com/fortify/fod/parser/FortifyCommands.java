@@ -124,8 +124,9 @@ public class FortifyCommands {
     private static final String AUDIT_PREFERENCE_ID = "-auditPreferenceId";
     private static final String AUDIT_PREFERENCE_ID_SHORT = "-a";
     @Parameter(names = { AUDIT_PREFERENCE_ID, AUDIT_PREFERENCE_ID_SHORT },
-            description = "false positive audit type (Manual or Automated)")
-    public String auditPreferenceType = null;
+            description = "false positive audit type (Manual or Automated)",
+            converter = AuditPreferenceConverter.class)
+    public FodEnums.AuditPreferenceTypes auditPreferenceType = null;
 
     private static final String RUN_OPEN_SOURCE_SCAN = "-runOpenSourceScan";
     private static final String RUN_OPEN_SOURCE_SCAN_SHORT = "-os";
@@ -189,6 +190,36 @@ public class FortifyCommands {
     @Parameter(names = {IS_POLICY_FAILURE, IS_POLICY_FAILURE_SHORT },
             description = "Flag allows to exit with 0 code even if policy fails")
     public boolean allowPolicyFail = false;
+
+    private static final String ASSESSMENT_TYPE_ID = "-assessmentTypeId";
+    private static final String ASSESSMENT_TYPE_ID_SHORT = "-at";
+    @Parameter(names = { ASSESSMENT_TYPE_ID, ASSESSMENT_TYPE_ID_SHORT },
+            description = "The Assessment Type")
+    public int assessmentType = 0;
+
+    private static final String TECHNOLOGY_STACK_ID = "-technologyStackId";
+    private static final String TECHNOLOGY_STACK__ID_SHORT = "-ts";
+    @Parameter(names = { TECHNOLOGY_STACK_ID, TECHNOLOGY_STACK__ID_SHORT },
+            description = "The Technology Stack Id")
+    public int technologyStack = 0;
+
+    private static final String LANGUAGE_LEVEL_ID = "-languageLevelId";
+    private static final String LANGUAGE_LEVEL_ID_SHORT = "-l";
+    @Parameter(names = { LANGUAGE_LEVEL_ID, LANGUAGE_LEVEL_ID_SHORT },
+            description = "Language version based on the technology stack.")
+    public int languageLevel = 0;
+
+    private static final String IS_BINARY_SCAN = "-isBinaryScan";
+    private static final String IS_BINARY_SCAN_SHORT = "-bs";
+    @Parameter(names = {IS_BINARY_SCAN, IS_BINARY_SCAN_SHORT },
+            description = "Allows Binary Files to be scanned")
+    public boolean isBinaryScan = false;
+
+    private static final String ENTITLEMENT_ID = "-entitlementId";
+    private static final String ENTITLEMENT_ID_SHORT = "-eid";
+    @Parameter(names = {ENTITLEMENT_ID, ENTITLEMENT_ID_SHORT },
+            description = "Entitlement Id. Note: Purchase Entitlements option will no longer be valid if entitlement Id is specified.")
+    public int entitlementId = -1;
 
     public void version() {
         Package p = getClass().getPackage();
