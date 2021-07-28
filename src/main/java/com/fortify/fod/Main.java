@@ -67,7 +67,7 @@ public class Main {
             jc.usage();
             System.exit(1);
         }
-      
+
         if (fc.isRemediationScan && fc.remediationScanPreference != null) {
             System.err.println("Both --r and -rp cannot be used at the same time , --r is deprecated instead we would prefer you to use -rp for selecting Remediation Scan Preference ");
             System.exit(1);
@@ -108,6 +108,7 @@ public class Main {
 
             String tenantCode = bsiToken != null ? bsiToken.getTenantCode() : fc.tenantCode;
             fodApi.authenticate(tenantCode, username, password, grantType);
+            System.out.println("Authenticated");
             ReleaseController r = fodApi.getReleaseController();
             boolean proccedWithScan = r.UpdateScanSettings(r.getReleaseScanSettings(fc.releaseId),fc);
             if(proccedWithScan) {

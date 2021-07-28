@@ -156,9 +156,7 @@ public class ReleaseController extends ControllerBase {
 
             Response response = api.getClient().newCall(request).execute();
             // The endpoint call was unsuccessful. Maybe unauthorized who knows.
-            if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code: " + response);
-            }
+
             if (response.code() == HttpStatus.SC_UNAUTHORIZED) {
                 System.out.println("Token expired re-authorizing");
                 // Re-authenticate
@@ -177,9 +175,9 @@ public class ReleaseController extends ControllerBase {
             else if(saveScanSettingsResponse.getErrors().size() > 0){
                 System.out.println("Error saving Scan Settings");
                 String errorMessage= null;
-                for(int e =0 ;e < saveScanSettingsResponse.getErrors().size();e++ ){
+                for(int e = 0 ;e < saveScanSettingsResponse.getErrors().size();e++ ){
                     String error = saveScanSettingsResponse.getErrors().get(e);
-                    errorMessage = errorMessage + String.format("%d - %s ",e+1,error);
+                    errorMessage = errorMessage == null ? String.format("%d - %s ",e+1,error) : errorMessage + String.format("%d - %s ",e+1,error);
                 }
                 System.out.println(errorMessage);
                 return false;
@@ -201,7 +199,7 @@ public class ReleaseController extends ControllerBase {
                 return false;
             }
             if (fc.technologyStack != 0) {
-                if ((fc.technologyStack == 1 || fc.technologyStack == 23 || fc.technologyStack == 7 || fc.technologyStack == 10) && fc.languageLevel == 0) {
+                if (needsLanguageLevel(fc.technologyStack) && fc.languageLevel == 0) {
                     System.err.println("Language Id is required for following TechnologyTypes 1(.NET) , 23 (.NET Core) , 7 (Java/J2EE) , 10 (Python)");
                     return false;
                 }
@@ -230,8 +228,21 @@ public class ReleaseController extends ControllerBase {
             pss.scanBinary = fc.isBinaryScan ? fc.isBinaryScan : scanSettingsDTO.getScanBinary();
             pss.includeThirdPartyLibraries = fc.includeThirdPartyLibs ? fc.includeThirdPartyLibs : scanSettingsDTO.getincludeThirdPartyLibraries();
             pss.useSourceControl = false;
+            if(fc.technologyStack > 0){
+               pss.languageLevelId = needsLanguageLevel(fc.technologyStack) ? fc.languageLevel : 0;
+            } else {
+               pss.languageLevelId = scanSettingsDTO.getLanguageLevelId();
+            }
             proccedWithScan = SaveScanSettings(pss, fc);
         }
         return proccedWithScan;
+    }
+
+    private boolean needsLanguageLevel(int techStackId){
+        if (techStackId == 1 || techStackId == 23 || techStackId == 7 || techStackId == 10) {
+            return true;
+        } else{
+            return false;
+        }
     }
 }
