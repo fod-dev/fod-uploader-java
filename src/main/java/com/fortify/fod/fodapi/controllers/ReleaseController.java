@@ -197,7 +197,7 @@ public class ReleaseController extends ControllerBase {
         // Means there are no existing settings
         if (scanSettingsDTO.getTechnologyStackId() == 0 && scanSettingsDTO.getEntitlementId() <= 0 && scanSettingsDTO.getReleaseId() > 0) {
             if (fc.assessmentType <= 0 || fc.entitlementPreference == null || fc.auditPreferenceType == null || fc.technologyStack <= 0) {
-                System.err.println("The following options are required: AssessmentType , Entitlement Preference , AuditPreferenceType and Technology Stack. Without saving these settings a scan cannot be started");
+                System.err.println("The following options are required: Assessment Type, Entitlement Preference, Audit Preference Type and Technology Stack. Without saving these settings a scan cannot be started");
                 return false;
             }
             if (fc.technologyStack != 0) {
