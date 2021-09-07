@@ -75,7 +75,7 @@ public class Main {
 
         // Both bsiToken and ReleaseId are not provided - Exit
         if (fc.bsiToken == null && fc.releaseId == 0) {
-            System.out.println("Release ID or BSI token should be required. The Release ID is HIGHLY recommended for CI usage as the BSI token is being sunset in 2020");
+            System.out.println("Release ID or BSI token should be required. The Release ID is HIGHLY recommended for CI usage as the BSI token is being sunset in 2021");
             System.exit(1);
         }
 
