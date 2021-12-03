@@ -210,7 +210,7 @@ public class ReleaseController extends ControllerBase {
             pss.auditPreferenceType = fc.auditPreferenceType;
             pss.entitlementFrequencyType = null;
             pss.performOpenSourceAnalysis = fc.runOpenSourceScan;
-            pss.scanBinary = fc.isBinaryScan;
+            pss.scanBinary = fc.isBinaryScan ? fc.isBinaryScan : null;
             pss.includeThirdPartyLibraries = fc.includeThirdPartyLibs;
             pss.useSourceControl = false;
             proccedWithScan = SaveScanSettings(pss, fc);
@@ -225,13 +225,13 @@ public class ReleaseController extends ControllerBase {
             pss.auditPreferenceType = fc.auditPreferenceType != null ? fc.auditPreferenceType : FodEnums.AuditPreferenceTypes.fromInt(scanSettingsDTO.getauditPreferenceType());
             pss.entitlementFrequencyType = null;
             pss.performOpenSourceAnalysis = fc.runOpenSourceScan ? fc.runOpenSourceScan : scanSettingsDTO.getPerformOpenSourceAnalysis();
-            pss.scanBinary = fc.isBinaryScan ? fc.isBinaryScan : scanSettingsDTO.getScanBinary();
+            pss.scanBinary = fc.isBinaryScan ? fc.isBinaryScan : scanSettingsDTO.getScanBinary() ? scanSettingsDTO.getScanBinary() : null;
             pss.includeThirdPartyLibraries = fc.includeThirdPartyLibs ? fc.includeThirdPartyLibs : scanSettingsDTO.getincludeThirdPartyLibraries();
             pss.useSourceControl = false;
             if(fc.technologyStack > 0){
-               pss.languageLevelId = needsLanguageLevel(fc.technologyStack) ? fc.languageLevel : 0;
+                pss.languageLevelId = needsLanguageLevel(fc.technologyStack) ? fc.languageLevel : 0;
             } else {
-               pss.languageLevelId = scanSettingsDTO.getLanguageLevelId();
+                pss.languageLevelId = scanSettingsDTO.getLanguageLevelId();
             }
             proccedWithScan = SaveScanSettings(pss, fc);
         }
