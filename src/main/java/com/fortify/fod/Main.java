@@ -27,12 +27,12 @@ public class Main {
 
         if (fc.version) {
             fc.version();
-            System.exit(1);
+            System.exit(0);
         }
 
         if (fc.help) {
             jc.usage();
-            System.exit(1);
+            System.exit(0);
         }
 
         if (fc.bsiToken == null && (fc.isEmptyParameter(fc.portalUrl) || !fc.isValidUrl(fc.portalUrl)))
