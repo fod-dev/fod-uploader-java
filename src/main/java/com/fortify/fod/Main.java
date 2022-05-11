@@ -110,7 +110,7 @@ public class Main {
             fodApi.authenticate(tenantCode, username, password, grantType);
             System.out.println("Authenticated");
             ReleaseController r = fodApi.getReleaseController();
-            boolean proccedWithScan = r.UpdateScanSettings(r.getReleaseScanSettings(fc.releaseId),fc);
+            boolean proccedWithScan = ((fc.bsiToken == null)) ? r.UpdateScanSettings(r.getReleaseScanSettings(fc.releaseId),fc) : true;
             if(proccedWithScan) {
                 System.out.println("Beginning upload");
                 StaticScanController s = fodApi.getStaticScanController();

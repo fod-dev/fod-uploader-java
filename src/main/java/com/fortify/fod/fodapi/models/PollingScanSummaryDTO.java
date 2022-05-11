@@ -2,6 +2,7 @@ package com.fortify.fod.fodapi.models;
 
 public class PollingScanSummaryDTO {
     private int ScanId;
+    private Integer OpenSourceScanId;
     private int TenantId;
     private int AnalysisStatusId;
     private String AnalysisStatusTypeValue;
@@ -17,6 +18,7 @@ public class PollingScanSummaryDTO {
     private ScanPauseDetailPolling[] PauseDetails;
 
     public int getScanId() {return ScanId;}
+    public Integer getOpenSourceScanId() {return OpenSourceScanId ;}
     public int getTenantId() {return TenantId;}
     public int getAnalysisStatusId() {return AnalysisStatusId;}
     public String getAnalysisStatusTypeValue() {return AnalysisStatusTypeValue;}

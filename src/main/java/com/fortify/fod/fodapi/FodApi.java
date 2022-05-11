@@ -76,7 +76,7 @@ public class FodApi {
                 formBodyBuilder.add("grant_type", GRANT_TYPE_PASSWORD)
                         .add("username", tenantCode + "\\" + username)
                         .add("password", password);
-            // Has api key/secret
+                // Has api key/secret
             } else {
                 formBodyBuilder.add("grant_type", GRANT_TYPE_CLIENT_CREDENTIALS)
                         .add("client_id", username)
@@ -123,8 +123,8 @@ public class FodApi {
     }
 
     /**
-     * Retire the current token. Unclear if this actually does anything on the backend.
-     */
+     * Retire the current token.
+     **/
     public void retireToken() {
         try {
             Request request = new Request.Builder()
@@ -167,7 +167,7 @@ public class FodApi {
 
         // Build out the proxy
         OkHttpClient.Builder builder = baseClient
-            .proxy(new java.net.Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort())));
+                .proxy(new java.net.Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(clProxy.getProxyUri().getHost(), clProxy.getProxyUri().getPort())));
 
         if (clProxy.hasUsername() && clProxy.hasPassword()) {
             // Include NTDomain and NTWorkstation in auth
@@ -177,7 +177,7 @@ public class FodApi {
             if (clProxy.hasNTDomain() && clProxy.hasNTWorkstation()) {
                 credentials = new NTCredentials(clProxy.getUsername(), clProxy.getPassword(),
                         clProxy.getNTWorkstation(), clProxy.getNTDomain()).toString();
-            // Just use username and password
+                // Just use username and password
             } else {
                 credentials = Credentials.basic(clProxy.getUsername(), clProxy.getPassword());
             }

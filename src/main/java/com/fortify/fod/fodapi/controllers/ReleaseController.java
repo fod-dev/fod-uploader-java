@@ -225,7 +225,14 @@ public class ReleaseController extends ControllerBase {
             pss.auditPreferenceType = fc.auditPreferenceType != null ? fc.auditPreferenceType : FodEnums.AuditPreferenceTypes.fromInt(scanSettingsDTO.getauditPreferenceType());
             pss.entitlementFrequencyType = null;
             pss.performOpenSourceAnalysis = fc.runOpenSourceScan ? fc.runOpenSourceScan : scanSettingsDTO.getPerformOpenSourceAnalysis();
-            pss.scanBinary = fc.isBinaryScan ? fc.isBinaryScan : scanSettingsDTO.getScanBinary() ? scanSettingsDTO.getScanBinary() : null;
+            if(fc.isBinaryScan){
+                pss.scanBinary = fc.isBinaryScan;
+            } else {
+                if(scanSettingsDTO != null)
+                    pss.scanBinary = scanSettingsDTO.getScanBinary();
+                else
+                    pss.scanBinary = null;
+            }
             pss.includeThirdPartyLibraries = fc.includeThirdPartyLibs ? fc.includeThirdPartyLibs : scanSettingsDTO.getincludeThirdPartyLibraries();
             pss.useSourceControl = false;
             if(fc.technologyStack > 0){

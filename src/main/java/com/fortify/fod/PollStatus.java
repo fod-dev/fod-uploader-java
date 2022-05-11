@@ -39,6 +39,12 @@ class PollStatus {
                 this.failCount++;
                 return 1;
             }
+
+
+            System.out.println("Static Scan " + pollingSummary.getScanId() + "Completed");
+            if(pollingSummary.getOpenSourceScanId() != null && pollingSummary.getOpenSourceScanId() > 0){
+                System.out.println("Open Source Scan " + pollingSummary.getOpenSourceScanId() + "Completed");
+            }
             System.out.println("Number of criticals: " +  pollingSummary.IssueCountCritical());
             System.out.println("Number of highs: " +  pollingSummary.IssueCountHigh());
             System.out.println("Number of mediums: " +  pollingSummary.IssueCountMedium());
