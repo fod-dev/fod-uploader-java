@@ -41,9 +41,12 @@ class PollStatus {
             }
 
 
-            System.out.println("Static Scan " + pollingSummary.getScanId() + "Completed");
+            System.out.println("Static Scan " + pollingSummary.getScanId() + " Completed");
             if(pollingSummary.getOpenSourceScanId() != null && pollingSummary.getOpenSourceScanId() > 0){
-                System.out.println("Open Source Scan " + pollingSummary.getOpenSourceScanId() + "Completed");
+                if(pollingSummary.getOpenSourceStatusId() == 2)
+                    System.out.println("Open Source Scan " + pollingSummary.getOpenSourceScanId() + " Completed");
+                else
+                    System.out.println("Open Source Scan " + pollingSummary.getOpenSourceScanId() + " Cancelled/Failed");
             }
             System.out.println("Number of criticals: " +  pollingSummary.IssueCountCritical());
             System.out.println("Number of highs: " +  pollingSummary.IssueCountHigh());
