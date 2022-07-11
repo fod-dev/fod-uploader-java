@@ -11,5 +11,5 @@ public class PutStaticScanSetupRequest{
     public FodEnums.AuditPreferenceTypes auditPreferenceType;
     public boolean includeThirdPartyLibraries;
     public boolean useSourceControl;
-    public boolean scanBinary;
+    public Boolean scanBinary;
 }
