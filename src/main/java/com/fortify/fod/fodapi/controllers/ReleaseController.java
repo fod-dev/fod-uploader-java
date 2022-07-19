@@ -228,10 +228,12 @@ public class ReleaseController extends ControllerBase {
             if(fc.isBinaryScan){
                 pss.scanBinary = fc.isBinaryScan;
             } else {
-                if(scanSettingsDTO != null)
-                    pss.scanBinary = scanSettingsDTO.getScanBinary();
-                else
+                if(scanSettingsDTO != null) {
+                   pss.scanBinary = scanSettingsDTO.getScanBinary() ? scanSettingsDTO.getScanBinary() : null;
+                }
+                else {
                     pss.scanBinary = null;
+                }
             }
             pss.includeThirdPartyLibraries = fc.includeThirdPartyLibs ? fc.includeThirdPartyLibs : scanSettingsDTO.getincludeThirdPartyLibraries();
             pss.useSourceControl = false;
