@@ -107,48 +107,56 @@ public class Main {
             }
 
             String tenantCode = bsiToken != null ? bsiToken.getTenantCode() : fc.tenantCode;
-            fodApi.authenticate(tenantCode, username, password, grantType);
-            System.out.println("Authenticated");
-            ReleaseController r = fodApi.getReleaseController();
-            boolean proccedWithScan = ((fc.bsiToken == null)) ? r.UpdateScanSettings(r.getReleaseScanSettings(fc.releaseId),fc) : true;
-            if(proccedWithScan) {
-                System.out.println("Beginning upload");
-                StaticScanController s = fodApi.getStaticScanController();
-                uploadSucceeded = s.StartStaticScan(fc);
-                triggeredscanId = s.getTriggeredScanId();
-                //check success status exit appropriately
-                if (uploadSucceeded) {
-                    // Why do we need to poll for this?
-                    if (fc.pollingInterval > 0) {
-                        PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
-                        // Until status is complete or cancelled
-                        pollExitCode = listener.releaseStatus((fc.bsiToken != null) ? bsiToken.getProjectVersionId() : fc.releaseId, triggeredscanId);
-                    }
-                    fodApi.retireToken();
-                    switch (pollExitCode) {
-                        case 0:
-                            System.exit(0);
-                            break;
-                        case 4:
-                            System.exit(4);
-                            break; // On Scan Paused
-                        case 3:
-                            System.exit(3);
-                            break; // On Scan Cancelled
-                        case 1:
-                            System.exit(fc.allowPolicyFail ? 0 : 1);
-                            break;
-                        default:
-                            throw new IllegalStateException("Unexpected value: " + pollExitCode);
+            int authProceed = fodApi.authenticate(tenantCode, username, password, grantType);
+            if(authProceed != 1) {
+                System.out.println("Authenticated");
+                ReleaseController r = fodApi.getReleaseController();
+                boolean proccedWithScan = ((fc.bsiToken == null)) ? r.UpdateScanSettings(r.getReleaseScanSettings(fc.releaseId), fc) : true;
+                if (proccedWithScan) {
+                    System.out.println("Beginning upload");
+                    StaticScanController s = fodApi.getStaticScanController();
+                    uploadSucceeded = s.StartStaticScan(fc);
+                    triggeredscanId = s.getTriggeredScanId();
+                    //check success status exit appropriately
+                    if (uploadSucceeded) {
+                        // Why do we need to poll for this?
+                        if (fc.pollingInterval > 0) {
+                            PollStatus listener = new PollStatus(fodApi, fc.pollingInterval);
+                            // Until status is complete or cancelled
+                            pollExitCode = listener.releaseStatus((fc.bsiToken != null) ? bsiToken.getProjectVersionId() : fc.releaseId, triggeredscanId);
+                        }
+                        fodApi.retireToken();
+                        switch (pollExitCode) {
+                            case 0:
+                                System.exit(0);
+                                break;
+                            case 4:
+                                System.exit(4);
+                                break; // On Scan Paused
+                            case 3:
+                                System.exit(3);
+                                break; // On Scan Cancelled
+                            case 1:
+                                System.exit(fc.allowPolicyFail ? 0 : 1);
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + pollExitCode);
+                        }
+                    } else {
+                        fodApi.retireToken();
+                        System.exit(1);
                     }
                 } else {
                     fodApi.retireToken();
                     System.exit(1);
                 }
-            }
 
-            fodApi.retireToken();
-            System.exit(proccedWithScan ? 0 : 1) ;
+
+                fodApi.retireToken();
+                System.exit(proccedWithScan ? 0 : 1);
+            }else{
+                System.exit(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);

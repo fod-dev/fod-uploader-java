@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import okhttp3.*;
 import okhttp3.Credentials;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 import org.apache.http.auth.*;
 
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class FodApi {
      * @param password password (or api secret)
      * @param grantType the type of authentication client_credentials | password
      */
-    public void authenticate(String tenantCode, String username, String password, String grantType) {
+    public int authenticate(String tenantCode, String username, String password, String grantType) {
         try {
             // Build the form body
             FormBody.Builder formBodyBuilder = new FormBody.Builder().add("scope", "api-tenant");
@@ -95,7 +96,15 @@ public class FodApi {
             Response response = client.newCall(request).execute();
 
             if (!response.isSuccessful())
+            {
+                if (response.code() == HttpStatus.SC_UNAUTHORIZED){
+                    final String ANSI_RED = "\033[0;31m";
+                    final String ANSI_RESET = "\033[0m";
+                    System.out.println(ANSI_RED+"Unauthorized: The username, password and/or tenant was incorrect."+ ANSI_RESET);
+                    return 1;
+                }
                 throw new IOException("Unexpected code " + response);
+            }
 
             // Read the results and close the response
             String content = IOUtils.toString(response.body().byteStream(), "utf-8");
@@ -110,16 +119,18 @@ public class FodApi {
             this.username = username;
             this.password = password;
             this.grantType = grantType;
+            return 0;
         } catch (Exception e) {
             e.printStackTrace();
+            return 1;
         }
     }
 
     /**
      * Used for re-authenticating in the case of a time out using the saved api credentials.
      */
-    public void authenticate() {
-        this.authenticate(tenantCode, username, password, grantType);
+    public int authenticate() {
+        return this.authenticate(tenantCode, username, password, grantType);
     }
 
     /**
