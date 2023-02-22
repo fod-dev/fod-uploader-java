@@ -98,9 +98,7 @@ public class FodApi {
             if (!response.isSuccessful())
             {
                 if (response.code() == HttpStatus.SC_UNAUTHORIZED){
-                    final String ANSI_RED = "\033[0;31m";
-                    final String ANSI_RESET = "\033[0m";
-                    System.out.println(ANSI_RED+"Unauthorized: The username, password and/or tenant was incorrect."+ ANSI_RESET);
+                    System.out.println("Unauthorized: The username, password and/or tenant was incorrect.");
                     return 1;
                 }
                 throw new IOException("Unexpected code " + response);
