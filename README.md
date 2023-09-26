@@ -13,7 +13,7 @@ Short Name	| Long Name                     | Required?         | Description
 ----------	| ----------                    |----------         | ----------
  -z			     | -zipLocation                  | Yes               | Location of payload zip file
  -ep		     | -entitlementPreferenceType    | Yes               | Whether to use a single scan or subscription assessment: 1/SingleScanOnly, 2/SubscriptionOnly, 3/SingleScanFirstThenSubscription, 4/SubscriptionFirstThenSingleScan 
- -ac		     | -apiCredentials               | Yes<sup>1</sup>   | API credentials credentials                                                 
+ -ac		     | -apiCredentials               | Yes<sup>1</sup>   | API credentials                                                 
  -uc		     | -userCredentials              | Yes<sup>1</sup>   | User credentials (wrap each in quotations to handle certain non-alphanumeric characters in the CLI) 
  -bsi	    	| -bsiToken                     | Yes<sup>2</sup>   | BSI token
  -rid	    	| -releaseId                    | Yes<sup>2</sup>   | Release ID
