@@ -1,0 +1,55 @@
+################################################################################################################################################
+# Fortify lets you build secure software fast with an appsec platform that automates testing throughout the DevSecOps pipeline. Fortify static,#
+# dynamic, interactive, and runtime security testing is available on premises or as a service. To learn more about Fortify, start a free trial #
+# or contact our sales team, visit microfocus.com/appsecurity.                                                                                 #
+#                                                                                                                                              #
+# Use this workflow template as a basis for integrating Fortify on Demand Static Application Security Testing(SAST) into your GitHub workflows.#
+# This template demonstrates the steps to prepare the code+dependencies, initiate a scan, download results once complete and import into       #
+# GitHub Security Code Scanning Alerts. Existing customers should review inputs and environment variables below to configure scanning against  #
+# an existing application in your Fortify on Demand tenant. Additional information is available in the comments throughout the workflow, the   #
+# documentation for the Fortify actions used, and the Fortify on Demand / ScanCentral Client product documentation. If you need additional     #
+# assistance with configuration, feel free to create a help ticket in the Fortify on Demand portal.                                            #
+################################################################################################################################################
+
+name: Fortify AST Scan
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+
+jobs:
+  Fortify-AST-Scan:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      # Check out source code
+      - name: Check Out Source Code
+        uses: actions/checkout@v3
+
+      # Java is required to run the various Fortify utilities. Ensuring proper version is installed on the runner.
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      # Perform Fortify on Demand SAST + SCA scan and import SAST results into GitHub code scanning alerts
+      - name: Run FoD SAST Scan
+        uses: fortify/github-action@v1
+        with:
+          sast-scan: true
+        env:
+          FOD_URL: https://ams.fortify.com
+          FOD_TENANT: ${{secrets.FOD_TENANT}}
+          FOD_USER: ${{secrets.FOD_USER}}
+          FOD_PASSWORD: ${{secrets.FOD_PAT}}
+          FOD_RELEASE: ${{ secrets.FOD_RELEASE_ID }}
+          EXTRA_PACKAGE_OPTS: -oss
+          DO_EXPORT: true
