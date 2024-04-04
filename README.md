@@ -13,7 +13,7 @@ Short Name	| Long Name                     | Required?         | Description
 ----------	| ----------                    |----------         | ----------
  -z			     | -zipLocation                  | Yes               | Location of payload zip file
  -ep		     | -entitlementPreferenceType    | Yes               | Whether to use a single scan or subscription assessment: 1/SingleScanOnly, 2/SubscriptionOnly, 3/SingleScanFirstThenSubscription, 4/SubscriptionFirstThenSingleScan 
- -ac		     | -apiCredentials               | Yes<sup>1</sup>   | API credentials credentials                                                 
+ -ac		     | -apiCredentials               | Yes<sup>1</sup>   | API credentials                                                 
  -uc		     | -userCredentials              | Yes<sup>1</sup>   | User credentials (wrap each in quotations to handle certain non-alphanumeric characters in the CLI) 
  -bsi	    	| -bsiToken                     | Yes<sup>2</sup>   | BSI token
  -rid	    	| -releaseId                    | Yes<sup>2</sup>   | Release ID
@@ -23,7 +23,7 @@ Short Name	| Long Name                     | Required?         | Description
  -at		     | -assessmentTypeId				         | Yes<sup>4</sup>   | Assessment type ID
  -eid	    	| -entitlement					             | Yes<sup>4</sup>   | Entitlement ID
  -ts		     | -technologyStackId 			        | Yes<sup>4</sup>   | Technology stack as an integer: 1 (.NET), 23 (.Net Core), 2 (ABAP), 21 (Apex/Visualforce), 3 (ASP), 5 (CFML), 6 (COBOL), 22 (Go), 7 (JAVA/J2EE), 16 (JS/TS/HTML), 18 (MBS/C/C++/Scala), 9 (PHP), 10 (PYTHON), 17 (Ruby), 12 (Swift/Objective C/C++), 11 (VB6), 14 (VBScript)
- -l			     | -languageLevelId				          | Yes<sup>4</sup>   | Language level as an integer:<br />.NET: 2 (2.0), 3 (3.0), 4 (3.5), 5 (4.0), 11 (4.5), 15 (4.6), 16 (4.7), 30, (4.8), 32 (5.0)<br /> .NET Core: 23 (1.0), 24 (1.1), 25 (2.0), 26 (2.1), 27 (2.2), 28 (3.0), 29 (3.1)<br />Java: 8 (1.5), 9 (1.6), 10 (1.7), 12 (1.8), 17 (1.9), 19 (10), 20 (11), 21 (12), 22 (13)<br /> Python: 13 (2), 14 (2 Django), 18 (3), React Native: 28, DART: 29, Kotlin: 26, .NET Core: 23, Infrastructure-As-Code/Dockerfile: 27
+ -l			     | -languageLevelId				          | Yes<sup>4</sup>   | Language level as an integer:<br />.NET: 2 (2.0), 3 (3.0), 4 (3.5), 5 (4.0), 11 (4.5), 15 (4.6), 16 (4.7), 30, (4.8), 32 (5.0)<br /> .NET Core: 23 (1.0), 24 (1.1), 25 (2.0), 26 (2.1), 27 (2.2), 28 (3.0), 29 (3.1)<br />Java: 12 (1.8), 17 (1.9), 19 (10), 20 (11), 21 (12), 22 (13)<br /> Python: 13 (2), 14 (2 Django), 18 (3), 37 <br /> (4.2 Django) React Native: 28, DART: 29, Kotlin: 26, .NET Core: 23, Infrastructure-As-Code/Dockerfile: 27
  -a			     | -auditPreferenceId 		        	| Yes<sup>4</sup>	  | Audit preference: Manual, Automated
  -bs		     | -isBinaryScan					            | No<sup>4</sup>	   | Scan compiled and source code (the feature must be enabled)
  -os 		    | -allowopenSourceComponentAnalysis| No<sup>4</sup>	| Include open source component analysis

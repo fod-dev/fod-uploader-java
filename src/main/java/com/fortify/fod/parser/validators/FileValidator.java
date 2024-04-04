@@ -7,7 +7,7 @@ import java.io.File;
 
 public class FileValidator implements IParameterValidator {
     public void validate(String name, String value) throws ParameterException {
-        final long maxFileSize = 5000 * 1024 * 1024L;
+        final long maxFileSize = 8000 * 1024 * 1024L;
 
         File f = new File(value);
 
