@@ -77,7 +77,7 @@ public class FortifyCommands {
             description = "whether to purchase an entitlement if available")
     public boolean purchaseEntitlement = false;
 
-    public String scanTool = "FoDUploader";
+    public String scanTool = "OT Core Application Security Uploader";
     public String scanMethodType = "CICD";
 
     private static final String API_CREDENTIALS = "-apiCredentials";
