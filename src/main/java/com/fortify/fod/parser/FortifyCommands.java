@@ -56,7 +56,7 @@ public class FortifyCommands {
             converter = InProgressScanActionTypeConverter.class)
     public FodEnums.InProgressScanActionType inProgressScanPreferenceType = null;
 
-    private static final String REMEDIATION_SCAN_PREFERENCE = "-remdiationScanPreferenceType";
+    private static final String REMEDIATION_SCAN_PREFERENCE = "-remediationScanPreferenceType";
     private static final String REMEDIATION_SCAN_PREFERENCE_SHORT = "-rp";
     @Parameter(names = {REMEDIATION_SCAN_PREFERENCE, REMEDIATION_SCAN_PREFERENCE_SHORT},
             description = "preferred remediation scan type (Remediation Scan if Available or Remediation Scan Only or Non Remediation Scan Only)",
