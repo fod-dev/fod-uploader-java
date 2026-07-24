@@ -1,5 +1,5 @@
-# OT-Core-Application-Security-Uploader
-Java utility for uploading code to OT Core Application Security
+# fod-uploader-java
+Java utility for uploading code to Fortify on Demand
 
 ## Usage
 
@@ -7,7 +7,7 @@ Java utility for uploading code to OT Core Application Security
 
 **Note**: Command-line arguments have been reworked since 3.1.0. If you are upgrading from an older version to the latest version, make sure to update your arguments.
 
-The following table describes the OT Core Application Security Uploader arguments. Arguments are named and can be in any order: 
+The following table describes the FoDUploader arguments. Arguments are named and can be in any order: 
 
 Short Name	| Long Name                     | Required?         | Description                                                      
 ----------	| ----------                    |----------         | ----------
@@ -30,7 +30,7 @@ Short Name	| Long Name                     | Required?         | Description
  -rp       | -remediationScanPreferenceType| No                | Remediation scan preference: 0/RemediationScanIfAvailable, 1/RemediationScanOnly, 2/NonRemediationScanOnly (default)
  -pp		     | -inProgressScanActionType     | No                | If in-progress scan exists, the action to take for a new scan: 0/DoNotStartScan (default), 1/CancelScanInProgress, 2/Queue
  -purchase	| -purchaseEntitlement          | No				            | Whether to purchase an entitlement (if available)
- -apf		| -allowPolicyFail                  | No                | Whether to return exit(0) instead of exit(1) if the scan fails the security policy specified in OT Core Application Security 
+ -apf		| -allowPolicyFail                  | No                | Whether to return exit(0) instead of exit(1) if the scan fails the security policy specified in FOD 
  -n			     | -notes                        | No                | The notes about the scan
  -I		     	| -pollingInterval              | No                | Interval between checking scan status in minutes                 
  -P			     | -proxy                        | No                | Proxy connection details (order dependent): <proxy_url> <username> <password> <nt_domain> <nt_workstation>             
@@ -44,12 +44,12 @@ Short Name	| Long Name                     | Required?         | Description
 
 Syntax:
 ```
-OTCoreApplicationSecurityUploader.jar -z <zip_file_path> -ep {1|SingleScanOnly|2|SubscriptionOnly|3|SingleScanFirstThenSubscription|4|SubscriptionFirstThenSingleScan} {-ac <key> <secret> | -uc <username> <password>} {-rid <release_id> | -bsi <token> | -at <assessment_id> -eid <entitlement_id> -ts <tstack_id> -l <lang_id> <-a {Manual|Automated} bs -os} -purl <domain_url> -aurl <api_url> -tc <tenant_id>  [-rp {0|RemediationScanIfAvailable|1|RemediationScanOnly|2|NonRemediationScanOnly}] [-pp {0|DoNotStartScan|1|CancelScanInProgress|2|Queue}] [-purchase] [-apf] [-n] [-I <minutes>] [-P <proxyUrl> <username> <password> <nt_domain> <nt_workstation>] [-h] [-v]
+FodUpload.jar -z <zip_file_path> -ep {1|SingleScanOnly|2|SubscriptionOnly|3|SingleScanFirstThenSubscription|4|SubscriptionFirstThenSingleScan} {-ac <key> <secret> | -uc <username> <password>} {-rid <release_id> | -bsi <token> | -at <assessment_id> -eid <entitlement_id> -ts <tstack_id> -l <lang_id> <-a {Manual|Automated} bs -os} -purl <domain_url> -aurl <api_url> -tc <tenant_id>  [-rp {0|RemediationScanIfAvailable|1|RemediationScanOnly|2|NonRemediationScanOnly}] [-pp {0|DoNotStartScan|1|CancelScanInProgress|2|Queue}] [-purchase] [-apf] [-n] [-I <minutes>] [-P <proxyUrl> <username> <password> <nt_domain> <nt_workstation>] [-h] [-v]
 ```
 
 ### Previous
 
-The following table describes the OTCoreApplicationSecurityUploader arguments for 3.1.0:
+The following table describes the FodUploader arguments for 3.1.0:
 
 Short Name | Long Name              | Required? | Description                                                      
 ---------- | ---------------------- |---------  | --------------------------------------------------------
@@ -75,12 +75,12 @@ Short Name | Long Name              | Required? | Description
 
 Syntax:
 ```
-OTCoreApplicationSecurityUploader.jar -bsi <token> -z <file> {-ac <key> <secret> | -uc <username> <password>} -ep {1|SingleScan|2|Subscription} [-p {1|Standard|2|Express}] [-a {1|Manual|2|Automated}] [-itp] [-os] [-b] [-r] [-purchase] [-n] [-I <minutes>] [-P <proxy_url> <username> <password> <nt_domain> <nt_workstation>] [-h] [-v] 
+FodUpload.jar -bsi <token> -z <file> {-ac <key> <secret> | -uc <username> <password>} -ep {1|SingleScan|2|Subscription} [-p {1|Standard|2|Express}] [-a {1|Manual|2|Automated}] [-itp] [-os] [-b] [-r] [-purchase] [-n] [-I <minutes>] [-P <proxy_url> <username> <password> <nt_domain> <nt_workstation>] [-h] [-v] 
 ```
  
 ## Developer Setup
 
-OT-Core-Application-Security-Uploader is configured to build a fat jar with the Gradle Shadow plugin as the default gradle task.
+FoDUploader is configured to build a fat jar with the Gradle Shadow plugin as the default gradle task.
 
 To compile, simply use the gradlew or gradlew.bat depending on your operating system.
 
