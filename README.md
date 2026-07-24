@@ -1,3 +1,8 @@
+[!WARNING]
+## Deprecated Repository
+Hello everyone,
+Thank you for your support and contributions to Fortify Uploader.After careful evaluation, we have decided to transition future development and support to **Fortify CLI (fcli)**: https://github.com/fortify/fcli . As a result, Fortify Uploader is entering maintenance mode and will no longer receive new feature development.
+
 # fod-uploader-java
 Java utility for uploading code to Fortify on Demand
 
